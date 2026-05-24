@@ -1,0 +1,466 @@
+Create a PREMIUM DARK SAAS-STYLE DIGITAL MARKETING AGENCY WEBSITE for:
+
+BRAND NAME:
+Adsrahu
+
+==================================================
+MAIN POSITIONING
+
+Primary Positioning:
+Real Estate Lead Generation & Growth Systems
+
+Secondary Positioning:
+Helping Businesses Generate Qualified Leads Using Ads, Funnels, CRM Automation & WhatsApp Systems
+
+==================================================
+OVERALL WEBSITE STYLE
+
+Design Style:
+
+- Premium dark SaaS aesthetic
+- Cinematic UI
+- Luxury startup feel
+- Modern international agency style
+- Smooth animations
+- Mobile-first responsive design
+- Premium spacing
+- Glassmorphism effects
+- Glowing blue gradients
+- Elegant typography
+- Futuristic but professional
+
+Inspired by:
+
+- Stripe
+- Linear
+- Framer
+- Vercel
+- Modern AI startups
+
+IMPORTANT:
+The website should feel:
+
+- extremely premium
+- conversion focused
+- modern
+- international
+- high-end
+- visually rich
+
+Avoid:
+
+- generic templates
+- cluttered layouts
+- outdated agency designs
+- excessive text
+- cartoon style visuals
+
+==================================================
+COLOR PALETTE
+
+Primary:
+
+- Black
+- Deep navy blue
+- Dark charcoal
+
+Accent:
+
+- Electric blue glow
+- Gold premium highlights
+- Soft glass reflections
+
+==================================================
+MAIN PAGES
+
+1. HOME
+2. SERVICES
+3. RESULTS
+4. ABOUT
+5. CONTACT
+6. BOOK A CALL
+7. BLOG
+8. INDUSTRIES
+9. PRIVACY POLICY
+10. TERMS & CONDITIONS
+11. REFUND POLICY
+
+==================================================
+IMPORTANT WEBSITE FEATURES
+
+- Mobile optimized
+- Fast loading
+- Reduced heavy animations for mobile
+- Smooth hover effects
+- Premium CTA buttons
+- Sticky navbar
+- Glassmorphism cards
+- Animated gradient backgrounds
+- CRM dashboard visuals
+- Lead generation visuals
+- WhatsApp automation visuals
+- Analytics dashboard UI
+- Funnel system graphics
+- Scroll animations
+- Premium section transitions
+
+==================================================
+REMOVE / AVOID THESE
+
+- Remove Case Studies section completely
+- Remove Testimonials section completely
+- Remove “Trusted By Category Defining Teams”
+- Remove “New AI Growth Operating System for 2026”
+- Do not create fake companies
+- Do not create fake clients
+
+==================================================
+HOMEPAGE STRUCTURE
+
+---
+
+HERO SECTION
+
+Main Heading:
+Performance Marketing & Lead Generation Systems For Real Estate Businesses
+
+Sub Heading:
+We help builders, realtors and modern businesses generate qualified leads using Facebook Ads, Google Ads, CRM automation and WhatsApp funnels.
+
+Primary CTA:
+Book Free Strategy Call
+
+Secondary CTA:
+Chat On WhatsApp
+
+IMPORTANT:
+
+- Add WhatsApp logo inside WhatsApp button
+- Add phone/call icon inside strategy call button
+- Premium glowing CTA styling
+
+Background:
+
+- animated gradient mesh
+- floating dashboard visuals
+- CRM analytics mockup
+- lead generation visuals
+
+---
+
+TRUST SECTION
+
+Heading:
+Trusted Growth Partner For Modern Businesses
+
+Small Text:
+Performance-driven lead generation systems powered by ads, automation, CRM and smart funnels.
+
+---
+
+PROBLEM VS SOLUTION SECTION
+
+Left Side — Problems:
+• Low quality leads
+• Wasted ad budget
+• Poor follow-up systems
+• No automation
+• Low conversion rates
+• Inconsistent inquiries
+
+Right Side — Solutions:
+• High-converting lead funnels
+• CRM & WhatsApp automation
+• Smart targeting systems
+• Faster follow-ups
+• Better lead tracking
+• Scalable growth systems
+
+Create:
+
+- premium comparison layout
+- glowing icons
+- animated cards
+
+---
+
+REAL ESTATE SECTION
+
+Heading:
+Real Estate Lead Generation Experts
+
+Description:
+Adsrahu helps real estate businesses generate qualified buyer and site visit leads using high-converting ads, landing pages, CRM systems and automation workflows.
+
+Services:
+• Facebook & Instagram Ads
+• Google Lead Campaigns
+• Landing Pages
+• CRM Setup
+• WhatsApp Funnels
+• Automation Systems
+• Lead Tracking
+• Scaling & Optimization
+
+IMPORTANT:
+Real Estate section should be:
+
+- biggest section
+- premium highlighted
+- visually strongest
+
+---
+
+FUNNEL FLOW SECTION
+
+Heading:
+How Our Lead Generation System Works
+
+Flow:
+Ads → Landing Page → WhatsApp → CRM → Follow-Up → Sales
+
+Description:
+We build complete lead generation systems that help businesses capture, track and convert leads more efficiently.
+
+Add:
+
+- animated workflow visuals
+- glowing arrows
+- dashboard UI mockups
+
+---
+
+OTHER SERVICES SECTION
+
+Heading:
+Other Growth Services
+
+Services:
+• Social Media Management
+• Business Development
+• App Development
+• CRM Automation
+• WhatsApp Automation
+• Funnel Systems
+• Branding & Growth Strategy
+
+---
+
+FOUNDER SECTION
+
+Heading:
+Meet The Founder
+
+Founder Name:
+Raushan Pratap Yadav
+
+Founder Description:
+Founder of Adsrahu focused on building modern lead generation and automation systems for real estate and growth-focused businesses.
+
+IMPORTANT:
+
+- Add founder image
+- Premium founder card
+- Cinematic lighting
+- Luxury typography
+
+---
+
+FAQ SECTION
+
+Q1:
+How fast can I start getting leads?
+
+A:
+Most campaigns start generating leads within a few days after launch.
+
+Q2:
+Do you provide CRM and WhatsApp automation?
+
+A:
+Yes, we provide complete automation and lead management systems.
+
+Q3:
+Do you work only with real estate businesses?
+
+A:
+Real estate is our main expertise, but we also work with other lead generation businesses.
+
+Q4:
+Do you work with international clients?
+
+A:
+Yes, Adsrahu works with clients from India, USA, Dubai and UK.
+
+Q5:
+What services do you provide?
+
+A:
+We provide ads management, lead generation, CRM automation, funnels and growth systems.
+
+---
+
+FINAL CTA SECTION
+
+Heading:
+Ready To Generate More Leads & Scale Faster?
+
+Sub Heading:
+Book a free strategy call and discover how Adsrahu can help grow your business with smart lead generation systems.
+
+Buttons:
+
+- Book Strategy Call
+- Chat On WhatsApp
+
+==================================================
+SERVICES PAGE
+
+Main Heading:
+Real Estate Lead Generation & Growth Systems
+
+Sub Heading:
+We help real estate and modern businesses generate qualified leads using ads, funnels, CRM automation and social media growth systems.
+
+Core Services:
+
+- Lead Generation Systems
+- Social Media Management
+- CRM & Automation
+- Funnels & Landing Pages
+
+Industries:
+
+- Real Estate
+- Coaches & Consultants
+- Healthcare
+- Local Businesses
+- Service Businesses
+
+==================================================
+RESULTS PAGE
+
+Heading:
+Real Results Powered By Smart Lead Generation Systems
+
+Show:
+
+- CRM dashboards
+- analytics
+- lead tracking
+- WhatsApp automation visuals
+- funnel workflows
+
+==================================================
+ABOUT PAGE
+
+Heading:
+About Adsrahu
+
+Vision:
+To build modern lead generation and automation systems that help businesses grow faster with smarter marketing and scalable systems.
+
+==================================================
+CONTACT PAGE
+
+Heading:
+Let’s Connect
+
+Contact Information:
+
+WhatsApp:
++91 74850 22937
+
+Phone:
++91 74850 22937
+
+Email:
+contact@adsrahu.com
+
+Add:
+
+- premium contact cards
+- WhatsApp quick action
+- strategy call section
+- modern contact form
+
+==================================================
+BOOK A CALL PAGE
+
+Heading:
+Book A Free Strategy Call
+
+Sub Heading:
+Let’s discuss your business goals, lead generation needs and growth opportunities.
+
+Include:
+
+- modern booking UI
+- premium calendar section
+- WhatsApp backup CTA
+
+==================================================
+BLOG PAGE
+
+Heading:
+Lead Generation & Business Growth Insights
+
+Categories:
+
+- Real Estate Lead Generation
+- Facebook Ads
+- Google Ads
+- WhatsApp Funnels
+- CRM Automation
+- Marketing Strategies
+
+==================================================
+INDUSTRIES PAGE
+
+Main Focus:
+Real Estate Lead Generation
+
+Secondary Industries:
+
+- Coaches & Consultants
+- Healthcare
+- Service Businesses
+- Local Businesses
+- Startups
+
+==================================================
+SOCIAL MEDIA LINKS
+
+LinkedIn:
+https://www.linkedin.com/in/raushanpratapyadav
+
+Instagram:
+https://www.instagram.com/adsrahu
+
+Twitter/X:
+https://x.com/Adsrahu
+
+YouTube:
+https://youtube.com/@adsrahu
+
+WhatsApp Channel:
+https://whatsapp.com/channel/0029Vb13PcHLI8YaV5TrMm1g
+
+==================================================
+IMPORTANT FINAL INSTRUCTIONS
+
+- Make website feel extremely premium
+- High-end SaaS quality
+- Mobile responsive
+- Fast loading
+- Reduce laggy animations
+- Smooth scrolling
+- International agency feel
+- Modern startup UI
+- Conversion-focused layout
+- Real Estate should always remain the primary highlighted niche
+- Keep clean and visually balanced spacing
+- Use premium dashboard visuals throughout website
+- Add floating CRM UI mockups and analytics cards
+- Use modern glow effects carefully without overdoing them
+- Keep the final design visually very rich and premium

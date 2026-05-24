@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "q-k3uHh1uRzN90nihl1Zm"
+uri = "file://artifacts/adsrahu/public/founder.png"
+type = "image"
+title = "Founder headshot"
