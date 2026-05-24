@@ -5,12 +5,15 @@ import { Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-[#050505] border-t border-white/10 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="bg-[#050505] relative pt-16 pb-8 border-t border-white/5 overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-1">
-            <Link href="/" className="text-2xl font-bold text-white tracking-tight mb-4 inline-block">
-              Ads<span className="text-primary">rahu</span>
+            <Link href="/" className="text-2xl font-bold tracking-tight text-white mb-4 inline-block">
+              Ads<span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">rahu</span>
             </Link>
             <p className="text-gray-400 text-sm mb-6 leading-relaxed">
               Performance marketing & lead generation systems for real estate and modern growth businesses.
@@ -68,7 +71,7 @@ export function Footer() {
               </li>
             </ul>
             <div className="mt-6">
-              <Link href="/book-a-call" className="inline-flex h-10 items-center justify-center rounded-md border border-white/20 bg-transparent px-6 text-sm font-medium text-white shadow-sm transition-colors hover:bg-white/10 w-full">
+              <Link href="/book-a-call" className="inline-flex h-10 items-center justify-center rounded-md border border-white/20 bg-transparent px-6 text-sm font-medium text-white shadow-sm transition-colors hover:bg-white/10 w-full hover:border-blue-500/50">
                 Book Strategy Call
               </Link>
             </div>

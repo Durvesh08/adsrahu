@@ -1,0 +1,241 @@
+Upgrade this website into a WORLD-CLASS premium SaaS agency website with cinematic visuals and modern startup aesthetics.
+
+IMPORTANT:
+Do NOT rebuild from scratch.
+Improve the existing design system and layout.
+
+==================================================
+MAIN GOAL
+
+Make this website feel:
+
+- ultra premium
+- visually rich
+- luxury SaaS
+- futuristic
+- high-end startup quality
+- similar quality to Stripe, Linear, Framer, Vercel, Webflow
+
+The current website looks too simple and empty.
+Add more depth, visuals, polish and premium feeling.
+
+==================================================
+GLOBAL DESIGN IMPROVEMENTS
+
+1. Improve spacing and section hierarchy
+2. Add cinematic glow effects
+3. Add layered gradient backgrounds
+4. Add floating glassmorphism cards
+5. Add subtle animated background particles
+6. Add premium blur effects
+7. Add dashboard-style visuals
+8. Add modern premium shadows
+9. Add soft border glows
+10. Improve typography hierarchy
+11. Add smooth section transitions
+12. Add premium hover animations
+13. Add subtle motion effects
+14. Improve mobile responsiveness
+15. Add more breathing space between sections
+
+==================================================
+HERO SECTION IMPROVEMENTS
+
+The hero section should become MUCH stronger visually.
+
+Add:
+
+- animated gradient mesh background
+- glowing blue ambient lighting
+- floating analytics dashboard
+- CRM UI mockups
+- animated lead stats
+- floating WhatsApp notification cards
+- glassmorphism panels
+- subtle moving elements
+- premium animated CTA buttons
+
+Make the right-side dashboard look:
+
+- alive
+- animated
+- futuristic
+- visually rich
+
+Increase:
+
+- headline size
+- visual contrast
+- premium feeling
+
+Add:
+
+- glowing text highlights
+- animated number counters
+- floating badges
+- premium motion
+
+==================================================
+NAVBAR IMPROVEMENTS
+
+Make navbar:
+
+- glassmorphism
+- sticky
+- blurred transparent
+- premium floating look
+
+Add:
+
+- smooth hover underline animation
+- glowing CTA button
+- mobile menu animation
+
+==================================================
+SECTION DESIGN IMPROVEMENTS
+
+Every section currently feels too flat.
+
+Improve by adding:
+
+- section background variations
+- glowing borders
+- card depth
+- layered UI
+- premium icons
+- animated gradients
+- visual separators
+- floating elements
+
+==================================================
+PROBLEM VS SOLUTION SECTION
+
+Make this section more dramatic.
+
+Add:
+
+- split layout
+- red glow for problems
+- blue glow for solutions
+- animated check icons
+- hover animations
+- premium card depth
+- floating glass panels
+
+==================================================
+REAL ESTATE SECTION
+
+This should become the MOST premium section on the website.
+
+Add:
+
+- premium CRM visuals
+- dashboard analytics
+- animated lead generation workflow
+- property marketing visuals
+- glowing UI cards
+- animated performance stats
+- floating WhatsApp automation cards
+
+Make service cards:
+
+- larger
+- more modern
+- interactive
+- hover animated
+- premium gradients
+
+==================================================
+ANIMATIONS
+
+Use smooth modern animations:
+
+- fade up
+- blur reveal
+- floating movement
+- mouse parallax
+- smooth hover transitions
+- glowing pulse effects
+- animated gradients
+
+IMPORTANT:
+Animations should feel:
+
+- smooth
+- expensive
+- modern
+
+NOT:
+
+- excessive
+- laggy
+- childish
+
+==================================================
+TYPOGRAPHY
+
+Use:
+
+- larger headings
+- better spacing
+- stronger hierarchy
+- premium modern fonts
+
+Heading style should feel:
+
+- bold
+- futuristic
+- luxury SaaS
+
+==================================================
+BUTTONS
+
+Upgrade all buttons.
+
+Buttons should have:
+
+- glowing gradients
+- hover animations
+- premium shadows
+- smooth transitions
+- WhatsApp icon
+- premium CTA style
+
+==================================================
+ADD MORE VISUAL ELEMENTS
+
+Add:
+
+- floating metric cards
+- CRM mockups
+- WhatsApp notification cards
+- analytics charts
+- lead tracking visuals
+- animated workflow graphics
+- glowing UI components
+
+==================================================
+MOBILE RESPONSIVENESS
+
+Optimize for mobile:
+
+- cleaner spacing
+- proper font scaling
+- smooth mobile animations
+- better section stacking
+- responsive dashboard visuals
+
+==================================================
+FINAL RESULT
+
+The final website should feel:
+
+- premium startup website
+- international SaaS quality
+- visually rich
+- cinematic
+- luxury digital agency
+- modern and conversion focused
+
+The user should instantly feel:
+“This is a serious premium agency.”
