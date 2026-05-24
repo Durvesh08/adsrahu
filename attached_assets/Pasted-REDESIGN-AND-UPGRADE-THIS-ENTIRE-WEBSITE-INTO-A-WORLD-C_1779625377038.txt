@@ -1,0 +1,301 @@
+REDESIGN AND UPGRADE THIS ENTIRE WEBSITE INTO A WORLD-CLASS CINEMATIC SaaS PLATFORM WITH A PREMIUM ADMIN PANEL.
+
+==================================================
+MAIN OBJECTIVE
+
+Transform the current website into:
+
+- futuristic
+- luxury
+- cinematic
+- high-converting
+- visually unforgettable
+- premium AI startup quality
+
+The current website still feels too simple and empty.
+
+I want:
+
+1. Full premium redesign
+2. More advanced digital mockups
+3. Huge animations
+4. Better layout hierarchy
+5. Premium admin dashboard
+6. Better branding
+7. More immersive visuals
+
+==================================================
+LOGO CHANGES
+
+IMPORTANT:
+The current logo container looks square and basic.
+
+Change the logo style to:
+
+- circular logo container
+- glowing circular background
+- premium glassmorphism effect
+- subtle neon border
+- animated glow pulse
+- more modern SaaS branding style
+
+The logo should feel:
+
+- futuristic
+- premium
+- minimal
+- memorable
+
+==================================================
+WEBSITE VISUAL REDESIGN
+
+Completely redesign the website UI.
+
+DO NOT keep current simple layout style.
+
+Create a highly cinematic experience inspired by:
+
+- Stripe
+- Linear
+- Framer
+- Apple
+- Vercel
+- modern AI startups
+
+==================================================
+ADD MASSIVE DIGITAL MOCKUPS
+
+Add large futuristic animated mockups throughout the website:
+
+1. CRM dashboard
+2. Lead generation analytics
+3. WhatsApp automation UI
+4. Facebook Ads dashboard
+5. Google Ads analytics
+6. Funnel visualizations
+7. Lead pipeline boards
+8. ROI tracking screens
+9. Automation workflows
+10. Mobile WhatsApp chat UI
+11. Real estate campaign dashboard
+12. AI-powered analytics cards
+13. Live performance charts
+14. Automated follow-up systems
+15. Marketing KPI dashboards
+
+The mockups should:
+
+- float
+- glow
+- animate
+- have depth
+- feel 3D
+- look premium
+- move slightly on mouse movement
+
+==================================================
+HERO SECTION
+
+Create a completely premium hero section with:
+
+- animated dashboard
+- live lead counters
+- floating charts
+- glowing KPI cards
+- animated particles
+- layered gradients
+- glassmorphism
+- cinematic lighting
+- floating WhatsApp notifications
+- huge visual depth
+- moving background effects
+
+Hero section must instantly impress users.
+
+==================================================
+ADVANCED ANIMATIONS
+
+Use:
+
+- Framer Motion
+- smooth reveal animations
+- parallax scrolling
+- floating motion
+- hover micro-interactions
+- animated gradients
+- glow effects
+- dynamic lighting
+- scroll-triggered effects
+- animated counters
+- mouse tracking
+- loading transitions
+
+Animations should feel:
+
+- smooth
+- premium
+- cinematic
+- Apple-level quality
+
+==================================================
+MAKE WEBSITE FEEL MORE ALIVE
+
+Add:
+
+- moving backgrounds
+- animated grid effects
+- subtle particle systems
+- glowing borders
+- animated section transitions
+- floating UI cards
+- dynamic shadows
+- layered glassmorphism
+
+==================================================
+PREMIUM SECTIONS
+
+Create or redesign sections like:
+
+1. Hero
+2. Services
+3. Results
+4. Industries
+5. About
+6. Process
+7. Testimonials
+8. Blog
+9. Strategy Call
+10. Contact
+11. FAQ
+12. CTA sections
+
+Each section must:
+
+- feel unique
+- have different composition
+- use storytelling
+- look visually rich
+
+==================================================
+ADD MORE TRUST ELEMENTS
+
+Add:
+
+- animated client metrics
+- trust badges
+- company logos
+- premium testimonials
+- before/after results
+- performance cards
+- lead generation stats
+
+==================================================
+ADMIN PANEL
+
+Create a complete secure admin dashboard.
+
+==================================================
+ADMIN FEATURES
+
+1. Authentication
+
+- secure login
+- protected admin routes
+- session management
+
+2. Lead Management
+
+- view all leads
+- filter/search leads
+- mark contacted
+- export data
+
+3. Blog CMS
+
+- create blog posts
+- edit blogs
+- upload images
+- publish/unpublish
+
+4. Strategy Call Management
+
+- manage bookings
+- view appointments
+- update status
+
+5. Subscriber Management
+
+- email subscribers
+- export subscribers
+- manage contacts
+
+6. Website Content Management
+
+- edit website sections
+- update hero text
+- change metrics
+- update services
+
+7. Analytics Dashboard
+
+- leads count
+- conversion metrics
+- traffic overview
+- campaign stats
+- ROI visualizations
+
+==================================================
+ADMIN UI DESIGN
+
+The admin panel should also look premium.
+
+Use:
+
+- dark SaaS theme
+- glassmorphism
+- glowing cards
+- animated charts
+- premium sidebar
+- modern dashboard design
+
+==================================================
+TECH STACK
+
+Use:
+
+- React
+- Vite
+- TailwindCSS
+- Framer Motion
+- Supabase
+- Recharts or Chart.js
+
+==================================================
+SUPABASE
+
+Use Supabase for:
+
+- authentication
+- database
+- lead storage
+- blog storage
+- subscribers
+- admin accounts
+
+==================================================
+IMPORTANT
+
+The website should NOT feel like a template anymore.
+
+I want:
+
+- cinematic experience
+- futuristic visuals
+- premium SaaS quality
+- visually addictive animations
+- huge digital mockups
+- immersive design
+- strong branding
+- luxury startup feeling
+
+Completely elevate the entire project visually and structurally.
