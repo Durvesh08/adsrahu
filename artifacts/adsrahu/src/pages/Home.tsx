@@ -148,7 +148,7 @@ export default function Home() {
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {[
                       {label:'Total Leads', value:'1,248', delta:'+24%', up:true},
-                      {label:'Cost Per Lead', value:'₹142', delta:'-12%', up:true},
+                      {label:'Cost Per Lead', value:'₹23', delta:'-18%', up:true},
                       {label:'Conversions', value:'94%', delta:'+8%', up:true},
                     ].map((kpi,i) => (
                       <div key={i} className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
@@ -442,7 +442,7 @@ export default function Home() {
             <div className="rounded-2xl bg-[#080c14]/95 backdrop-blur-sm p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/5 text-center">
               {[
                 {val:'1,248', label:'Leads Generated This Month'},
-                {val:'₹142', label:'Average Cost Per Lead'},
+                {val:'₹23', label:'Average Cost Per Lead'},
                 {val:'94%', label:'Site Visit Conversion Rate'},
               ].map((s,i) => (
                 <div key={i} className="py-5 sm:py-0 px-6">

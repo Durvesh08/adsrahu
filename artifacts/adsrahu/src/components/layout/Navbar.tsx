@@ -13,8 +13,11 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex-shrink-0">
-              <Link href="/" className="text-2xl font-bold tracking-tight text-white">
-                Ads<span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">rahu</span>
+              <Link href="/" className="flex items-center gap-2.5" data-testid="link-logo">
+                <img src="/logo.png" alt="Adsrahu" className="h-9 w-9 object-contain" />
+                <span className="text-xl font-bold tracking-tight text-white">
+                  Ads<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">rahu</span>
+                </span>
               </Link>
             </div>
             

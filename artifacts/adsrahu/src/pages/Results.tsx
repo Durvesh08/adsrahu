@@ -9,7 +9,7 @@ const data = [
   { name: 'Week 3', leads: 85, cost: 180 },
   { name: 'Week 4', leads: 120, cost: 160 },
   { name: 'Week 5', leads: 150, cost: 150 },
-  { name: 'Week 6', leads: 210, cost: 142 },
+  { name: 'Week 6', leads: 210, cost: 23 },
 ];
 
 export default function Results() {
@@ -40,7 +40,7 @@ export default function Results() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[
                 { label: "Total Leads (30d)", value: "1,248", change: "+24.5%", up: true },
-                { label: "Avg. Cost Per Lead", value: "₹142", change: "-12.3%", up: true },
+                { label: "Avg. Cost Per Lead", value: "₹23", change: "-18%", up: true },
                 { label: "Site Visits Booked", value: "84", change: "+18.2%", up: true },
                 { label: "Conversion Rate", value: "6.7%", change: "+2.1%", up: true }
               ].map((stat, i) => (
