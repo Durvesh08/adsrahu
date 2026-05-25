@@ -1,21 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
-import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
+import { leadsStore } from "@/lib/admin-store";
 
 export default function Contact() {
+  const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", service: "", message: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  function validate() {
+    const e: Record<string, string> = {};
+    if (!form.name.trim()) e.name = "Name is required";
+    if (!form.email.trim()) e.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Enter a valid email";
+    if (!form.phone.trim()) e.phone = "Phone is required";
+    if (!form.message.trim()) e.message = "Message is required";
+    return e;
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    setLoading(true);
+    setTimeout(() => {
+      leadsStore.add({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        city: "",
+        source: "Website Contact",
+        status: "new",
+        notes: `Company: ${form.company || "—"}\nService: ${form.service || "—"}\nMessage: ${form.message}`,
+      });
+      setLoading(false);
+      setSubmitted(true);
+    }, 800);
+  }
+
+  function Field({ id, label, required, error, children }: { id: string; label: string; required?: boolean; error?: string; children: React.ReactNode }) {
+    return (
+      <div className="space-y-1.5">
+        <label htmlFor={id} className="text-sm font-medium text-gray-300">
+          {label}{required && <span className="text-blue-400 ml-0.5">*</span>}
+        </label>
+        {children}
+        {error && <p className="text-xs text-red-400">{error}</p>}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-20 pb-24 bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          
-          {/* Left Column: Info */}
+
+          {/* Left Column */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">Let's Build Your Growth Engine.</h1>
             <p className="text-lg text-gray-400 mb-12 max-w-md">
               Whether you need more qualified leads, better CRM automation, or a complete marketing overhaul, we're ready to partner with you.
             </p>
-
             <div className="space-y-8 mb-12">
               <div className="flex items-start">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4">
@@ -29,7 +76,6 @@ export default function Contact() {
                   </a>
                 </div>
               </div>
-
               <div className="flex items-start">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4">
                   <Mail className="w-6 h-6 text-primary" />
@@ -42,7 +88,6 @@ export default function Contact() {
                   </a>
                 </div>
               </div>
-
               <div className="flex items-start">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4">
                   <MapPin className="w-6 h-6 text-primary" />
@@ -53,7 +98,6 @@ export default function Contact() {
                 </div>
               </div>
             </div>
-
             <div className="rounded-xl border border-white/10 bg-[#0d0d14] p-6">
               <h3 className="text-white font-medium mb-2">Ready to move fast?</h3>
               <p className="text-gray-400 text-sm mb-4">Skip the emails and book a direct strategy session with our team.</p>
@@ -65,81 +109,110 @@ export default function Contact() {
 
           {/* Right Column: Form */}
           <div className="rounded-2xl border border-white/10 bg-[#0d0d14] p-8 md:p-10 shadow-2xl">
-            <h2 className="text-2xl font-bold text-white mb-6">Send a Message</h2>
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-gray-300">Full Name</label>
-                  <input 
-                    type="text" 
-                    id="name" 
-                    className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-white placeholder:text-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
-                    placeholder="John Doe"
-                  />
+            {submitted ? (
+              <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                <div className="w-16 h-16 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center mb-5">
+                  <CheckCircle2 className="w-8 h-8 text-green-400" />
                 </div>
-                <div className="space-y-2">
-                  <label htmlFor="company" className="text-sm font-medium text-gray-300">Company Name</label>
-                  <input 
-                    type="text" 
-                    id="company" 
-                    className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-white placeholder:text-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
-                    placeholder="Acme Real Estate"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-gray-300">Email Address</label>
-                  <input 
-                    type="email" 
-                    id="email" 
-                    className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-white placeholder:text-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
-                    placeholder="john@example.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium text-gray-300">Phone Number</label>
-                  <input 
-                    type="tel" 
-                    id="phone" 
-                    className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-white placeholder:text-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
-                    placeholder="+1 (555) 000-0000"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="service" className="text-sm font-medium text-gray-300">What do you need help with?</label>
-                <select 
-                  id="service" 
-                  className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors appearance-none"
+                <h2 className="text-2xl font-bold text-white mb-3">Message Sent!</h2>
+                <p className="text-gray-400 mb-2">Thanks, <span className="text-white font-medium">{form.name}</span>.</p>
+                <p className="text-gray-500 text-sm mb-8">We've received your message and will get back to you within 24 hours via email or WhatsApp.</p>
+                <a
+                  href="https://wa.me/917485022937"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-green-600/15 border border-green-500/30 text-green-400 text-sm font-medium hover:bg-green-600/25 transition-colors"
                 >
-                  <option value="">Select a service...</option>
-                  <option value="lead-gen">Real Estate Lead Generation</option>
-                  <option value="crm">CRM & WhatsApp Automation</option>
-                  <option value="social">Social Media Management</option>
-                  <option value="other">Other Growth Services</option>
-                </select>
+                  <SiWhatsapp className="w-4 h-4" /> Chat on WhatsApp for faster response
+                </a>
               </div>
-
-              <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-medium text-gray-300">Message</label>
-                <textarea 
-                  id="message" 
-                  rows={4}
-                  className="w-full rounded-md border border-white/10 bg-black px-4 py-3 text-white placeholder:text-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors resize-none"
-                  placeholder="Tell us about your current challenges and goals..."
-                ></textarea>
-              </div>
-
-              <button 
-                type="button" 
-                className="w-full rounded-md bg-primary px-8 py-4 text-base font-bold text-white shadow transition-all hover:bg-primary/90 glow-blue flex justify-center items-center"
-              >
-                Send Message
-              </button>
-            </form>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold text-white mb-6">Send a Message</h2>
+                <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <Field id="name" label="Full Name" required error={errors.name}>
+                      <input
+                        type="text"
+                        id="name"
+                        value={form.name}
+                        onChange={e => { setForm({...form, name: e.target.value}); setErrors({...errors, name: ""}); }}
+                        className={`w-full rounded-xl border bg-black/60 px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 transition-colors text-sm ${errors.name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/30" : "border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20"}`}
+                        placeholder="Raushan Kumar"
+                      />
+                    </Field>
+                    <Field id="company" label="Company Name" error={errors.company}>
+                      <input
+                        type="text"
+                        id="company"
+                        value={form.company}
+                        onChange={e => setForm({...form, company: e.target.value})}
+                        className="w-full rounded-xl border border-white/10 bg-black/60 px-4 py-3 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-colors text-sm"
+                        placeholder="Acme Real Estate"
+                      />
+                    </Field>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <Field id="email" label="Email Address" required error={errors.email}>
+                      <input
+                        type="email"
+                        id="email"
+                        value={form.email}
+                        onChange={e => { setForm({...form, email: e.target.value}); setErrors({...errors, email: ""}); }}
+                        className={`w-full rounded-xl border bg-black/60 px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 transition-colors text-sm ${errors.email ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/30" : "border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20"}`}
+                        placeholder="you@example.com"
+                      />
+                    </Field>
+                    <Field id="phone" label="Phone / WhatsApp" required error={errors.phone}>
+                      <input
+                        type="tel"
+                        id="phone"
+                        value={form.phone}
+                        onChange={e => { setForm({...form, phone: e.target.value}); setErrors({...errors, phone: ""}); }}
+                        className={`w-full rounded-xl border bg-black/60 px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 transition-colors text-sm ${errors.phone ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/30" : "border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20"}`}
+                        placeholder="+91 98765 43210"
+                      />
+                    </Field>
+                  </div>
+                  <Field id="service" label="What do you need help with?" error={errors.service}>
+                    <select
+                      id="service"
+                      value={form.service}
+                      onChange={e => setForm({...form, service: e.target.value})}
+                      className="w-full rounded-xl border border-white/10 bg-[#0a0a12] px-4 py-3 text-white focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-colors appearance-none text-sm"
+                    >
+                      <option value="">Select a service...</option>
+                      <option value="real-estate-lead-gen">Real Estate Lead Generation</option>
+                      <option value="lead-gen">Lead Generation</option>
+                      <option value="crm">CRM & WhatsApp Automation</option>
+                      <option value="social">Social Media Management</option>
+                      <option value="other">Other Growth Services</option>
+                    </select>
+                  </Field>
+                  <Field id="message" label="Message" required error={errors.message}>
+                    <textarea
+                      id="message"
+                      rows={4}
+                      value={form.message}
+                      onChange={e => { setForm({...form, message: e.target.value}); setErrors({...errors, message: ""}); }}
+                      className={`w-full rounded-xl border bg-black/60 px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 transition-colors resize-none text-sm ${errors.message ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/30" : "border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20"}`}
+                      placeholder="Tell us about your current challenges and goals..."
+                    />
+                  </Field>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-xl btn-premium px-8 py-4 text-base font-bold text-white shadow transition-all flex justify-center items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Sending...</>
+                    ) : (
+                      "Send Message"
+                    )}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       </div>

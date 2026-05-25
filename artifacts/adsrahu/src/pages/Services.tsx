@@ -19,6 +19,8 @@ export default function Services() {
             <h2 className="text-2xl font-bold text-white mb-8 border-b border-white/10 pb-4">Core Lead Generation Systems</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
+                { title: "Real Estate Lead Generation", desc: "End-to-end lead generation systems built specifically for builders, developers, and realtors — from ad creative to site visit." },
+                { title: "Lead Generation", desc: "Full-funnel performance marketing for any industry — generating qualified, sales-ready leads at scale using paid and organic channels." },
                 { title: "Facebook & Instagram Ads", desc: "Targeted campaigns to capture high-intent property buyers and investors." },
                 { title: "Google Lead Campaigns", desc: "Capture search intent from people actively looking for real estate or your services." },
                 { title: "Landing Page Development", desc: "High-converting, mobile-optimized pages designed specifically for lead capture." },
