@@ -41,7 +41,7 @@ export default function AdminLogin() {
             </div>
           </div>
           <h1 className="text-2xl font-bold text-white mb-1">Admin Panel</h1>
-          <p className="text-gray-500 text-sm">Sign in to manage Adsrahu</p>
+          <p className="text-gray-500 text-sm">Sign in to manage <span className="text-white font-medium">Adsrahu</span></p>
         </div>
 
         <div className="rounded-2xl border border-white/5 bg-[#060912]/80 backdrop-blur-xl p-8" style={{boxShadow:'0 0 60px rgba(59,130,246,0.06)'}}>

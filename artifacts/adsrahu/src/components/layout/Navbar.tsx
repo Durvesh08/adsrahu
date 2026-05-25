@@ -20,9 +20,7 @@ export function Navbar() {
                     <img src="/logo.png" alt="Adsrahu logo" className="w-7 h-7 object-contain" />
                   </div>
                 </div>
-                <span className="text-xl font-bold tracking-tight text-white">
-                  Ads<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">rahu</span>
-                </span>
+                <span className="text-xl font-bold tracking-tight text-white">Adsrahu</span>
               </Link>
             </div>
             

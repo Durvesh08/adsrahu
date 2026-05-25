@@ -34,7 +34,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div>
-          <div className="text-sm font-bold text-white">Ads<span className="text-amber-400">rahu</span></div>
+          <div className="text-sm font-bold text-white">Adsrahu</div>
           <div className="text-[10px] text-gray-500 uppercase tracking-wider">Admin Panel</div>
         </div>
       </div>
