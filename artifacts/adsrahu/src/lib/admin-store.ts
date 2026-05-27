@@ -146,3 +146,45 @@ export const subscribersStore = {
     subscribersStore.save(subscribersStore.get().filter(s => s.id !== id));
   },
 };
+
+export interface SiteSettings {
+  heroHeading: string;
+  heroSubheading: string;
+  whatsappNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  totalLeads: string;
+  avgCPL: string;
+  conversionRate: string;
+  metaTitle: string;
+  metaDescription: string;
+}
+
+const SETTINGS_KEY = "adsrahu_site_settings";
+
+export const settingsDefaults: SiteSettings = {
+  heroHeading: "Performance Marketing & Lead Generation Systems For Real Estate",
+  heroSubheading: "We help builders, realtors and modern businesses generate qualified leads using Facebook Ads, Google Ads, CRM automation and WhatsApp funnels.",
+  whatsappNumber: "+91 74850 22937",
+  contactEmail: "contact@adsrahu.com",
+  contactPhone: "+91 74850 22937",
+  totalLeads: "1,248",
+  avgCPL: "₹23",
+  conversionRate: "94%",
+  metaTitle: "Adsrahu — Real Estate Lead Generation & Performance Marketing",
+  metaDescription: "Premium lead generation and growth systems for real estate businesses. Facebook Ads, Google Ads, CRM automation, WhatsApp funnels.",
+};
+
+export const settingsStore = {
+  get: (): SiteSettings => {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      return raw ? { ...settingsDefaults, ...JSON.parse(raw) } : settingsDefaults;
+    } catch {
+      return settingsDefaults;
+    }
+  },
+  save: (s: SiteSettings) => localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)),
+  /** Strips spaces and non-digits, returns digits only (e.g. "917485022937") for wa.me links */
+  toWaNumber: (phone: string) => phone.replace(/\D/g, ""),
+};

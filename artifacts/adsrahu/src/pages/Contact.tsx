@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { Mail, Phone, MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
-import { leadsStore } from "@/lib/admin-store";
+import { leadsStore, settingsStore } from "@/lib/admin-store";
 
 export default function Contact() {
+  const settings = settingsStore.get();
+  const waNumber = settingsStore.toWaNumber(settings.whatsappNumber);
+
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", service: "", message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -71,8 +74,8 @@ export default function Contact() {
                 <div>
                   <h3 className="text-white font-medium text-lg mb-1">WhatsApp / Phone</h3>
                   <p className="text-gray-400 mb-2">Fastest way to reach us.</p>
-                  <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className="text-primary hover:text-white transition-colors font-medium">
-                    +91 74850 22937
+                  <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noreferrer" className="text-primary hover:text-white transition-colors font-medium">
+                    {settings.whatsappNumber}
                   </a>
                 </div>
               </div>
@@ -83,8 +86,8 @@ export default function Contact() {
                 <div>
                   <h3 className="text-white font-medium text-lg mb-1">Email</h3>
                   <p className="text-gray-400 mb-2">For general inquiries and proposals.</p>
-                  <a href="mailto:contact@adsrahu.com" className="text-primary hover:text-white transition-colors font-medium">
-                    contact@adsrahu.com
+                  <a href={`mailto:${settings.contactEmail}`} className="text-primary hover:text-white transition-colors font-medium">
+                    {settings.contactEmail}
                   </a>
                 </div>
               </div>
@@ -118,7 +121,7 @@ export default function Contact() {
                 <p className="text-gray-400 mb-2">Thanks, <span className="text-white font-medium">{form.name}</span>.</p>
                 <p className="text-gray-500 text-sm mb-8">We've received your message and will get back to you within 24 hours via email or WhatsApp.</p>
                 <a
-                  href="https://wa.me/917485022937"
+                  href={`https://wa.me/${waNumber}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-green-600/15 border border-green-500/30 text-green-400 text-sm font-medium hover:bg-green-600/25 transition-colors"

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import { settingsStore } from "@/lib/admin-store";
 import {
   Phone, ArrowRight, CheckCircle2, TrendingUp, Users, Target,
   Activity, MessageSquare, X, Zap, BarChart2, Layers, Bell,
@@ -37,6 +38,9 @@ const fadeUp = {
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 export default function Home() {
+  const settings = settingsStore.get();
+  const waNumber = settingsStore.toWaNumber(settings.whatsappNumber);
+
   return (
     <div className="flex flex-col min-h-screen pt-20 overflow-x-hidden">
 
@@ -79,7 +83,7 @@ export default function Home() {
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              We help builders, realtors and modern businesses generate qualified leads using Facebook Ads, Google Ads, CRM automation and WhatsApp funnels.
+              {settings.heroSubheading}
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
@@ -92,7 +96,7 @@ export default function Home() {
                 Book Free Strategy Call
               </Link>
               <a
-                href="https://wa.me/917485022937"
+                href={`https://wa.me/${waNumber}`}
                 target="_blank"
                 rel="noreferrer"
                 data-testid="button-hero-whatsapp"

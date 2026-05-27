@@ -1,4 +1,5 @@
 import React from "react";
+import { settingsStore } from "@/lib/admin-store";
 import { Link } from "wouter";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { ArrowUpRight, TrendingUp, Users, Target, Activity } from "lucide-react";
@@ -13,6 +14,8 @@ const data = [
 ];
 
 export default function Results() {
+  const settings = settingsStore.get();
+
   return (
     <div className="min-h-screen pt-20 pb-24 bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
@@ -39,8 +42,8 @@ export default function Results() {
           <div className="p-6 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[
-                { label: "Total Leads (30d)", value: "1,248", change: "+24.5%", up: true },
-                { label: "Avg. Cost Per Lead", value: "₹23", change: "-18%", up: true },
+                { label: "Total Leads (30d)", value: settings.totalLeads, change: "+24.5%", up: true },
+                { label: "Avg. Cost Per Lead", value: settings.avgCPL, change: "-18%", up: true },
                 { label: "Site Visits Booked", value: "84", change: "+18.2%", up: true },
                 { label: "Conversion Rate", value: "6.7%", change: "+2.1%", up: true }
               ].map((stat, i) => (

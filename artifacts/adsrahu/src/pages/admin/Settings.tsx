@@ -1,38 +1,6 @@
 import React, { useState } from "react";
 import { Save, Globe, Phone, MessageSquare, Check } from "lucide-react";
-
-const SETTINGS_KEY = "adsrahu_site_settings";
-
-interface SiteSettings {
-  heroHeading: string;
-  heroSubheading: string;
-  whatsappNumber: string;
-  contactEmail: string;
-  contactPhone: string;
-  totalLeads: string;
-  avgCPL: string;
-  conversionRate: string;
-  metaTitle: string;
-  metaDescription: string;
-}
-
-const defaults: SiteSettings = {
-  heroHeading: "Performance Marketing & Lead Generation Systems For Real Estate",
-  heroSubheading: "We help builders, realtors and modern businesses generate qualified leads using Facebook Ads, Google Ads, CRM automation and WhatsApp funnels.",
-  whatsappNumber: "+91 74850 22937",
-  contactEmail: "contact@adsrahu.com",
-  contactPhone: "+91 74850 22937",
-  totalLeads: "1,248",
-  avgCPL: "₹23",
-  conversionRate: "94%",
-  metaTitle: "Adsrahu — Real Estate Lead Generation & Performance Marketing",
-  metaDescription: "Premium lead generation and growth systems for real estate businesses. Facebook Ads, Google Ads, CRM automation, WhatsApp funnels.",
-};
-
-function getSettings(): SiteSettings {
-  try { const raw = localStorage.getItem(SETTINGS_KEY); return raw ? JSON.parse(raw) : defaults; }
-  catch { return defaults; }
-}
+import { settingsStore, type SiteSettings } from "@/lib/admin-store";
 
 interface FieldProps {
   label: string;
@@ -65,7 +33,7 @@ function Field({ label, value, onChange, multiline = false }: FieldProps) {
 }
 
 export default function AdminSettings() {
-  const [settings, setSettings] = useState<SiteSettings>(getSettings());
+  const [settings, setSettings] = useState<SiteSettings>(settingsStore.get());
   const [saved, setSaved] = useState(false);
 
   function set(field: keyof SiteSettings) {
@@ -74,7 +42,7 @@ export default function AdminSettings() {
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    settingsStore.save(settings);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
