@@ -45,7 +45,7 @@ export default function Results() {
                 { label: "Total Leads (30d)", value: settings.totalLeads, change: "+24.5%", up: true },
                 { label: "Avg. Cost Per Lead", value: settings.avgCPL, change: "-18%", up: true },
                 { label: "Site Visits Booked", value: "84", change: "+18.2%", up: true },
-                { label: "Conversion Rate", value: "6.7%", change: "+2.1%", up: true }
+                { label: "Conversion Rate", value: settings.conversionRate, change: "+2.1%", up: true }
               ].map((stat, i) => (
                 <div key={i} className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
                   <div className="text-sm text-gray-400 mb-2">{stat.label}</div>

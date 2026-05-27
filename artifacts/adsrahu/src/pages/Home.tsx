@@ -41,6 +41,10 @@ export default function Home() {
   const settings = useSettings();
   const waNumber = settings.whatsappNumber.replace(/\D/g, "");
 
+  useEffect(() => {
+    if (settings.metaTitle) document.title = settings.metaTitle;
+  }, [settings.metaTitle]);
+
   return (
     <div className="flex flex-col min-h-screen pt-20 overflow-x-hidden">
 
@@ -68,18 +72,8 @@ export default function Home() {
               Premium Real Estate Growth Partner
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl lg:text-[72px] font-bold tracking-tight text-white mb-6 leading-[1.05]">
-              Performance{" "}
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-400 bg-clip-text text-transparent animate-gradient" style={{backgroundSize:'200% 200%'}}>
-                  Marketing
-                </span>
-              </span>
-              {" "}&amp;{" "}
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-300 bg-clip-text text-transparent animate-gradient" style={{backgroundSize:'200% 200%', animationDelay:'1s'}}>
-                Lead Generation
-              </span>
-              {" "}Systems For Real Estate
+            <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl lg:text-[72px] font-bold tracking-tight mb-6 leading-[1.05] bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent animate-gradient" style={{backgroundSize:'200% 200%'}}>
+              {settings.heroHeading}
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
