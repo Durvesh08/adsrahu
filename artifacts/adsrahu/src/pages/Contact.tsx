@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { Mail, Phone, MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
-import { leadsStore, settingsStore } from "@/lib/admin-store";
+import { leadsStore } from "@/lib/admin-store";
+import { useSettings } from "@/lib/useSettings";
 
 export default function Contact() {
-  const settings = settingsStore.get();
-  const waNumber = settingsStore.toWaNumber(settings.whatsappNumber);
+  const settings = useSettings();
+  const waNumber = settings.whatsappNumber.replace(/\D/g, "");
 
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", service: "", message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});

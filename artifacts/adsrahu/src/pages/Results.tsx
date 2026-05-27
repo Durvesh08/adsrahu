@@ -1,5 +1,5 @@
 import React from "react";
-import { settingsStore } from "@/lib/admin-store";
+import { useSettings } from "@/lib/useSettings";
 import { Link } from "wouter";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { ArrowUpRight, TrendingUp, Users, Target, Activity } from "lucide-react";
@@ -14,7 +14,7 @@ const data = [
 ];
 
 export default function Results() {
-  const settings = settingsStore.get();
+  const settings = useSettings();
 
   return (
     <div className="min-h-screen pt-20 pb-24 bg-black">

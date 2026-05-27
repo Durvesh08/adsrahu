@@ -175,6 +175,8 @@ export const settingsDefaults: SiteSettings = {
   metaDescription: "Premium lead generation and growth systems for real estate businesses. Facebook Ads, Google Ads, CRM automation, WhatsApp funnels.",
 };
 
+const SETTINGS_EVENT = "adsrahu-settings-changed";
+
 export const settingsStore = {
   get: (): SiteSettings => {
     try {
@@ -184,7 +186,12 @@ export const settingsStore = {
       return settingsDefaults;
     }
   },
-  save: (s: SiteSettings) => localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)),
-  /** Strips spaces and non-digits, returns digits only (e.g. "917485022937") for wa.me links */
+  save: (s: SiteSettings) => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+    window.dispatchEvent(new CustomEvent(SETTINGS_EVENT));
+  },
+  /** Strips non-digits for wa.me links (e.g. "+91 74850 22937" → "917485022937") */
   toWaNumber: (phone: string) => phone.replace(/\D/g, ""),
+  /** Event name for listening to settings changes */
+  EVENT: SETTINGS_EVENT,
 };

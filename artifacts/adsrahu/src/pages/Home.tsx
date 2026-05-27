@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { settingsStore } from "@/lib/admin-store";
+import { useSettings } from "@/lib/useSettings";
 import {
   Phone, ArrowRight, CheckCircle2, TrendingUp, Users, Target,
   Activity, MessageSquare, X, Zap, BarChart2, Layers, Bell,
@@ -38,8 +38,8 @@ const fadeUp = {
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 export default function Home() {
-  const settings = settingsStore.get();
-  const waNumber = settingsStore.toWaNumber(settings.whatsappNumber);
+  const settings = useSettings();
+  const waNumber = settings.whatsappNumber.replace(/\D/g, "");
 
   return (
     <div className="flex flex-col min-h-screen pt-20 overflow-x-hidden">
