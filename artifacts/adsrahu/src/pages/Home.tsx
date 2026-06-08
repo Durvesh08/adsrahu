@@ -145,9 +145,9 @@ export default function Home() {
                   {/* KPI row */}
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {[
-                      {label:'Total Leads', value:'1,248', delta:'+24%', up:true},
-                      {label:'Cost Per Lead', value:'₹23', delta:'-18%', up:true},
-                      {label:'Conversions', value:'94%', delta:'+8%', up:true},
+                      {label:'Total Leads', value:settings.totalLeads, delta:'+24%', up:true},
+                      {label:'Cost Per Lead', value:settings.avgCpl, delta:'-18%', up:true},
+                      {label:'Conversions', value:settings.conversionRate, delta:'+8%', up:true},
                     ].map((kpi,i) => (
                       <div key={i} className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
                         <div className="text-[10px] text-gray-500 mb-1 uppercase tracking-wider">{kpi.label}</div>

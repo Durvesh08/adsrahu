@@ -1,7 +1,42 @@
-import React, { useState } from "react";
-import { ArrowRight, X, Clock, Tag, ChevronLeft } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowRight, Clock, Tag, ChevronLeft, Loader2 } from "lucide-react";
+import { blogApi, type ApiPost } from "@/lib/api";
 
-const blogPosts = [
+const categoryColors: Record<string, string> = {
+  "Real Estate": "from-blue-600/20 to-indigo-800/20",
+  "Automation": "from-green-600/20 to-teal-800/20",
+  "Paid Ads": "from-yellow-600/20 to-orange-800/20",
+  "CRM": "from-purple-600/20 to-pink-800/20",
+  "Strategy": "from-red-600/20 to-rose-800/20",
+  "Case Study": "from-amber-600/20 to-yellow-800/20",
+  "General": "from-blue-600/20 to-indigo-800/20",
+};
+
+interface DisplayPost {
+  id?: number;
+  category: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  readTime: string;
+  color: string;
+  content: string;
+}
+
+function apiToDisplay(p: ApiPost): DisplayPost {
+  return {
+    id: p.id,
+    category: p.category,
+    title: p.title,
+    excerpt: p.excerpt,
+    date: new Date(p.createdAt).toLocaleDateString("en-IN", { month: "long", day: "numeric", year: "numeric" }),
+    readTime: `${Math.max(1, Math.ceil(p.content.trim().split(/\s+/).length / 200))} min read`,
+    color: categoryColors[p.category] ?? "from-blue-600/20 to-indigo-800/20",
+    content: p.content,
+  };
+}
+
+const seedPosts: DisplayPost[] = [
   {
     category: "Real Estate",
     title: "How to Generate 100+ Qualified Real Estate Leads per Month",
@@ -293,14 +328,27 @@ Every lead entered a 14-day WhatsApp sequence with:
 ];
 
 export default function Blog() {
+  const [posts, setPosts] = useState<DisplayPost[]>(seedPosts);
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
-  const [openPost, setOpenPost] = useState<typeof blogPosts[0] | null>(null);
+  const [openPost, setOpenPost] = useState<DisplayPost | null>(null);
 
-  const categories = ["All", "Real Estate", "Paid Ads", "Automation", "CRM", "Strategy", "Case Study"];
+  useEffect(() => {
+    blogApi.getAll(true)
+      .then(apiPosts => {
+        if (apiPosts.length > 0) {
+          setPosts(apiPosts.map(apiToDisplay));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const categories = ["All", ...Array.from(new Set(posts.map(p => p.category)))];
 
   const filtered = activeCategory === "All"
-    ? blogPosts
-    : blogPosts.filter(p => p.category === activeCategory);
+    ? posts
+    : posts.filter(p => p.category === activeCategory);
 
   if (openPost) {
     return (
@@ -401,40 +449,46 @@ export default function Blog() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((post, i) => (
-            <article
-              key={i}
-              className="rounded-2xl border border-white/8 bg-[#0a0a12] overflow-hidden flex flex-col hover:border-blue-500/30 transition-all duration-300 group cursor-pointer hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(59,130,246,0.1)]"
-              onClick={() => setOpenPost(post)}
-            >
-              <div className={`aspect-[16/9] bg-gradient-to-br ${post.color} relative overflow-hidden flex items-end p-4`}>
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDBNIDAgMjAgTCA0MCAyMCBNIDIwIDAgTCAyMCA0ME0gMCAzMCBMIDQwIDMwIE0gMzAgMCBMIDMwIDQwIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNCkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-60" />
-                <span className="relative inline-flex items-center rounded-full bg-black/60 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-white border border-white/10">
-                  {post.category}
-                </span>
-              </div>
-              <div className="p-6 flex flex-col flex-grow">
-                <div className="flex items-center text-xs text-gray-500 mb-3 gap-3">
-                  <span>{post.date}</span>
-                  <span>·</span>
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime}</span>
-                </div>
-                <h3 className="text-base font-bold text-white mb-3 group-hover:text-blue-300 transition-colors leading-snug">
-                  {post.title}
-                </h3>
-                <p className="text-gray-500 text-sm mb-6 flex-grow leading-relaxed">
-                  {post.excerpt}
-                </p>
-                <div className="mt-auto">
-                  <span className="text-blue-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Read Article <ArrowRight className="w-4 h-4" />
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((post, i) => (
+              <article
+                key={post.id ?? i}
+                className="rounded-2xl border border-white/8 bg-[#0a0a12] overflow-hidden flex flex-col hover:border-blue-500/30 transition-all duration-300 group cursor-pointer hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(59,130,246,0.1)]"
+                onClick={() => setOpenPost(post)}
+              >
+                <div className={`aspect-[16/9] bg-gradient-to-br ${post.color} relative overflow-hidden flex items-end p-4`}>
+                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDBNIDAgMjAgTCA0MCAyMCBNIDIwIDAgTCAyMCA0ME0gMCAzMCBMIDQwIDMwIE0gMzAgMCBMIDMwIDQwIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNCkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-60" />
+                  <span className="relative inline-flex items-center rounded-full bg-black/60 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-white border border-white/10">
+                    {post.category}
                   </span>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="flex items-center text-xs text-gray-500 mb-3 gap-3">
+                    <span>{post.date}</span>
+                    <span>·</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime}</span>
+                  </div>
+                  <h3 className="text-base font-bold text-white mb-3 group-hover:text-blue-300 transition-colors leading-snug">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm mb-6 flex-grow leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                  <div className="mt-auto">
+                    <span className="text-blue-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                      Read Article <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

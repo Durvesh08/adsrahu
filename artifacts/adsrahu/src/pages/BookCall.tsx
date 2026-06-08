@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { Calendar as CalendarIcon, Clock, Video, ChevronLeft, ChevronRight, CheckCircle2, Check } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { bookingsApi } from "@/lib/api";
+import { useSettings } from "@/lib/useSettings";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAYS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 const TIME_SLOTS = ["09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","01:00 PM","02:00 PM","02:30 PM","03:00 PM","04:00 PM","05:00 PM"];
 
 export default function BookCall() {
+  const settings = useSettings();
+  const waNumber = settings.whatsappNumber.replace(/\D/g, "");
   const today = new Date();
   const [step, setStep] = useState<1|2|3>(1);
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -87,7 +90,7 @@ export default function BookCall() {
             We'll reach out to {form.email || form.phone} with your meeting link shortly.
           </p>
           <a
-            href="https://wa.me/917485022937"
+            href={`https://wa.me/${waNumber}`}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-green-600/20 border border-green-500/30 text-green-400 text-sm font-medium hover:bg-green-600/30 transition-colors"
@@ -321,7 +324,7 @@ export default function BookCall() {
         <div className="mt-12 text-center">
           <p className="text-gray-400 mb-4">Need immediate assistance?</p>
           <a
-            href="https://wa.me/917485022937"
+            href={`https://wa.me/${waNumber}`}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center justify-center rounded-full border border-green-500/30 bg-green-500/10 px-6 py-2 text-sm font-medium text-green-500 hover:bg-green-500/20 transition-colors"

@@ -1,10 +1,11 @@
 import { Router, type IRouter } from "express";
+import { eq } from "drizzle-orm";
 import { db, settingsTable } from "@workspace/db";
 import { adminAuth } from "../middlewares/adminAuth";
 
 const router: IRouter = Router();
 
-router.get("/settings", async (req, res): Promise<void> => {
+router.get("/settings", async (_req, res): Promise<void> => {
   const rows = await db.select().from(settingsTable).limit(1);
   if (rows.length === 0) {
     const [row] = await db.insert(settingsTable).values({}).returning();
@@ -34,6 +35,7 @@ router.put("/settings", adminAuth, async (req, res): Promise<void> => {
   const [row] = await db.update(settingsTable)
     .set({ heroHeading, heroSubheading, whatsappNumber, contactEmail, contactPhone,
            totalLeads, avgCpl, conversionRate, metaTitle, metaDescription })
+    .where(eq(settingsTable.id, rows[0].id))
     .returning();
   res.json(row);
 });
