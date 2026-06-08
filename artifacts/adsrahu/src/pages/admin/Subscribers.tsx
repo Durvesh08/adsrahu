@@ -1,26 +1,36 @@
-import React, { useState } from "react";
-import { Mail, Trash2, Download, Plus, X } from "lucide-react";
-import { subscribersStore, Subscriber } from "@/lib/admin-store";
+import React, { useState, useEffect } from "react";
+import { Mail, Trash2, Download, Plus, X, Loader2 } from "lucide-react";
+import { subscribersApi, type ApiSubscriber } from "@/lib/api";
 
 export default function AdminSubscribers() {
-  const [subs, setSubs] = useState<Subscriber[]>(subscribersStore.get());
+  const [subs, setSubs] = useState<ApiSubscriber[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: "", email: "" });
 
-  function refresh() { setSubs(subscribersStore.get()); }
+  async function refresh() {
+    try { setSubs(await subscribersApi.getAll()); } catch {}
+  }
 
-  function handleAdd(e: React.FormEvent) {
+  useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
+
+  async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
-    subscribersStore.add(form.email, form.name);
+    await subscribersApi.create(form.email, form.name);
     setForm({ name: "", email: "" });
     setShowAdd(false);
     refresh();
   }
 
-  function handleDelete(id: string) {
-    if (confirm("Remove this subscriber?")) { subscribersStore.delete(id); refresh(); }
+  async function handleDelete(id: number) {
+    if (confirm("Remove this subscriber?")) { await subscribersApi.delete(id); refresh(); }
   }
+
+  const filtered = subs.filter(s => {
+    const q = search.toLowerCase();
+    return !q || s.email.toLowerCase().includes(q) || s.name.toLowerCase().includes(q);
+  });
 
   function exportCSV() {
     const headers = "Name,Email,Date\n";
@@ -28,11 +38,6 @@ export default function AdminSubscribers() {
     const blob = new Blob([headers + rows], { type: "text/csv" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "subscribers.csv"; a.click();
   }
-
-  const filtered = subs.filter(s => {
-    const q = search.toLowerCase();
-    return !q || s.email.toLowerCase().includes(q) || s.name.toLowerCase().includes(q);
-  });
 
   return (
     <div className="space-y-6">
@@ -42,12 +47,8 @@ export default function AdminSubscribers() {
           <p className="text-gray-500 text-sm mt-1">{subs.length} email subscribers</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">
-            <Download className="w-4 h-4" /> Export
-          </button>
-          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white btn-premium rounded-xl">
-            <Plus className="w-4 h-4" /> Add
-          </button>
+          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 border border-white/10 rounded-xl hover:bg-white/5 transition-colors"><Download className="w-4 h-4" /> Export</button>
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white btn-premium rounded-xl"><Plus className="w-4 h-4" /> Add</button>
         </div>
       </div>
 
@@ -61,14 +62,14 @@ export default function AdminSubscribers() {
             <form onSubmit={handleAdd} className="space-y-4">
               <div>
                 <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Name</label>
-                <input value={form.name} onChange={e => setForm({...form, name:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50" placeholder="Full name" />
+                <input value={form.name} onChange={e => setForm({...form,name:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none" placeholder="Full name" />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Email</label>
-                <input type="email" required value={form.email} onChange={e => setForm({...form, email:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50" placeholder="email@example.com" />
+                <input type="email" required value={form.email} onChange={e => setForm({...form,email:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none" placeholder="email@example.com" />
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowAdd(false)} className="flex-1 py-2 text-sm text-gray-400 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">Cancel</button>
+                <button type="button" onClick={() => setShowAdd(false)} className="flex-1 py-2 text-sm text-gray-400 border border-white/10 rounded-xl hover:bg-white/5">Cancel</button>
                 <button type="submit" className="flex-1 py-2 text-sm font-medium text-white btn-premium rounded-xl">Add</button>
               </div>
             </form>
@@ -78,33 +79,31 @@ export default function AdminSubscribers() {
 
       <div className="relative">
         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search subscribers..."
-          className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all"
-        />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search subscribers..."
+          className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all" />
       </div>
 
       <div className="rounded-2xl border border-white/5 bg-[#060912] overflow-hidden">
-        <div className="divide-y divide-white/5">
-          {filtered.length === 0 && <div className="text-center py-12 text-gray-600 text-sm">No subscribers found</div>}
-          {filtered.map(sub => (
-            <div key={sub.id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.02] transition-colors">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
-                {(sub.name || sub.email).charAt(0).toUpperCase()}
+        {loading ? (
+          <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 text-blue-400 animate-spin" /></div>
+        ) : (
+          <div className="divide-y divide-white/5">
+            {filtered.length === 0 && <div className="text-center py-12 text-gray-600 text-sm">No subscribers found</div>}
+            {filtered.map(sub => (
+              <div key={sub.id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.02] transition-colors">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                  {(sub.name || sub.email).charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-white">{sub.name || "—"}</div>
+                  <div className="text-xs text-gray-500">{sub.email}</div>
+                </div>
+                <div className="text-xs text-gray-600 hidden sm:block">{new Date(sub.createdAt).toLocaleDateString()}</div>
+                <button onClick={() => handleDelete(sub.id)} className="text-gray-600 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-white">{sub.name || "—"}</div>
-                <div className="text-xs text-gray-500">{sub.email}</div>
-              </div>
-              <div className="text-xs text-gray-600 hidden sm:block">{new Date(sub.createdAt).toLocaleDateString()}</div>
-              <button onClick={() => handleDelete(sub.id)} className="text-gray-600 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10">
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { Mail, Phone, MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
-import { leadsStore } from "@/lib/admin-store";
+import { leadsApi } from "@/lib/api";
 import { useSettings } from "@/lib/useSettings";
 
 export default function Contact() {
@@ -24,13 +24,13 @@ export default function Contact() {
     return e;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setLoading(true);
-    setTimeout(() => {
-      leadsStore.add({
+    try {
+      await leadsApi.create({
         name: form.name,
         phone: form.phone,
         email: form.email,
@@ -39,9 +39,12 @@ export default function Contact() {
         status: "new",
         notes: `Company: ${form.company || "—"}\nService: ${form.service || "—"}\nMessage: ${form.message}`,
       });
-      setLoading(false);
       setSubmitted(true);
-    }, 800);
+    } catch {
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function Field({ id, label, required, error, children }: { id: string; label: string; required?: boolean; error?: string; children: React.ReactNode }) {

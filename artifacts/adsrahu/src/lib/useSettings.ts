@@ -1,26 +1,35 @@
 import { useState, useEffect } from "react";
-import { settingsStore, type SiteSettings } from "@/lib/admin-store";
+import { settingsApi, type ApiSettings } from "@/lib/api";
 
-export function useSettings(): SiteSettings {
-  const [settings, setSettings] = useState<SiteSettings>(settingsStore.get);
+export type Settings = ApiSettings;
+
+const defaults: ApiSettings = {
+  id: 1,
+  heroHeading: "Performance Marketing & Lead Generation Systems For Real Estate",
+  heroSubheading: "We help builders, realtors and modern businesses generate qualified leads using Facebook Ads, Google Ads, CRM automation and WhatsApp funnels.",
+  whatsappNumber: "+91 74850 22937",
+  contactEmail: "contact@adsrahu.com",
+  contactPhone: "+91 74850 22937",
+  totalLeads: "1,248",
+  avgCpl: "₹23",
+  conversionRate: "94%",
+  metaTitle: "Adsrahu — Real Estate Lead Generation & Performance Marketing",
+  metaDescription: "Premium lead generation and growth systems for real estate businesses. Facebook Ads, Google Ads, CRM automation, WhatsApp funnels.",
+};
+
+export const SETTINGS_CHANGED = "adsrahu-settings-changed";
+
+export function useSettings(): ApiSettings {
+  const [settings, setSettings] = useState<ApiSettings>(defaults);
 
   useEffect(() => {
-    function refresh() {
-      setSettings(settingsStore.get());
-    }
-    function onStorage(e: StorageEvent) {
-      if (e.key === "adsrahu_site_settings") refresh();
-    }
+    settingsApi.get().then(setSettings).catch(() => {});
 
-    // Same-tab updates (admin saves while you're on the same page)
-    window.addEventListener(settingsStore.EVENT, refresh);
-    // Cross-tab updates (admin open in one tab, public page in another)
-    window.addEventListener("storage", onStorage);
-
-    return () => {
-      window.removeEventListener(settingsStore.EVENT, refresh);
-      window.removeEventListener("storage", onStorage);
-    };
+    function onChanged() {
+      settingsApi.get().then(setSettings).catch(() => {});
+    }
+    window.addEventListener(SETTINGS_CHANGED, onChanged);
+    return () => window.removeEventListener(SETTINGS_CHANGED, onChanged);
   }, []);
 
   return settings;

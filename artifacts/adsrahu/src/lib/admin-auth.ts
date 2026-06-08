@@ -1,18 +1,21 @@
-const ADMIN_KEY = "adsrahu_admin_session";
+const SESSION_KEY = "adsrahu_admin_session";
+const TOKEN_KEY = "adsrahu_admin_token";
 const ADMIN_PASSWORD = "adsrahu@2024";
 
 export function login(password: string): boolean {
   if (password === ADMIN_PASSWORD) {
-    sessionStorage.setItem(ADMIN_KEY, "true");
+    sessionStorage.setItem(SESSION_KEY, "true");
+    localStorage.setItem(TOKEN_KEY, password);
     return true;
   }
   return false;
 }
 
 export function logout(): void {
-  sessionStorage.removeItem(ADMIN_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 }
 
 export function isAuthenticated(): boolean {
-  return sessionStorage.getItem(ADMIN_KEY) === "true";
+  return sessionStorage.getItem(SESSION_KEY) === "true";
 }

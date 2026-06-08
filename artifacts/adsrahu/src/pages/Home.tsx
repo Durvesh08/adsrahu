@@ -33,7 +33,7 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as any } },
 };
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
@@ -118,7 +118,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, x: 60, scale: 0.92 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] as any }}
             className="hidden lg:block relative"
           >
             {/* Main dashboard card */}

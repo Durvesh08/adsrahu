@@ -43,7 +43,7 @@ export default function Results() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[
                 { label: "Total Leads (30d)", value: settings.totalLeads, change: "+24.5%", up: true },
-                { label: "Avg. Cost Per Lead", value: settings.avgCPL, change: "-18%", up: true },
+                { label: "Avg. Cost Per Lead", value: settings.avgCpl, change: "-18%", up: true },
                 { label: "Site Visits Booked", value: "84", change: "+18.2%", up: true },
                 { label: "Conversion Rate", value: settings.conversionRate, change: "+2.1%", up: true }
               ].map((stat, i) => (

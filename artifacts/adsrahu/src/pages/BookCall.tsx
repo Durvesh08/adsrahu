@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Calendar as CalendarIcon, Clock, Video, ChevronLeft, ChevronRight, CheckCircle2, Check } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
-import { bookingsStore } from "@/lib/admin-store";
+import { bookingsApi } from "@/lib/api";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAYS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
@@ -52,13 +52,12 @@ export default function BookCall() {
     return d.toLocaleDateString("en-US", { weekday:"long", month:"long", day:"numeric" });
   }
 
-  function handleConfirm(e: React.FormEvent) {
+  async function handleConfirm(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedDay || !selectedTime) return;
     const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2,"0")}-${String(selectedDay).padStart(2,"0")}`;
-    bookingsStore.save([
-      {
-        id: Date.now().toString(),
+    try {
+      await bookingsApi.create({
         name: form.name,
         phone: form.phone,
         email: form.email,
@@ -66,10 +65,8 @@ export default function BookCall() {
         time: selectedTime,
         status: "pending",
         notes: form.notes,
-        createdAt: new Date().toISOString(),
-      },
-      ...bookingsStore.get(),
-    ]);
+      });
+    } catch { }
     setStep(3);
   }
 
