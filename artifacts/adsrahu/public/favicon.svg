@@ -1,3 +1,58 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1a0f00"/>
+      <stop offset="100%" stop-color="#090909"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD97A"/>
+      <stop offset="40%" stop-color="#FFA500"/>
+      <stop offset="100%" stop-color="#CC6A00"/>
+    </linearGradient>
+    <linearGradient id="goldShine" x1="0%" y1="0%" x2="60%" y2="100%">
+      <stop offset="0%" stop-color="#FFE599"/>
+      <stop offset="50%" stop-color="#FF9500"/>
+      <stop offset="100%" stop-color="#B85C00"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Outer glow ring -->
+  <circle cx="90" cy="90" r="89" fill="none" stroke="#FFA500" stroke-width="1.5" opacity="0.35"/>
+
+  <!-- Background circle -->
+  <circle cx="90" cy="90" r="87" fill="url(#bg)"/>
+
+  <!-- Ambient golden glow behind mark -->
+  <circle cx="90" cy="86" r="48" fill="#FF8C00" opacity="0.08"/>
+
+  <!-- ===== WINGED-B MARK ===== -->
+  <!-- Left wing - outer sweep -->
+  <path d="M 36 88 C 32 78, 38 65, 52 62 C 62 59, 70 63, 73 68" 
+        stroke="url(#gold)" stroke-width="7" stroke-linecap="round" fill="none" filter="url(#glow)"/>
+  <!-- Left wing - inner parallel line -->
+  <path d="M 42 90 C 39 82, 44 72, 56 69 C 64 67, 70 70, 73 74" 
+        stroke="url(#gold)" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Vertical stem of the "b" -->
+  <rect x="84" y="44" width="11" height="20" rx="3" fill="url(#goldShine)" filter="url(#glow)"/>
+
+  <!-- Horizontal crossbar -->
+  <rect x="72" y="71" width="36" height="10" rx="4" fill="url(#gold)" filter="url(#glow)"/>
+
+  <!-- Circular "o" bowl of the b -->
+  <circle cx="96" cy="96" r="21" fill="none" stroke="url(#goldShine)" stroke-width="10" filter="url(#glow)"/>
+
+  <!-- Inner highlight on bowl -->
+  <path d="M 81 88 Q 85 78 96 76" stroke="#FFE599" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
+
+  <!-- Speed lines (left of bowl) -->
+  <line x1="58" y1="82" x2="72" y2="82" stroke="url(#gold)" stroke-width="5" stroke-linecap="round"/>
+  <line x1="60" y1="94" x2="72" y2="94" stroke="url(#gold)" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+
+  <!-- Bottom shine line -->
+  <path d="M 60 126 Q 90 132 120 126" stroke="#FFA500" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.4"/>
 </svg>
