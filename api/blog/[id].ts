@@ -1,37 +1,40 @@
-import { eq } from "drizzle-orm";
-import { getDb, checkAuth, cors, blogPostsTable } from "../_lib/db";
+import { getSql, checkAuth, cors } from "../_lib/db";
 
 export default async function handler(req: any, res: any) {
   cors(res);
   if (req.method === "OPTIONS") { res.status(200).end(); return; }
-  if (!checkAuth(req.headers["authorization"])) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
 
   const id = parseInt(req.query?.id, 10);
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
 
-  const db = getDb();
+  const sql = getSql();
 
-  // PUT /api/blog/:id
   if (req.method === "PUT") {
-    const { title, slug, category, excerpt, content, published } = req.body ?? {};
-    const [row] = await db.update(blogPostsTable)
-      .set({ title, slug, category, excerpt, content, published })
-      .where(eq(blogPostsTable.id, id))
-      .returning();
-    if (!row) { res.status(404).json({ error: "Not found" }); return; }
-    res.status(200).json(row);
+    const b = req.body ?? {};
+    const rows = await sql`
+      UPDATE blog_posts SET
+        title = COALESCE(${b.title}, title),
+        slug = COALESCE(${b.slug}, slug),
+        category = COALESCE(${b.category}, category),
+        excerpt = COALESCE(${b.excerpt}, excerpt),
+        content = COALESCE(${b.content}, content),
+        published = COALESCE(${b.published}, published)
+      WHERE id = ${id} RETURNING *`;
+    if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
+    res.status(200).json(toCamel(rows[0]));
     return;
   }
 
-  // DELETE /api/blog/:id
   if (req.method === "DELETE") {
-    await db.delete(blogPostsTable).where(eq(blogPostsTable.id, id));
+    await sql`DELETE FROM blog_posts WHERE id = ${id}`;
     res.status(204).end();
     return;
   }
 
   res.status(405).json({ error: "Method not allowed" });
+}
+
+function toCamel(row: any) {
+  return { id: row.id, title: row.title, slug: row.slug, category: row.category, excerpt: row.excerpt, content: row.content, published: row.published, createdAt: row.created_at };
 }

@@ -1,37 +1,41 @@
-import { eq } from "drizzle-orm";
-import { getDb, checkAuth, cors, bookingsTable } from "../_lib/db";
+import { getSql, checkAuth, cors } from "../_lib/db";
 
 export default async function handler(req: any, res: any) {
   cors(res);
   if (req.method === "OPTIONS") { res.status(200).end(); return; }
-  if (!checkAuth(req.headers["authorization"])) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
 
   const id = parseInt(req.query?.id, 10);
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
 
-  const db = getDb();
+  const sql = getSql();
 
-  // PATCH /api/bookings/:id
   if (req.method === "PATCH") {
-    const { name, phone, email, date, time, status, notes } = req.body ?? {};
-    const [row] = await db.update(bookingsTable)
-      .set({ name, phone, email, date, time, status, notes })
-      .where(eq(bookingsTable.id, id))
-      .returning();
-    if (!row) { res.status(404).json({ error: "Not found" }); return; }
-    res.status(200).json(row);
+    const b = req.body ?? {};
+    const rows = await sql`
+      UPDATE bookings SET
+        name = COALESCE(${b.name}, name),
+        phone = COALESCE(${b.phone}, phone),
+        email = COALESCE(${b.email}, email),
+        date = COALESCE(${b.date}, date),
+        time = COALESCE(${b.time}, time),
+        status = COALESCE(${b.status}, status),
+        notes = COALESCE(${b.notes}, notes)
+      WHERE id = ${id} RETURNING *`;
+    if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
+    res.status(200).json(toCamel(rows[0]));
     return;
   }
 
-  // DELETE /api/bookings/:id
   if (req.method === "DELETE") {
-    await db.delete(bookingsTable).where(eq(bookingsTable.id, id));
+    await sql`DELETE FROM bookings WHERE id = ${id}`;
     res.status(204).end();
     return;
   }
 
   res.status(405).json({ error: "Method not allowed" });
+}
+
+function toCamel(row: any) {
+  return { id: row.id, name: row.name, phone: row.phone, email: row.email, date: row.date, time: row.time, status: row.status, notes: row.notes, createdAt: row.created_at };
 }

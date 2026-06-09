@@ -1,37 +1,41 @@
-import { eq } from "drizzle-orm";
-import { getDb, checkAuth, cors, leadsTable } from "../_lib/db";
+import { getSql, checkAuth, cors } from "../_lib/db";
 
 export default async function handler(req: any, res: any) {
   cors(res);
   if (req.method === "OPTIONS") { res.status(200).end(); return; }
-  if (!checkAuth(req.headers["authorization"])) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
 
   const id = parseInt(req.query?.id, 10);
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
 
-  const db = getDb();
+  const sql = getSql();
 
-  // PATCH /api/leads/:id
   if (req.method === "PATCH") {
-    const { name, phone, email, city, source, status, notes } = req.body ?? {};
-    const [row] = await db.update(leadsTable)
-      .set({ name, phone, email, city, source, status, notes })
-      .where(eq(leadsTable.id, id))
-      .returning();
-    if (!row) { res.status(404).json({ error: "Not found" }); return; }
-    res.status(200).json(row);
+    const b = req.body ?? {};
+    const rows = await sql`
+      UPDATE leads SET
+        name = COALESCE(${b.name}, name),
+        phone = COALESCE(${b.phone}, phone),
+        email = COALESCE(${b.email}, email),
+        city = COALESCE(${b.city}, city),
+        source = COALESCE(${b.source}, source),
+        status = COALESCE(${b.status}, status),
+        notes = COALESCE(${b.notes}, notes)
+      WHERE id = ${id} RETURNING *`;
+    if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
+    res.status(200).json(toCamel(rows[0]));
     return;
   }
 
-  // DELETE /api/leads/:id
   if (req.method === "DELETE") {
-    await db.delete(leadsTable).where(eq(leadsTable.id, id));
+    await sql`DELETE FROM leads WHERE id = ${id}`;
     res.status(204).end();
     return;
   }
 
   res.status(405).json({ error: "Method not allowed" });
+}
+
+function toCamel(row: any) {
+  return { id: row.id, name: row.name, phone: row.phone, email: row.email, city: row.city, source: row.source, status: row.status, notes: row.notes, createdAt: row.created_at };
 }
