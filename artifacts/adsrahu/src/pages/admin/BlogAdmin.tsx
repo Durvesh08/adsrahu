@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Loader2, AlertCircle } from "lucide-react";
 import { blogApi, type ApiPost } from "@/lib/api";
 
 const CATEGORIES = ["Real Estate Lead Generation","Facebook Ads","Google Ads","WhatsApp Funnels","CRM Automation","Marketing Strategies","Business Growth"];
@@ -17,39 +17,62 @@ export default function AdminBlog() {
   const [view, setView] = useState<"list"|"edit">("list");
   const [editing, setEditing] = useState<ApiPost | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
+  const [error, setError] = useState("");
+  const [listError, setListError] = useState("");
 
   async function refresh() {
-    try { setPosts(await blogApi.getAll()); } catch {}
+    try {
+      setPosts(await blogApi.getAll());
+      setListError("");
+    } catch {
+      setListError("Failed to load posts. Check your connection.");
+    }
   }
 
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
 
-  function openNew() { setEditing(null); setForm({...emptyForm}); setView("edit"); }
+  function openNew() { setEditing(null); setForm({...emptyForm}); setError(""); setView("edit"); }
 
   function openEdit(post: ApiPost) {
     setEditing(post);
     setForm({ title:post.title, slug:post.slug, category:post.category, excerpt:post.excerpt, content:post.content, published:post.published });
+    setError("");
     setView("edit");
   }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setError("");
     try {
       if (editing) { await blogApi.update(editing.id, form); }
       else { await blogApi.create(form); }
       await refresh();
       setView("list");
-    } catch { } finally { setSaving(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDelete(id: number) {
-    if (confirm("Delete this post?")) { await blogApi.delete(id); refresh(); }
+    if (!confirm("Delete this post?")) return;
+    try {
+      await blogApi.delete(id);
+      await refresh();
+    } catch {
+      setListError("Failed to delete post. Please try again.");
+    }
   }
 
   async function togglePublish(id: number, current: boolean) {
-    await blogApi.update(id, { published: !current });
-    refresh();
+    try {
+      await blogApi.update(id, { published: !current });
+      await refresh();
+    } catch {
+      setListError("Failed to update publish status.");
+    }
   }
 
   if (view === "edit") {
@@ -61,6 +84,11 @@ export default function AdminBlog() {
             <X className="w-4 h-4" /> Cancel
           </button>
         </div>
+        {error && (
+          <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+          </div>
+        )}
         <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-5">
             <div>
@@ -122,6 +150,11 @@ export default function AdminBlog() {
           <Plus className="w-4 h-4" /> New Post
         </button>
       </div>
+      {listError && (
+        <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+          <AlertCircle className="w-4 h-4 shrink-0" /> {listError}
+        </div>
+      )}
       <div className="rounded-2xl border border-white/5 bg-[#060912] overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 text-blue-400 animate-spin" /></div>

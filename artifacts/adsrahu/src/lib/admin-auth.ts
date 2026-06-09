@@ -1,5 +1,5 @@
 const SESSION_KEY = "adsrahu_admin_session";
-const TOKEN_KEY = "adsrahu_admin_token";
+const TOKEN_KEY   = "adsrahu_admin_token";
 const ADMIN_PASSWORD = "adsrahu@2024";
 
 export function login(password: string): boolean {
@@ -17,5 +17,13 @@ export function logout(): void {
 }
 
 export function isAuthenticated(): boolean {
-  return sessionStorage.getItem(SESSION_KEY) === "true";
+  // Check active session first
+  if (sessionStorage.getItem(SESSION_KEY) === "true") return true;
+  // Auto-restore from persisted token so page refreshes don't log the admin out
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token === ADMIN_PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, "true");
+    return true;
+  }
+  return false;
 }

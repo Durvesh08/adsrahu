@@ -29,8 +29,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-amber-400/30 blur-sm" />
-          <div className="relative w-8 h-8 rounded-full border border-amber-400/40 bg-black/60 flex items-center justify-center overflow-hidden">
-            <img src="/logo.png" alt="Adsrahu" className="w-6 h-6 object-contain" />
+          <div className="relative w-8 h-8 rounded-full border border-amber-400/40 overflow-hidden">
+            <img src="/logo.png" alt="Adsrahu" className="absolute w-full h-full object-cover" style={{objectPosition:'50% 8%', transform:'scale(2.1)', transformOrigin:'50% 8%'}} />
           </div>
         </div>
         <div>
