@@ -20,7 +20,12 @@ export default function AdminLeads() {
   const [form, setForm] = useState({ name:"", phone:"", email:"", city:"", source:"Facebook Ads", status:"new", notes:"" });
 
   async function refresh() {
-    try { setLeads(await leadsApi.getAll()); } catch {}
+    try { 
+      const data = await leadsApi.getAll();
+      setLeads(data);
+    } catch (error) {
+      console.error("Failed to refresh leads:", error);
+    }
   }
 
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
@@ -34,19 +39,37 @@ export default function AdminLeads() {
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
-    await leadsApi.create(form);
-    setForm({ name:"", phone:"", email:"", city:"", source:"Facebook Ads", status:"new", notes:"" });
-    setShowAdd(false);
-    refresh();
+    try {
+      await leadsApi.create(form);
+      setForm({ name:"", phone:"", email:"", city:"", source:"Facebook Ads", status:"new", notes:"" });
+      await refresh();
+      setShowAdd(false);
+    } catch (error) {
+      console.error("Failed to add lead:", error);
+      alert("Failed to add lead. Please try again.");
+    }
   }
 
   async function handleDelete(id: number) {
-    if (confirm("Delete this lead?")) { await leadsApi.delete(id); refresh(); }
+    if (confirm("Delete this lead?")) { 
+      try {
+        await leadsApi.delete(id);
+        await refresh();
+      } catch (error) {
+        console.error("Failed to delete lead:", error);
+        alert("Failed to delete lead. Please try again.");
+      }
+    }
   }
 
   async function handleStatusChange(id: number, status: string) {
-    await leadsApi.update(id, { status });
-    refresh();
+    try {
+      await leadsApi.update(id, { status });
+      await refresh();
+    } catch (error) {
+      console.error("Failed to update lead status:", error);
+      alert("Failed to update status. Please try again.");
+    }
   }
 
   function exportCSV() {
@@ -81,7 +104,7 @@ export default function AdminLeads() {
               <button onClick={() => setShowAdd(false)} className="text-gray-400 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleAdd} className="grid grid-cols-2 gap-4">
-              {[{label:"Name",key:"name",type:"text",req:true},{label:"Phone",key:"phone",type:"text",req:true},{label:"Email",key:"email",type:"email",req:false},{label:"City",key:"city",type:"text",req:false}].map(f => (
+              {[{label:"Name",key:"name",type:"text",req:true},{label:"Phone",key:"phone",type:"text",req:true},{label:"Email",key:"email",type:"email",req:false},{label:"City",key:"city",type:"text",req:false},{label:"Notes",key:"notes",type:"text",req:false}].map(f => (
                 <div key={f.key}>
                   <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">{f.label}</label>
                   <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm({...form,[f.key]:e.target.value})} required={f.req}
@@ -90,19 +113,15 @@ export default function AdminLeads() {
               ))}
               <div>
                 <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Source</label>
-                <select value={form.source} onChange={e => setForm({...form,source:e.target.value})} className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none">
+                <select value={form.source} onChange={e => setForm({...form,source:e.target.value})} className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-all">
                   {["Facebook Ads","Google Ads","WhatsApp","Instagram","Referral","Website","Other"].map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Status</label>
-                <select value={form.status} onChange={e => setForm({...form,status:e.target.value})} className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none">
+                <select value={form.status} onChange={e => setForm({...form,status:e.target.value})} className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 transition-all">
                   {STATUSES.map(s => <option key={s}>{s}</option>)}
                 </select>
-              </div>
-              <div className="col-span-2">
-                <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Notes</label>
-                <textarea value={form.notes} onChange={e => setForm({...form,notes:e.target.value})} rows={2} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none resize-none" />
               </div>
               <div className="col-span-2 flex gap-3 justify-end pt-2">
                 <button type="button" onClick={() => setShowAdd(false)} className="px-5 py-2 text-sm text-gray-400 border border-white/10 rounded-xl hover:bg-white/5">Cancel</button>
@@ -121,7 +140,9 @@ export default function AdminLeads() {
         </div>
         <div className="flex gap-2 flex-wrap">
           {["all",...STATUSES].map(s => (
-            <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-2 text-xs font-medium rounded-xl capitalize transition-colors ${filterStatus===s?"bg-blue-600/30 text-blue-300 border border-blue-500/30":"text-gray-400 border border-white/8 hover:border-white/15"}`}>{s}</button>
+            <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-2 text-xs font-medium rounded-xl capitalize transition-colors ${filterStatus===s?"bg-blue-600/30 text-blue-300 border border-blue-500/50":"border border-white/10 text-gray-400 hover:bg-white/5"}`}>
+              {s}
+            </button>
           ))}
         </div>
       </div>
