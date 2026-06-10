@@ -23,7 +23,7 @@ async function req<T>(method: string, path: string, body?: unknown, auth = false
   return data as T;
 }
 
-// ── Settings ────────────────────────────────────────────────────────────────
+// ── Settings ───────────────────────────────────────────────────────────
 export interface ApiSettings {
   id: number;
   heroHeading: string;
@@ -43,7 +43,7 @@ export const settingsApi = {
   save: (data: Omit<ApiSettings, "id">) => req<ApiSettings>("PUT", "/settings", data, true),
 };
 
-// ── Leads ───────────────────────────────────────────────────────────────────
+// ── Leads ────────────────────────────────────────────────────────────
 export interface ApiLead {
   id: number;
   name: string;
@@ -58,12 +58,13 @@ export interface ApiLead {
 
 export const leadsApi = {
   getAll: () => req<ApiLead[]>("GET", "/leads", undefined, true),
-  create: (data: Omit<ApiLead, "id" | "createdAt">) => req<ApiLead>("POST", "/leads", data),
+  // 🔒 FIX: Changed from (auth=false) to (auth=true) - prevents unauthorized lead creation
+  create: (data: Omit<ApiLead, "id" | "createdAt">) => req<ApiLead>("POST", "/leads", data, true),
   update: (id: number, data: Partial<ApiLead>) => req<ApiLead>("PATCH", `/leads/${id}`, data, true),
   delete: (id: number) => req<void>("DELETE", `/leads/${id}`, undefined, true),
 };
 
-// ── Bookings ─────────────────────────────────────────────────────────────────
+// ── Bookings ───────────────────────────────────────────────────────────
 export interface ApiBooking {
   id: number;
   name: string;
@@ -78,12 +79,13 @@ export interface ApiBooking {
 
 export const bookingsApi = {
   getAll: () => req<ApiBooking[]>("GET", "/bookings", undefined, true),
-  create: (data: Omit<ApiBooking, "id" | "createdAt">) => req<ApiBooking>("POST", "/bookings", data),
+  // 🔒 FIX: Changed from (auth=false) to (auth=true) - prevents unauthorized booking creation
+  create: (data: Omit<ApiBooking, "id" | "createdAt">) => req<ApiBooking>("POST", "/bookings", data, true),
   update: (id: number, data: Partial<ApiBooking>) => req<ApiBooking>("PATCH", `/bookings/${id}`, data, true),
   delete: (id: number) => req<void>("DELETE", `/bookings/${id}`, undefined, true),
 };
 
-// ── Blog ─────────────────────────────────────────────────────────────────────
+// ── Blog ────────────────────────────────────────────────────────────
 export interface ApiPost {
   id: number;
   title: string;
@@ -102,7 +104,7 @@ export const blogApi = {
   delete: (id: number) => req<void>("DELETE", `/blog/${id}`, undefined, true),
 };
 
-// ── Subscribers ──────────────────────────────────────────────────────────────
+// ── Subscribers ─────────────────────────────────────────────────────────
 export interface ApiSubscriber {
   id: number;
   email: string;
@@ -112,6 +114,7 @@ export interface ApiSubscriber {
 
 export const subscribersApi = {
   getAll: () => req<ApiSubscriber[]>("GET", "/subscribers", undefined, true),
+  // Public endpoint - newsletter signup doesn't require authentication
   create: (email: string, name: string) => req<ApiSubscriber>("POST", "/subscribers", { email, name }),
   delete: (id: number) => req<void>("DELETE", `/subscribers/${id}`, undefined, true),
 };
