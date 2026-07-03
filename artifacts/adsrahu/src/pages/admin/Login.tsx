@@ -10,18 +10,22 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
-    setTimeout(() => {
-      if (login(password)) {
+    try {
+      const success = await login(password);
+      if (success) {
         setLocation("/admin/dashboard");
       } else {
         setError("Invalid password. Please try again.");
         setLoading(false);
       }
-    }, 600);
+    } catch {
+      setError("Login failed. Please check your connection and try again.");
+      setLoading(false);
+    }
   }
 
   return (

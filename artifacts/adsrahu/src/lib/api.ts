@@ -58,8 +58,7 @@ export interface ApiLead {
 
 export const leadsApi = {
   getAll: () => req<ApiLead[]>("GET", "/leads", undefined, true),
-  // 🔒 FIX: Changed from (auth=false) to (auth=true) - prevents unauthorized lead creation
-  create: (data: Omit<ApiLead, "id" | "createdAt">) => req<ApiLead>("POST", "/leads", data, true),
+  create: (data: Omit<ApiLead, "id" | "createdAt">) => req<ApiLead>("POST", "/leads", data),
   update: (id: number, data: Partial<ApiLead>) => req<ApiLead>("PATCH", `/leads/${id}`, data, true),
   delete: (id: number) => req<void>("DELETE", `/leads/${id}`, undefined, true),
 };
@@ -79,8 +78,7 @@ export interface ApiBooking {
 
 export const bookingsApi = {
   getAll: () => req<ApiBooking[]>("GET", "/bookings", undefined, true),
-  // 🔒 FIX: Changed from (auth=false) to (auth=true) - prevents unauthorized booking creation
-  create: (data: Omit<ApiBooking, "id" | "createdAt">) => req<ApiBooking>("POST", "/bookings", data, true),
+  create: (data: Omit<ApiBooking, "id" | "createdAt">) => req<ApiBooking>("POST", "/bookings", data),
   update: (id: number, data: Partial<ApiBooking>) => req<ApiBooking>("PATCH", `/bookings/${id}`, data, true),
   delete: (id: number) => req<void>("DELETE", `/bookings/${id}`, undefined, true),
 };
