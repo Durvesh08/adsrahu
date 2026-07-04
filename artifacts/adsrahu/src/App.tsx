@@ -29,6 +29,9 @@ import AdminBookings from "@/pages/admin/Bookings";
 import AdminSubscribers from "@/pages/admin/Subscribers";
 import AdminSettings from "@/pages/admin/Settings";
 
+import PremiumLanding from "@/pages/PremiumLanding";
+import TelegramGrowth from "@/pages/TelegramGrowth";
+
 const queryClient = new QueryClient();
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -48,6 +51,24 @@ function AdminLoginRoute() {
 function Router() {
   const [location] = useLocation();
   const isAdmin = location.startsWith("/admin");
+  const isSecretLanding = location === "/adsrahu-real";
+  const isTelegramGrowth = location === "/telegram-growth";
+
+  if (isSecretLanding) {
+    return (
+      <Switch>
+        <Route path="/adsrahu-real" component={PremiumLanding} />
+      </Switch>
+    );
+  }
+
+  if (isTelegramGrowth) {
+    return (
+      <Switch>
+        <Route path="/telegram-growth" component={TelegramGrowth} />
+      </Switch>
+    );
+  }
 
   if (isAdmin) {
     return (

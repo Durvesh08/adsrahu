@@ -595,7 +595,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#080c14] hidden md:block" style={{left:'60%'}} />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080c14] to-transparent md:hidden" style={{top:'60%'}} />
                 <img
-                  src="/founder.png"
+                  src="/founder.jpg"
                   alt="Raushan Pratap Yadav — Founder, Adsrahu"
                   className="w-full h-full object-cover object-center"
                   onError={(e) => {

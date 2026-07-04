@@ -63,7 +63,7 @@ export default function About() {
           <div className="rounded-2xl border border-white/10 bg-[#0d0d14] overflow-hidden flex flex-col md:flex-row shadow-2xl">
             <div className="w-full md:w-1/2 relative">
               <img 
-                src="/founder.png" 
+                src="/founder.jpg" 
                 alt="Raushan Pratap Yadav" 
                 className="w-full h-full object-cover object-center min-h-[400px]"
               />
