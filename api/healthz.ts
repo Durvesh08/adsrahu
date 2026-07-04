@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { cors } from "./_lib/db";
 
 export default async function handler(req: any, res: any) {

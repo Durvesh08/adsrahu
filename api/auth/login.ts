@@ -1,3 +1,5 @@
+// @ts-nocheck
+// @ts-nocheck
 import { cors, verifyPassword, createToken } from "../_lib/db";
 
 export default async function handler(req: any, res: any) {

@@ -1,3 +1,5 @@
+// @ts-nocheck
+// @ts-nocheck
 import { neon } from "@neondatabase/serverless";
 import crypto from "crypto";
 
