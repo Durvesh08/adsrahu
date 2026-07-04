@@ -93,9 +93,21 @@ CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
     }
   }
 
-  // Use a reliable, copyright-free placeholder service that supports keywords
-  const keywords = encodeURIComponent(parsed.imageQuery || category || "business");
-  const imageUrl = `https://loremflickr.com/1200/630/${keywords}?lock=${Date.now()}`;
+  // Curated list of premium Unsplash images related to Real Estate & Digital Marketing
+  const premiumImages = [
+    "1560518883-ce09059eeffa", // Modern office building
+    "1556155092-490a1ba16284", // Analytics on screen
+    "1460925895917-afdab827c52f", // Marketing/Teamwork
+    "1600880292203-757bb62b4baf", // Real Estate house
+    "1512917774080-9991f1c4c750", // Real estate modern house
+    "1486406146926-c627a92ad1ab", // Business meeting
+    "1551288049-bebda4e38f71", // Data charts
+    "1570125909202-e2f5d0b3ab45", // Modern workspace
+    "1504384308090-c894fdcc538d", // Workstation
+    "1434626881859-194d673664c1"  // Marketing strategy
+  ];
+  const randomId = premiumImages[Math.floor(Math.random() * premiumImages.length)];
+  const imageUrl = `https://images.unsplash.com/photo-${randomId}?w=1200&h=630&fit=crop&q=80`;
 
   return {
     title: parsed.title,
