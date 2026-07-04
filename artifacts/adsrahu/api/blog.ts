@@ -53,9 +53,9 @@ CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
               slug: { type: "STRING", description: "url-friendly-slug-with-hyphens" },
               excerpt: { type: "STRING", description: "A compelling 1-2 sentence summary for the blog card (under 160 chars)" },
               content: { type: "STRING", description: "The full blog body in Markdown format. Use \\n for newlines." },
-              imageQuery: { type: "STRING", description: "A 2-3 word Unsplash search query for a relevant, professional cover image" }
+              imagePrompt: { type: "STRING", description: "A highly detailed, creative, and completely unique prompt for an AI image generator (like Midjourney). Do NOT use the same style every time. Mix it up: sometimes use photorealistic human professionals, sometimes sleek futuristic photography, sometimes cinematic lighting. Keep it fresh, trendy, and deeply relevant to the blog." }
             },
-            required: ["title", "slug", "excerpt", "content", "imageQuery"]
+            required: ["title", "slug", "excerpt", "content", "imagePrompt"]
           }
         },
       }),
@@ -93,21 +93,11 @@ CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
     }
   }
 
-  // Curated list of premium Unsplash images related to Real Estate & Digital Marketing
-  const premiumImages = [
-    "1560518883-ce09059eeffa", // Modern office building
-    "1556155092-490a1ba16284", // Analytics on screen
-    "1460925895917-afdab827c52f", // Marketing/Teamwork
-    "1600880292203-757bb62b4baf", // Real Estate house
-    "1512917774080-9991f1c4c750", // Real estate modern house
-    "1486406146926-c627a92ad1ab", // Business meeting
-    "1551288049-bebda4e38f71", // Data charts
-    "1570125909202-e2f5d0b3ab45", // Modern workspace
-    "1504384308090-c894fdcc538d", // Workstation
-    "1434626881859-194d673664c1"  // Marketing strategy
-  ];
-  const randomId = premiumImages[Math.floor(Math.random() * premiumImages.length)];
-  const imageUrl = `https://images.unsplash.com/photo-${randomId}?w=1200&h=630&fit=crop&q=80`;
+  // Generate a completely unique, high-quality AI image using Pollinations AI
+  const fallbackPrompt = `High quality professional digital marketing real estate photography: ${category}`;
+  const imgPrompt = encodeURIComponent(parsed.imagePrompt || fallbackPrompt);
+  const seed = Math.floor(Math.random() * 1000000);
+  const imageUrl = `https://image.pollinations.ai/prompt/${imgPrompt}?width=1200&height=630&nologo=true&seed=${seed}`;
 
   return {
     title: parsed.title,
