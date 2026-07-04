@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Loader2, AlertCircle, Upload, ImageIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Loader2, AlertCircle, Upload, ImageIcon, Sparkles, Wand2 } from "lucide-react";
 import { blogApi, type ApiPost } from "@/lib/api";
 
 const CATEGORIES = ["Real Estate Lead Generation","Facebook Ads","Google Ads","WhatsApp Funnels","CRM Automation","Marketing Strategies","Business Growth"];
@@ -38,7 +38,7 @@ export default function AdminBlog() {
   const [posts, setPosts] = useState<ApiPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [view, setView] = useState<"list"|"edit">("list");
+  const [view, setView] = useState<"list"|"edit"|"generate">("list");
   const [editing, setEditing] = useState<ApiPost | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
   const [error, setError] = useState("");
@@ -46,6 +46,10 @@ export default function AdminBlog() {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiCategory, setAiCategory] = useState(CATEGORIES[0]);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   async function refresh() {
     try {
@@ -139,6 +143,116 @@ export default function AdminBlog() {
     e.preventDefault();
     setDragOver(false);
   }, []);
+
+  // ── AI Generate View ──────────────────────────────────────────────────
+  if (view === "generate") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-purple-400" />
+            </div>
+            AI Blog Generator
+          </h1>
+          <button onClick={() => { setView("list"); setAiError(""); }} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white border border-white/10 rounded-xl px-4 py-2 hover:bg-white/5 transition-colors">
+            <X className="w-4 h-4" /> Cancel
+          </button>
+        </div>
+
+        {aiGenerating ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center mb-6">
+                <Wand2 className="w-10 h-10 text-purple-400 animate-pulse" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-blue-500/30 animate-ping" />
+              <div className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full bg-purple-500/30 animate-ping" style={{animationDelay: '0.5s'}} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Generating Your Blog...</h3>
+            <p className="text-gray-500 text-sm text-center max-w-md">Gemini AI is writing a professional, SEO-optimized blog post on <span className="text-blue-400 font-medium">"{aiTopic}"</span>. This usually takes 10-15 seconds.</p>
+            <div className="mt-8 w-48 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full animate-[shimmer_2s_ease-in-out_infinite]" style={{width: '60%'}} />
+            </div>
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto">
+            {aiError && (
+              <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-6">
+                <AlertCircle className="w-4 h-4 shrink-0" /> {aiError}
+              </div>
+            )}
+
+            <div className="rounded-2xl border border-white/10 bg-[#060912] p-8 space-y-6">
+              <div className="text-center mb-2">
+                <h3 className="text-lg font-semibold text-white mb-1">What should the blog be about?</h3>
+                <p className="text-sm text-gray-500">Describe the topic and Gemini AI will write a complete blog post.</p>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Topic / Description *</label>
+                <textarea
+                  value={aiTopic}
+                  onChange={e => setAiTopic(e.target.value)}
+                  rows={3}
+                  placeholder="e.g. How to generate qualified real estate leads using Facebook ads in Mumbai..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-600 resize-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Category</label>
+                <select
+                  value={aiCategory}
+                  onChange={e => setAiCategory(e.target.value)}
+                  className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50"
+                >
+                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+
+              <button
+                onClick={async () => {
+                  if (!aiTopic.trim()) { setAiError("Please enter a topic"); return; }
+                  setAiGenerating(true);
+                  setAiError("");
+                  try {
+                    const result = await blogApi.generate(aiTopic.trim(), aiCategory);
+                    setForm({
+                      title: result.title || "",
+                      slug: result.slug || autoSlug(result.title || ""),
+                      category: result.category || aiCategory,
+                      excerpt: result.excerpt || "",
+                      content: result.content || "",
+                      published: false,
+                      imageUrl: result.imageUrl || "",
+                    });
+                    setEditing(null);
+                    setError("");
+                    setView("edit");
+                  } catch (err) {
+                    setAiError(err instanceof Error ? err.message : "AI generation failed. Please try again.");
+                  } finally {
+                    setAiGenerating(false);
+                  }
+                }}
+                disabled={!aiTopic.trim()}
+                className="w-full h-12 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                style={{background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', boxShadow: '0 0 20px rgba(139,92,246,0.3), 0 4px 15px rgba(0,0,0,0.5)'}}
+              >
+                <Sparkles className="w-4 h-4" />
+                Generate Blog with AI
+              </button>
+
+              <div className="border-t border-white/5 pt-4">
+                <p className="text-[11px] text-gray-600 text-center">Powered by Gemini 2.5 Flash · Blog will be saved as Draft for your review</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (view === "edit") {
     return (
@@ -274,9 +388,18 @@ export default function AdminBlog() {
           <h1 className="text-2xl font-bold text-white">Blog CMS</h1>
           <p className="text-gray-500 text-sm mt-1">{posts.length} posts · {posts.filter(p=>p.published).length} published</p>
         </div>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white btn-premium rounded-xl">
-          <Plus className="w-4 h-4" /> New Post
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => { setAiTopic(""); setAiCategory(CATEGORIES[0]); setAiError(""); setView("generate"); }}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-xl transition-all hover:scale-[1.02]"
+            style={{background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', boxShadow: '0 0 15px rgba(139,92,246,0.25)'}}
+          >
+            <Sparkles className="w-4 h-4" /> AI Generate
+          </button>
+          <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white btn-premium rounded-xl">
+            <Plus className="w-4 h-4" /> New Post
+          </button>
+        </div>
       </div>
       {listError && (
         <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">

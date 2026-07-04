@@ -109,6 +109,7 @@ export const blogApi = {
   create: (data: Omit<ApiPost, "id" | "createdAt">) => req<ApiPost>("POST", "/blog", data, true),
   update: (id: number, data: Partial<ApiPost>) => req<ApiPost>("PUT", `/blog/${id}`, data, true),
   delete: (id: number) => req<void>("DELETE", `/blog/${id}`, undefined, true),
+  generate: (topic: string, category: string) => req<{title:string;slug:string;category:string;excerpt:string;content:string;imageUrl:string}>("POST", "/blog?action=generate", { topic, category }, true),
 };
 
 // ── Subscribers ─────────────────────────────────────────────────────────
