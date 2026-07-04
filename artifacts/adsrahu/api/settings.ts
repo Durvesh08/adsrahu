@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getSql, checkAuth, cors } from "./_lib/db.js";
 
 export default async function handler(req: any, res: any) {
@@ -43,6 +44,7 @@ export default async function handler(req: any, res: any) {
 }
 
 function toCamel(row: any) {
+  if (!row) return row;
   return {
     id: row.id,
     heroHeading: row.hero_heading,

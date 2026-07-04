@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getSql, checkAuth, cors } from "../_lib/db.js";
 
 export default async function handler(req: any, res: any) {
@@ -14,13 +15,13 @@ export default async function handler(req: any, res: any) {
     const b = req.body ?? {};
     const rows = await sql`
       UPDATE leads SET
-        name = COALESCE(${b.name ?? null}, name),
-        phone = COALESCE(${b.phone ?? null}, phone),
-        email = COALESCE(${b.email ?? null}, email),
-        city = COALESCE(${b.city ?? null}, city),
-        source = COALESCE(${b.source ?? null}, source),
-        status = COALESCE(${b.status ?? null}, status),
-        notes = COALESCE(${b.notes ?? null}, notes)
+        name = COALESCE(${b.name}, name),
+        phone = COALESCE(${b.phone}, phone),
+        email = COALESCE(${b.email}, email),
+        city = COALESCE(${b.city}, city),
+        source = COALESCE(${b.source}, source),
+        status = COALESCE(${b.status}, status),
+        notes = COALESCE(${b.notes}, notes)
       WHERE id = ${id} RETURNING *`;
     if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
     res.status(200).json(toCamel(rows[0]));

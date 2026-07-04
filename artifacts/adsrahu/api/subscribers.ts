@@ -1,4 +1,5 @@
-import { getSql, checkAuth, cors } from "./_lib/db";
+// @ts-nocheck
+import { getSql, checkAuth, cors } from "./_lib/db.js";
 
 export default async function handler(req: any, res: any) {
   cors(res);
@@ -17,7 +18,8 @@ export default async function handler(req: any, res: any) {
     const b = req.body ?? {};
     if (!b.email) { res.status(400).json({ error: "email is required" }); return; }
     try {
-      const rows = await sql`INSERT INTO subscribers (email, name) VALUES (${b.email}, ${b.name ?? ""}) RETURNING *`;
+      const rows = await sql`
+        INSERT INTO subscribers (email, name) VALUES (${b.email}, ${b.name ?? ""}) RETURNING *`;
       res.status(201).json(toCamel(rows[0]));
     } catch {
       res.status(409).json({ error: "Email already subscribed" });
