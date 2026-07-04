@@ -314,9 +314,9 @@ export default function Home() {
             <motion.p variants={fadeUp} className="text-gray-400 max-w-2xl mx-auto text-lg">The old agency model is broken. You need a complete lead generation system, not just ads.</motion.p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+          <div className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-2 gap-6 lg:gap-10 pb-6 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             {/* Problems */}
-            <motion.div initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.7}} className="relative">
+            <motion.div initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.7}} className="relative min-w-[85vw] snap-center md:min-w-0">
               <div className="absolute -inset-px rounded-2xl" style={{background:'linear-gradient(135deg, rgba(239,68,68,0.3) 0%, transparent 60%)'}} />
               <div className="relative rounded-2xl bg-[#0a0608]/90 border border-red-500/20 p-8 backdrop-blur-sm" style={{boxShadow:'0 0 60px rgba(239,68,68,0.08), inset 0 1px 0 rgba(239,68,68,0.1)'}}>
                 <div className="flex items-center gap-3 mb-8">
@@ -344,7 +344,7 @@ export default function Home() {
             </motion.div>
 
             {/* Solutions */}
-            <motion.div initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.7}} className="relative">
+            <motion.div initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.7}} className="relative min-w-[85vw] snap-center md:min-w-0">
               <div className="absolute -inset-px rounded-2xl animate-pulse-glow" style={{background:'linear-gradient(135deg, rgba(59,130,246,0.4) 0%, rgba(99,102,241,0.2) 50%, transparent 100%)'}} />
               <div className="relative rounded-2xl bg-[#060812]/90 border border-blue-500/25 p-8 backdrop-blur-sm" style={{boxShadow:'0 0 80px rgba(59,130,246,0.12), inset 0 1px 0 rgba(59,130,246,0.15)'}}>
                 <div className="absolute top-0 right-0 w-48 h-48 orb bg-blue-500/15" style={{transform:'translate(30%, -30%)'}} />
@@ -402,7 +402,7 @@ export default function Home() {
           </motion.div>
 
           {/* Service cards — 8 cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+          <div className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12 pb-6 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             {[
               { title: "Facebook & IG Ads", icon: SiFacebook, desc: "Laser-targeted campaigns reaching active property buyers.", color: "#1877f2" },
               { title: "Google Lead Campaigns", icon: SiGoogleads, desc: "Capture high-intent search traffic looking to buy now.", color: "#ea4335" },
@@ -419,7 +419,7 @@ export default function Home() {
                 whileInView={{opacity:1, y:0}}
                 viewport={{once:true}}
                 transition={{duration:0.5, delay:i*0.07}}
-                className="group relative rounded-2xl p-[1px] cursor-default"
+                className="group relative rounded-2xl p-[1px] cursor-default min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0"
                 style={{background:'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)'}}
               >
                 <div className="rounded-2xl bg-[#080c14] p-7 h-full transition-all duration-500 group-hover:-translate-y-1 group-hover:bg-[#0c1220]" style={{boxShadow:'0 0 0 0 transparent'}}
@@ -477,7 +477,7 @@ export default function Home() {
           </motion.div>
 
           {/* Funnel steps */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-stretch">
+          <div className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-5 gap-4 items-stretch pb-6 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             {[
               { step:"01", label:"Targeted Ads", sub:"Facebook, Google", icon:SiFacebook, color:"#1877f2" },
               { step:"02", label:"Landing Page", sub:"Capture & qualify", icon:Layers, color:"#3b82f6" },
@@ -541,7 +541,7 @@ export default function Home() {
               View All <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 pb-6 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             {[
               { name:"Social Media Management", desc:"Content, strategy and community growth across all platforms.", icon:Star, color:"#f59e0b" },
               { name:"Business Development", desc:"Strategic partnerships and market expansion for real growth.", icon:TrendingUp, color:"#3b82f6" },

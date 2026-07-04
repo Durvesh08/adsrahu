@@ -149,12 +149,12 @@ export default function Blog() {
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-16">
+        <div className="flex flex-nowrap md:flex-wrap overflow-x-auto snap-x hide-scrollbar gap-3 mb-16 pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center">
           {categories.map((cat, i) => (
             <button
               key={i}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+              className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap snap-center shrink-0 ${
                 activeCategory === cat
                   ? "bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.3)]"
                   : "bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10"

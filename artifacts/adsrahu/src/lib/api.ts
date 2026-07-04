@@ -19,6 +19,14 @@ async function req<T>(method: string, path: string, body?: unknown, auth = false
   });
   if (res.status === 204) return undefined as T;
   const data = await res.json();
+  if (res.status === 401 && auth) {
+    // Token expired or invalid — clear session and redirect to login
+    localStorage.removeItem("adsrahu_admin_token");
+    localStorage.removeItem("adsrahu_admin_expiry");
+    sessionStorage.removeItem("adsrahu_admin_session");
+    window.location.href = "/admin";
+    throw new Error("Session expired. Please log in again.");
+  }
   if (!res.ok) throw new Error(data.error ?? "Request failed");
   return data as T;
 }

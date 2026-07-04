@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { isAuthenticated } from "@/lib/admin-auth";
+import { MobileBottomNav } from "@/components/ui/MobileBottomNav";
 
 // Public pages
 import Home from "@/pages/Home";
@@ -95,6 +96,7 @@ function Router() {
         </Switch>
       </main>
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 }

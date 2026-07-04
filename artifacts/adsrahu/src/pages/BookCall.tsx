@@ -200,7 +200,7 @@ export default function BookCall() {
                             disabled={!available}
                             onClick={() => { setSelectedDay(day); setSelectedTime(null); }}
                             className={`
-                              aspect-square rounded-full text-sm flex items-center justify-center transition-all duration-150 font-medium
+                              aspect-square min-h-[44px] min-w-[44px] sm:min-w-0 sm:min-h-0 rounded-full text-sm flex items-center justify-center transition-all duration-150 font-medium mx-auto
                               ${selected ? "bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.5)]" : ""}
                               ${!selected && available ? "text-white hover:bg-blue-600/30 hover:text-blue-300 cursor-pointer" : ""}
                               ${past || (!available && !selected) ? "text-gray-700 cursor-not-allowed" : ""}
@@ -224,7 +224,7 @@ export default function BookCall() {
                             <button
                               key={i}
                               onClick={() => setSelectedTime(time)}
-                              className={`w-full border rounded-xl py-2.5 text-sm font-medium transition-all duration-150 ${
+                              className={`w-full border rounded-xl py-3.5 text-sm font-medium transition-all duration-150 ${
                                 selectedTime === time
                                   ? "bg-blue-600 border-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.3)]"
                                   : "border-white/10 text-gray-300 hover:border-blue-500/50 hover:text-white hover:bg-blue-600/10"
