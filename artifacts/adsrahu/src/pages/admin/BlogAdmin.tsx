@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Loader2, AlertCircle } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Loader2, AlertCircle, Upload, ImageIcon } from "lucide-react";
 import { blogApi, type ApiPost } from "@/lib/api";
 
 const CATEGORIES = ["Real Estate Lead Generation","Facebook Ads","Google Ads","WhatsApp Funnels","CRM Automation","Marketing Strategies","Business Growth"];
@@ -10,6 +10,30 @@ function autoSlug(title: string) {
 
 const emptyForm = { title:"", slug:"", category:CATEGORIES[0], excerpt:"", content:"", published:false, imageUrl:"" };
 
+/** Compress an image File to a JPEG base64 data-URL (max 1200px wide, 0.75 quality) */
+function compressImage(file: File, maxWidth = 1200, quality = 0.75): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function AdminBlog() {
   const [posts, setPosts] = useState<ApiPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +43,9 @@ export default function AdminBlog() {
   const [form, setForm] = useState({ ...emptyForm });
   const [error, setError] = useState("");
   const [listError, setListError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function refresh() {
     try {
@@ -75,6 +102,44 @@ export default function AdminBlog() {
     }
   }
 
+  const handleImageFile = useCallback(async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload an image file (JPG, PNG, WebP, etc.)");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image is too large. Maximum size is 10 MB.");
+      return;
+    }
+    setUploading(true);
+    setError("");
+    try {
+      const dataUrl = await compressImage(file);
+      setForm(prev => ({...prev, imageUrl: dataUrl}));
+    } catch {
+      setError("Failed to process image. Please try a different file.");
+    } finally {
+      setUploading(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleImageFile(file);
+  }, [handleImageFile]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+  }, []);
+
   if (view === "edit") {
     return (
       <div className="space-y-6">
@@ -101,6 +166,69 @@ export default function AdminBlog() {
               <textarea value={form.excerpt} onChange={e => setForm({...form, excerpt:e.target.value})} rows={2} placeholder="Brief description shown on blog page..."
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600 resize-none transition-all" />
             </div>
+
+            {/* ── Cover Image Uploader ─────────────────────────────── */}
+            <div>
+              <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Cover Image</label>
+              <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleImageFile(f); }} />
+
+              {form.imageUrl ? (
+                <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-[#0a0a12]">
+                  <img src={form.imageUrl} alt="Cover preview" className="w-full aspect-video object-cover" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <button type="button" onClick={() => fileInputRef.current?.click()}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-2">
+                      <Upload className="w-4 h-4" /> Replace
+                    </button>
+                    <button type="button" onClick={() => setForm({...form, imageUrl: ""})}
+                      className="px-4 py-2 text-sm font-medium text-white bg-red-600/80 rounded-lg hover:bg-red-500 transition-colors flex items-center gap-2">
+                      <Trash2 className="w-4 h-4" /> Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  className={`relative flex flex-col items-center justify-center gap-3 w-full aspect-video rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 ${
+                    dragOver
+                      ? "border-blue-400 bg-blue-500/10 scale-[1.01]"
+                      : "border-white/10 bg-white/[0.02] hover:border-blue-500/40 hover:bg-blue-500/5"
+                  }`}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+                      <span className="text-sm text-gray-400">Processing image…</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                        <ImageIcon className="w-7 h-7 text-blue-400" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-300 font-medium">Drop an image here or <span className="text-blue-400">click to browse</span></p>
+                        <p className="text-xs text-gray-500 mt-1">JPG, PNG, WebP up to 10 MB · Auto-compressed to JPEG</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Also allow pasting a URL directly */}
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-[10px] text-gray-600 uppercase tracking-wider shrink-0">Or paste URL:</span>
+                <input
+                  value={form.imageUrl.startsWith("data:") ? "" : form.imageUrl}
+                  onChange={e => setForm({...form, imageUrl: e.target.value})}
+                  placeholder="/blog/image.jpg or https://..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Content (Markdown)</label>
               <textarea value={form.content} onChange={e => setForm({...form, content:e.target.value})} rows={16} placeholder="Write your post content here..."
@@ -116,11 +244,6 @@ export default function AdminBlog() {
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600" />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Image URL (Cover)</label>
-                <input value={form.imageUrl} onChange={e => setForm({...form, imageUrl:e.target.value})} placeholder="/blog/image.jpg or https://..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600" />
-              </div>
-              <div>
                 <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Category</label>
                 <select value={form.category} onChange={e => setForm({...form, category:e.target.value})} className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none">
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
@@ -133,7 +256,7 @@ export default function AdminBlog() {
                   <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.published?"translate-x-5":""}`} />
                 </button>
               </div>
-              <button type="submit" disabled={saving} className="w-full h-10 btn-premium rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60">
+              <button type="submit" disabled={saving || uploading} className="w-full h-10 btn-premium rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                 {saving ? "Saving…" : editing ? "Save Changes" : "Publish Post"}
               </button>
@@ -168,6 +291,14 @@ export default function AdminBlog() {
             {posts.length === 0 && <div className="text-center py-12 text-gray-600 text-sm">No posts yet. Create your first post.</div>}
             {posts.map(post => (
               <div key={post.id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.02] transition-colors">
+                {/* Thumbnail */}
+                <div className="w-14 h-10 rounded-lg overflow-hidden bg-white/5 shrink-0 border border-white/5">
+                  {post.imageUrl ? (
+                    <img src={post.imageUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-4 h-4 text-gray-600" /></div>
+                  )}
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-sm font-medium text-white truncate">{post.title}</span>
