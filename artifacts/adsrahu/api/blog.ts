@@ -18,17 +18,7 @@ Topic: "${topic}"
 Category: "${category}"
 
 The blog should be written for real estate developers, builders, and business owners who want to grow using digital marketing.
-
-Return your response as valid JSON with these exact keys:
-{
-  "title": "An SEO-friendly, compelling blog title (50-70 chars)",
-  "slug": "url-friendly-slug-with-hyphens",
-  "excerpt": "A compelling 1-2 sentence summary for the blog card (under 160 chars)",
-  "content": "The full blog body in Markdown format. Include:\n- An engaging introduction\n- 3-5 sections with ## headings\n- Practical tips, statistics, and actionable advice\n- A conclusion with a CTA to contact Adsrahu\n- Aim for 800-1200 words",
-  "imageQuery": "A 2-3 word Unsplash search query for a relevant, professional cover image (e.g. 'digital marketing', 'real estate office', 'business analytics')"
-}
-
-IMPORTANT: Return ONLY the JSON object. No markdown code fences, no extra text.`;
+The content should be formatted in Markdown. Include an engaging introduction, 3-5 sections with ## headings, practical tips, statistics, and a conclusion with a CTA to contact Adsrahu. Aim for 800-1200 words.`;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
@@ -44,6 +34,17 @@ IMPORTANT: Return ONLY the JSON object. No markdown code fences, no extra text.`
           temperature: 0.8,
           maxOutputTokens: 4096,
           responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              title: { type: "STRING", description: "An SEO-friendly, compelling blog title (50-70 chars)" },
+              slug: { type: "STRING", description: "url-friendly-slug-with-hyphens" },
+              excerpt: { type: "STRING", description: "A compelling 1-2 sentence summary for the blog card (under 160 chars)" },
+              content: { type: "STRING", description: "The full blog body in Markdown format. Use \\n for newlines." },
+              imageQuery: { type: "STRING", description: "A 2-3 word Unsplash search query for a relevant, professional cover image" }
+            },
+            required: ["title", "slug", "excerpt", "content", "imageQuery"]
+          }
         },
       }),
     }
