@@ -18,7 +18,7 @@ export function Navbar() {
                   <div className="absolute inset-0 rounded-full bg-amber-400/30 blur-md animate-pulse-glow" />
                   <div className="relative w-10 h-10 rounded-full border border-amber-400/40 overflow-hidden" style={{boxShadow:'0 0 20px rgba(251,191,36,0.35), inset 0 1px 0 rgba(251,191,36,0.2)'}}>
                     <img
-                      src="/logo.png"
+                      src="/logo.jpg"
                       alt="Adsrahu logo"
                       className="absolute w-full h-full object-cover"
                       style={{ objectPosition: '50% 8%', transform: 'scale(2.1)', transformOrigin: '50% 8%' }}

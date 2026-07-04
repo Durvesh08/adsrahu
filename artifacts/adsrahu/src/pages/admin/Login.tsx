@@ -40,7 +40,7 @@ export default function AdminLogin() {
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-amber-400/25 blur-lg animate-pulse" />
               <div className="relative w-16 h-16 rounded-full border border-amber-400/40 overflow-hidden" style={{boxShadow:'0 0 30px rgba(251,191,36,0.3)'}}>
-                <img src="/logo.png" alt="Adsrahu" className="absolute w-full h-full object-cover" style={{objectPosition:'50% 8%', transform:'scale(2.1)', transformOrigin:'50% 8%'}} />
+                <img src="/logo.jpg" alt="Adsrahu" className="absolute w-full h-full object-cover" style={{objectPosition:'50% 8%', transform:'scale(2.1)', transformOrigin:'50% 8%'}} />
               </div>
             </div>
           </div>
