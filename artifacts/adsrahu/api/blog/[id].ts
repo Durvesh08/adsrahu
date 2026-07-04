@@ -12,7 +12,10 @@ export default async function handler(req: any, res: any) {
   const sql = getSql();
 
   if (req.method === "PUT") {
-    const b = req.body ?? {};
+    let b = req.body ?? {};
+    if (typeof b === "string") {
+      try { b = JSON.parse(b); } catch (e) {}
+    }
     const rows = await sql`
       UPDATE blog_posts SET
         title = COALESCE(${b.title}, title),

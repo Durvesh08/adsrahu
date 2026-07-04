@@ -18,7 +18,10 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === "POST") {
     if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
-    const b = req.body ?? {};
+    let b = req.body ?? {};
+    if (typeof b === "string") {
+      try { b = JSON.parse(b); } catch (e) {}
+    }
     if (!b.title || !b.slug) { res.status(400).json({ error: "title and slug required" }); return; }
     const rows = await sql`
       INSERT INTO blog_posts (title, slug, category, excerpt, content, published)
