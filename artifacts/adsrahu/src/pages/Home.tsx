@@ -43,7 +43,16 @@ export default function Home() {
 
   useEffect(() => {
     if (settings.metaTitle) document.title = settings.metaTitle;
-  }, [settings.metaTitle]);
+    if (settings.metaDescription) {
+      let meta = document.querySelector('meta[name="description"]');
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', 'description');
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', settings.metaDescription);
+    }
+  }, [settings.metaTitle, settings.metaDescription]);
 
   return (
     <div className="flex flex-col min-h-screen pt-20 overflow-x-hidden">
@@ -439,9 +448,9 @@ export default function Home() {
           >
             <div className="rounded-2xl bg-[#080c14]/95 backdrop-blur-sm p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/5 text-center">
               {[
-                {val:'1,248', label:'Leads Generated This Month'},
-                {val:'₹23', label:'Average Cost Per Lead'},
-                {val:'94%', label:'Site Visit Conversion Rate'},
+                {val: settings.totalLeads, label:'Leads Generated This Month'},
+                {val: settings.avgCpl, label:'Average Cost Per Lead'},
+                {val: settings.conversionRate, label:'Site Visit Conversion Rate'},
               ].map((s,i) => (
                 <div key={i} className="py-5 sm:py-0 px-6">
                   <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2">{s.val}</div>

@@ -22,9 +22,9 @@ export default function Services() {
                 { title: "Real Estate Lead Generation", desc: "End-to-end lead generation systems built specifically for builders, developers, and realtors — from ad creative to site visit." },
                 { title: "Lead Generation", desc: "Full-funnel performance marketing for any industry — generating qualified, sales-ready leads at scale using paid and organic channels." },
                 { title: "Facebook & Instagram Ads", desc: "Targeted campaigns to capture high-intent property buyers and investors." },
-                { title: "Google Lead Campaigns", desc: "Capture search intent from people actively looking for real estate or your services." },
-                { title: "Landing Page Development", desc: "High-converting, mobile-optimized pages designed specifically for lead capture." },
-                { title: "CRM Automation Setup", desc: "End-to-end lead management systems so no inquiry falls through the cracks." },
+                { title: "Google Ads", desc: "Capture search intent from people actively looking for real estate or your services." },
+                { title: "Apps and Website Development", desc: "High-speed, conversion-optimized pages designed specifically for your paid traffic." },
+                { title: "Automation Services", desc: "Never lose a lead. We set up automated email and WhatsApp workflows." },
                 { title: "WhatsApp Funnels", desc: "Automated brochure delivery, project updates, and direct engagement via WhatsApp." },
                 { title: "Analytics & Lead Tracking", desc: "Attribution models and dashboard setups to track CPL, ROI, and lead quality." }
               ].map((item, i) => (

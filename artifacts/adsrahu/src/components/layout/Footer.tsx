@@ -13,7 +13,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-1">
             <Link href="/" className="text-2xl font-bold tracking-tight text-white mb-4 inline-block">
-              Ads<span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">rahu</span>
+              Adsrahu
             </Link>
             <p className="text-gray-400 text-sm mb-6 leading-relaxed">
               Performance marketing & lead generation systems for real estate and modern growth businesses.

@@ -272,7 +272,7 @@ export default function BookCall() {
                       value={form.name}
                       onChange={e => setForm({...form, name:e.target.value})}
                       className="w-full rounded-xl border border-white/10 bg-black/60 px-4 py-3 text-white text-sm focus:border-blue-500/50 focus:outline-none placeholder-gray-600 transition-all"
-                      placeholder="Raushan Kumar"
+                      placeholder="John Doe"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

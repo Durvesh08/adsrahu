@@ -145,7 +145,7 @@ export default function Contact() {
                         value={form.name}
                         onChange={e => { setForm({...form, name: e.target.value}); setErrors({...errors, name: ""}); }}
                         className={`w-full rounded-xl border bg-black/60 px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 transition-colors text-sm ${errors.name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/30" : "border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20"}`}
-                        placeholder="Raushan Kumar"
+                        placeholder="John Doe"
                       />
                     </Field>
                     <Field id="company" label="Company Name" error={errors.company}>
