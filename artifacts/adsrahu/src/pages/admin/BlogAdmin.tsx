@@ -46,10 +46,16 @@ export default function AdminBlog() {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // AI Generator State
   const [aiTopic, setAiTopic] = useState("");
   const [aiCategory, setAiCategory] = useState(CATEGORIES[0]);
+  const [aiTone, setAiTone] = useState("Professional & Authoritative");
+  const [aiTargetAudience, setAiTargetAudience] = useState("");
+  const [aiKeyPoints, setAiKeyPoints] = useState("");
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   async function refresh() {
     try {
@@ -200,49 +206,101 @@ export default function AdminBlog() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Category</label>
-                <select
-                  value={aiCategory}
-                  onChange={e => setAiCategory(e.target.value)}
-                  className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50"
-                >
-                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Category</label>
+                  <select
+                    value={aiCategory}
+                    onChange={e => setAiCategory(e.target.value)}
+                    className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50"
+                  >
+                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Tone of Voice</label>
+                  <select
+                    value={aiTone}
+                    onChange={e => setAiTone(e.target.value)}
+                    className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50"
+                  >
+                    <option>Professional & Authoritative</option>
+                    <option>Conversational & Engaging</option>
+                    <option>Urgent & Persuasive</option>
+                    <option>Luxurious & Exclusive</option>
+                    <option>Educational & Informative</option>
+                  </select>
+                </div>
               </div>
 
-              <button
-                onClick={async () => {
-                  if (!aiTopic.trim()) { setAiError("Please enter a topic"); return; }
-                  setAiGenerating(true);
-                  setAiError("");
-                  try {
-                    const result = await blogApi.generate(aiTopic.trim(), aiCategory);
-                    setForm({
-                      title: result.title || "",
-                      slug: result.slug || autoSlug(result.title || ""),
-                      category: result.category || aiCategory,
-                      excerpt: result.excerpt || "",
-                      content: result.content || "",
-                      published: false,
-                      imageUrl: result.imageUrl || "",
-                    });
-                    setEditing(null);
-                    setError("");
-                    setView("edit");
-                  } catch (err) {
-                    setAiError(err instanceof Error ? err.message : "AI generation failed. Please try again.");
-                  } finally {
-                    setAiGenerating(false);
-                  }
-                }}
-                disabled={!aiTopic.trim()}
-                className="w-full h-12 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                style={{background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', boxShadow: '0 0 20px rgba(139,92,246,0.3), 0 4px 15px rgba(0,0,0,0.5)'}}
-              >
-                <Sparkles className="w-4 h-4" />
-                Generate Blog with AI
-              </button>
+              <div className="pt-2">
+                <button 
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="text-xs font-medium text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors"
+                >
+                  {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+                </button>
+              </div>
+
+              {showAdvanced && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Target Audience (Optional)</label>
+                    <input
+                      type="text"
+                      value={aiTargetAudience}
+                      onChange={e => setAiTargetAudience(e.target.value)}
+                      placeholder="e.g. NRI Investors, First-time Homebuyers, Commercial Tenants..."
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Key Points to Include (Optional)</label>
+                    <textarea
+                      value={aiKeyPoints}
+                      onChange={e => setAiKeyPoints(e.target.value)}
+                      rows={2}
+                      placeholder="e.g. Mention our new VR property tour feature, highlight 12% ROI..."
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-600 resize-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-2">
+                <button
+                  onClick={async () => {
+                    if (!aiTopic.trim()) { setAiError("Please enter a topic"); return; }
+                    setAiGenerating(true);
+                    setAiError("");
+                    try {
+                      const result = await blogApi.generate(aiTopic.trim(), aiCategory, aiTone, aiTargetAudience, aiKeyPoints);
+                      setForm({
+                        title: result.title || "",
+                        slug: result.slug || autoSlug(result.title || ""),
+                        category: result.category || aiCategory,
+                        excerpt: result.excerpt || "",
+                        content: result.content || "",
+                        published: false,
+                        imageUrl: result.imageUrl || "",
+                      });
+                      setEditing(null);
+                      setError("");
+                      setView("edit");
+                    } catch (err) {
+                      setAiError(err instanceof Error ? err.message : "AI generation failed. Please try again.");
+                    } finally {
+                      setAiGenerating(false);
+                    }
+                  }}
+                  disabled={!aiTopic.trim()}
+                  className="w-full h-12 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  style={{background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', boxShadow: '0 0 20px rgba(139,92,246,0.3), 0 4px 15px rgba(0,0,0,0.5)'}}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Generate Blog with AI
+                </button>
+              </div>
 
               <div className="border-t border-white/5 pt-4">
                 <p className="text-[11px] text-gray-600 text-center">Powered by Gemini 2.5 Flash · Blog will be saved as Draft for your review</p>
