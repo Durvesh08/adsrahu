@@ -1,7 +1,7 @@
 {
   "buildCommand": "pnpm --filter @workspace/adsrahu run build",
   "outputDirectory": "artifacts/adsrahu/dist",
-  "installCommand": "pnpm install --frozen-lockfile",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": null,
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
