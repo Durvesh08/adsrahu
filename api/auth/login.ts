@@ -18,7 +18,7 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
-  if (!verifyPassword(password)) {
+  if (!verifyPassword(password.trim())) {
     res.status(401).json({ error: "Invalid password" });
     return;
   }

@@ -1,7 +1,7 @@
 // @ts-nocheck
 // @ts-nocheck
 import { neon } from "@neondatabase/serverless";
-import crypto from "crypto";
+import * as crypto from "node:crypto";
 
 // ── Security Constants ─────────────────────────────────────────────────
 // SHA-256 hash of the admin password "ADSRAHU@2025"
