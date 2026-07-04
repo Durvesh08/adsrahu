@@ -63,13 +63,24 @@ IMPORTANT: Return ONLY the JSON object. No markdown code fences, no extra text.`
   try {
     // Try direct parse first
     parsed = JSON.parse(text);
-  } catch {
-    // Try extracting JSON from markdown code fences
-    const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (match) {
-      parsed = JSON.parse(match[1].trim());
-    } else {
-      throw new Error("Failed to parse Gemini response as JSON");
+  } catch (e1) {
+    try {
+      // Try extracting JSON from markdown code fences
+      const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (match) {
+        parsed = JSON.parse(match[1].trim());
+      } else {
+        // Fallback: try finding the first { and last }
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          parsed = JSON.parse(text.substring(firstBrace, lastBrace + 1));
+        } else {
+          throw new Error("No JSON structure found");
+        }
+      }
+    } catch (e2) {
+      throw new Error("Failed to parse Gemini response as JSON. Snippet: " + text.substring(0, 150));
     }
   }
 
