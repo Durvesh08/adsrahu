@@ -23,7 +23,8 @@ export default async function handler(req: any, res: any) {
         category = COALESCE(${b.category}, category),
         excerpt = COALESCE(${b.excerpt}, excerpt),
         content = COALESCE(${b.content}, content),
-        published = COALESCE(${b.published}, published)
+        published = COALESCE(${b.published}, published),
+        image_url = COALESCE(${b.imageUrl}, image_url)
       WHERE id = ${id} RETURNING *`;
     if (!rows[0]) { res.status(404).json({ error: "Not found" }); return; }
     res.status(200).json(toCamel(rows[0]));
@@ -40,5 +41,5 @@ export default async function handler(req: any, res: any) {
 }
 
 function toCamel(row: any) {
-  return { id: row.id, title: row.title, slug: row.slug, category: row.category, excerpt: row.excerpt, content: row.content, published: row.published, createdAt: row.created_at };
+  return { id: row.id, title: row.title, slug: row.slug, category: row.category, excerpt: row.excerpt, content: row.content, published: row.published, createdAt: row.created_at, imageUrl: row.image_url };
 }

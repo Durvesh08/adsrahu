@@ -8,7 +8,7 @@ function autoSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
 }
 
-const emptyForm = { title:"", slug:"", category:CATEGORIES[0], excerpt:"", content:"", published:false };
+const emptyForm = { title:"", slug:"", category:CATEGORIES[0], excerpt:"", content:"", published:false, imageUrl:"" };
 
 export default function AdminBlog() {
   const [posts, setPosts] = useState<ApiPost[]>([]);
@@ -35,7 +35,7 @@ export default function AdminBlog() {
 
   function openEdit(post: ApiPost) {
     setEditing(post);
-    setForm({ title:post.title, slug:post.slug, category:post.category, excerpt:post.excerpt, content:post.content, published:post.published });
+    setForm({ title:post.title, slug:post.slug, category:post.category, excerpt:post.excerpt, content:post.content, published:post.published, imageUrl:post.imageUrl || "" });
     setError("");
     setView("edit");
   }
@@ -113,6 +113,11 @@ export default function AdminBlog() {
               <div>
                 <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Slug (URL)</label>
                 <input value={form.slug} onChange={e => setForm({...form, slug:e.target.value})} placeholder="post-url-slug"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Image URL (Cover)</label>
+                <input value={form.imageUrl} onChange={e => setForm({...form, imageUrl:e.target.value})} placeholder="/blog/image.jpg or https://..."
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600" />
               </div>
               <div>

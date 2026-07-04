@@ -93,6 +93,7 @@ export interface ApiPost {
   content: string;
   published: boolean;
   createdAt: string;
+  imageUrl?: string;
 }
 
 export const blogApi = {

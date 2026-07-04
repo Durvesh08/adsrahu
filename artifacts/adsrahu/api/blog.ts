@@ -24,8 +24,8 @@ export default async function handler(req: any, res: any) {
     }
     if (!b.title || !b.slug) { res.status(400).json({ error: "title and slug required" }); return; }
     const rows = await sql`
-      INSERT INTO blog_posts (title, slug, category, excerpt, content, published)
-      VALUES (${b.title}, ${b.slug}, ${b.category ?? "General"}, ${b.excerpt ?? ""}, ${b.content ?? ""}, ${b.published ?? false})
+      INSERT INTO blog_posts (title, slug, category, excerpt, content, published, image_url)
+      VALUES (${b.title}, ${b.slug}, ${b.category ?? "General"}, ${b.excerpt ?? ""}, ${b.content ?? ""}, ${b.published ?? false}, ${b.imageUrl ?? null})
       RETURNING *`;
     res.status(201).json(toCamel(rows[0]));
     return;
@@ -35,5 +35,5 @@ export default async function handler(req: any, res: any) {
 }
 
 function toCamel(row: any) {
-  return { id: row.id, title: row.title, slug: row.slug, category: row.category, excerpt: row.excerpt, content: row.content, published: row.published, createdAt: row.created_at };
+  return { id: row.id, title: row.title, slug: row.slug, category: row.category, excerpt: row.excerpt, content: row.content, published: row.published, createdAt: row.created_at, imageUrl: row.image_url };
 }
