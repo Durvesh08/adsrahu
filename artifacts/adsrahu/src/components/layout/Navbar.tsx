@@ -21,7 +21,6 @@ export function Navbar() {
                       src="/logo.jpg"
                       alt="Adsrahu logo"
                       className="absolute w-full h-full object-cover"
-                      style={{ objectPosition: '50% 8%', transform: 'scale(2.1)', transformOrigin: '50% 8%' }}
                     />
                   </div>
                 </div>

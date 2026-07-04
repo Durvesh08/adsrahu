@@ -30,7 +30,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-amber-400/30 blur-sm" />
           <div className="relative w-8 h-8 rounded-full border border-amber-400/40 overflow-hidden">
-            <img src="/logo.jpg" alt="Adsrahu" className="absolute w-full h-full object-cover" style={{objectPosition:'50% 8%', transform:'scale(2.1)', transformOrigin:'50% 8%'}} />
+            <img src="/logo.jpg" alt="Adsrahu" className="absolute w-full h-full object-cover" />
           </div>
         </div>
         <div>
