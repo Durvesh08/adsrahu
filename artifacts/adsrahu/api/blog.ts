@@ -11,14 +11,22 @@ async function generateBlogWithAI(topic: string, category: string) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
-  const prompt = `You are an expert digital marketing blog writer for "Adsrahu", a premium real estate lead generation and performance marketing agency based in India.
+  const prompt = `You are a world-class digital marketing and real estate lead generation expert writing for "Adsrahu". Adsrahu is a premium performance marketing agency in India that helps real estate developers and startups scale their leads and sales.
 
-Write a complete, professional, SEO-optimized blog post on the following topic:
+Write a highly detailed, professional, and actionable SEO-optimized blog post based on this exact topic:
 Topic: "${topic}"
 Category: "${category}"
 
-The blog should be written for real estate developers, builders, and business owners who want to grow using digital marketing.
-The content should be formatted in Markdown. Include an engaging introduction, 3-5 sections with ## headings, practical tips, statistics, and a conclusion with a CTA to contact Adsrahu. Aim for 800-1200 words.`;
+CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
+1. Speak directly to real estate developers, founders, and business owners. Use professional, authoritative, and persuasive language.
+2. Provide specific, actionable strategies (e.g., mention specific Facebook Ad strategies, Google Ads intent targeting, WhatsApp automation flows, CRM integrations).
+3. Avoid generic fluff. Use realistic data points, market trends, and modern SaaS/digital marketing methodologies.
+4. Format the content beautifully in Markdown:
+   - Start with an engaging hook.
+   - Use 3-5 clearly defined ## headings.
+   - Include bullet points, numbered lists, and bold text for readability.
+5. End with a strong Call-To-Action (CTA) encouraging the reader to book a consultation or contact Adsrahu to implement these strategies.
+6. The blog must be comprehensive and well-structured.`;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
@@ -85,11 +93,21 @@ The content should be formatted in Markdown. Include an engaging introduction, 3
     }
   }
 
-  // Build a relevant Unsplash cover image URL
-  const query = encodeURIComponent(parsed.imageQuery || category || "digital marketing");
-  const imageUrl = `https://images.unsplash.com/photo-${Date.now()}?w=1200&h=630&fit=crop&q=80`;
-  // Use Unsplash source API for a random relevant image
-  const unsplashUrl = `https://source.unsplash.com/1200x630/?${query}`;
+  // Curated list of premium Unsplash images related to Real Estate & Digital Marketing
+  const premiumImages = [
+    "1560518883-ce09059eeffa", // Modern office building
+    "1556155092-490a1ba16284", // Analytics on screen
+    "1460925895917-afdab827c52f", // Marketing/Teamwork
+    "1600880292203-757bb62b4baf", // Real Estate house
+    "1512917774080-9991f1c4c750", // Real estate modern house
+    "1486406146926-c627a92ad1ab", // Business meeting
+    "1551288049-bebda4e38f71", // Data charts
+    "1570125909202-e2f5d0b3ab45", // Modern workspace
+    "1504384308090-c894fdcc538d", // Workstation
+    "1434626881859-194d673664c1"  // Marketing strategy
+  ];
+  const randomId = premiumImages[Math.floor(Math.random() * premiumImages.length)];
+  const imageUrl = `https://images.unsplash.com/photo-${randomId}?w=1200&h=630&fit=crop&q=80`;
 
   return {
     title: parsed.title,
@@ -97,7 +115,7 @@ The content should be formatted in Markdown. Include an engaging introduction, 3
     category,
     excerpt: parsed.excerpt,
     content: parsed.content,
-    imageUrl: unsplashUrl,
+    imageUrl: imageUrl,
   };
 }
 
