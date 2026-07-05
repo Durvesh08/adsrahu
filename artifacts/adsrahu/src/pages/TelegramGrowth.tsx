@@ -68,7 +68,7 @@ const Navbar = () => {
           <a href="#how-it-works" className={`text-sm font-medium ${theme.textSecondary} hover:text-white transition-colors`}>How It Works</a>
           <a href="#showcase" className={`text-sm font-medium ${theme.textSecondary} hover:text-white transition-colors`}>Growth Showcase</a>
           <a href="#founder" className={`text-sm font-medium ${theme.textSecondary} hover:text-white transition-colors`}>Founder</a>
-          <a href="https://t.me/your_telegram_channel" target="_blank" rel="noreferrer" className="h-10 px-5 flex items-center justify-center rounded-full text-sm font-semibold text-white border transition-all duration-300 gap-2 hover:opacity-90" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
+          <a href="https://t.me/+3iPrSB-aHp8yOTVl" target="_blank" rel="noreferrer" className="h-10 px-5 flex items-center justify-center rounded-full text-sm font-semibold text-white border transition-all duration-300 gap-2 hover:opacity-90" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
             <Send size={14} /> Join Telegram
           </a>
         </div>
@@ -90,7 +90,7 @@ const Navbar = () => {
              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className={`${theme.textSecondary} text-sm`}>How It Works</a>
              <a href="#showcase" onClick={() => setMobileMenuOpen(false)} className={`${theme.textSecondary} text-sm`}>Growth Showcase</a>
              <a href="#founder" onClick={() => setMobileMenuOpen(false)} className={`${theme.textSecondary} text-sm`}>Founder</a>
-             <a href="https://t.me/your_telegram_channel" target="_blank" rel="noreferrer" className="mt-2 h-12 w-full flex items-center justify-center rounded-xl text-sm font-semibold text-white border gap-2 hover:opacity-90" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
+             <a href="https://t.me/+3iPrSB-aHp8yOTVl" target="_blank" rel="noreferrer" className="mt-2 h-12 w-full flex items-center justify-center rounded-xl text-sm font-semibold text-white border gap-2 hover:opacity-90" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
               <Send size={16} /> Join Telegram
             </a>
           </motion.div>
@@ -189,7 +189,7 @@ const Hero = () => (
             </p>
           </motion.div>
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <a href="https://t.me/your_telegram_channel" target="_blank" rel="noreferrer" className="h-14 px-8 rounded-xl flex items-center justify-center gap-2 text-base font-semibold text-white border shadow-[0_0_30px_rgba(29,78,216,0.3)] hover:shadow-[0_0_40px_rgba(29,78,216,0.5)] hover:-translate-y-1 transition-all duration-300" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
+            <a href="https://t.me/+3iPrSB-aHp8yOTVl" target="_blank" rel="noreferrer" className="h-14 px-8 rounded-xl flex items-center justify-center gap-2 text-base font-semibold text-white border shadow-[0_0_30px_rgba(29,78,216,0.3)] hover:shadow-[0_0_40px_rgba(29,78,216,0.5)] hover:-translate-y-1 transition-all duration-300" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
               <Send size={18} /> Join Our Telegram Channel
             </a>
             <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className="h-14 px-8 rounded-xl flex items-center justify-center gap-2 text-base font-medium text-white border hover:-translate-y-1 shadow-[0_0_30px_rgba(4,120,87,0.2)] transition-all duration-300" style={{ backgroundColor: '#047857', borderColor: '#10b981' }}>
@@ -424,7 +424,7 @@ const FounderSection = () => (
             Helping Telegram creators and communities scale faster through intelligent paid advertising and growth systems. Eliminate bot growth and build a community that converts.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <a href="https://t.me/your_telegram_channel" target="_blank" rel="noreferrer" className="h-12 px-6 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white border hover:-translate-y-1 transition-all hover:opacity-90" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
+            <a href="https://t.me/+3iPrSB-aHp8yOTVl" target="_blank" rel="noreferrer" className="h-12 px-6 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white border hover:-translate-y-1 transition-all hover:opacity-90" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
               <Send size={16} /> Join Telegram
             </a>
             <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className="h-12 px-6 rounded-xl flex items-center justify-center gap-2 text-sm font-medium text-white border hover:-translate-y-1 transition-all hover:opacity-90" style={{ backgroundColor: '#047857', borderColor: '#10b981' }}>
@@ -453,7 +453,7 @@ const FinalCTA = () => (
           Join our Telegram community and discover how paid advertising can consistently bring high-quality members to your channel.
         </p>
         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-          <a href="https://t.me/your_telegram_channel" target="_blank" rel="noreferrer" className="h-14 md:h-16 px-8 md:px-10 rounded-2xl flex items-center justify-center gap-2 text-base md:text-lg font-bold text-white border shadow-[0_0_40px_rgba(29,78,216,0.4)] hover:shadow-[0_0_60px_rgba(29,78,216,0.6)] hover:-translate-y-1 transition-all duration-300" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
+          <a href="https://t.me/+3iPrSB-aHp8yOTVl" target="_blank" rel="noreferrer" className="h-14 md:h-16 px-8 md:px-10 rounded-2xl flex items-center justify-center gap-2 text-base md:text-lg font-bold text-white border shadow-[0_0_40px_rgba(29,78,216,0.4)] hover:shadow-[0_0_60px_rgba(29,78,216,0.6)] hover:-translate-y-1 transition-all duration-300" style={{ backgroundColor: '#1d4ed8', borderColor: '#3b82f6' }}>
             <Send size={20} /> Join Telegram
           </a>
           <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className="h-14 md:h-16 px-8 md:px-10 rounded-2xl flex items-center justify-center gap-2 text-base md:text-lg font-medium text-white border hover:-translate-y-1 shadow-[0_0_40px_rgba(4,120,87,0.2)] hover:shadow-[0_0_60px_rgba(4,120,87,0.4)] transition-all duration-300" style={{ backgroundColor: '#047857', borderColor: '#10b981' }}>
