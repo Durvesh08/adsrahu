@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { MobileBottomNav } from "@/components/ui/MobileBottomNav";
-import { FloatingWhatsApp, SocialProofToast } from "@/components/ui/GlobalWidgets";
+import { FloatingWhatsApp } from "@/components/ui/GlobalWidgets";
 import { CursorSpotlight } from "@/components/ui/CursorSpotlight";
 
 // Public pages
@@ -132,7 +132,6 @@ function App() {
           <CursorSpotlight />
           <Router />
           <FloatingWhatsApp />
-          <SocialProofToast />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
