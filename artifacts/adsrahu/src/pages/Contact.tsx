@@ -5,6 +5,18 @@ import { SiWhatsapp } from "react-icons/si";
 import { leadsApi } from "@/lib/api";
 import { useSettings } from "@/lib/useSettings";
 
+function Field({ id, label, required, error, children }: { id: string; label: string; required?: boolean; error?: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="text-sm font-medium text-gray-300">
+        {label}{required && <span className="text-blue-400 ml-0.5">*</span>}
+      </label>
+      {children}
+      {error && <p className="text-xs text-red-400">{error}</p>}
+    </div>
+  );
+}
+
 export default function Contact() {
   const settings = useSettings();
   const waNumber = settings.whatsappNumber.replace(/\D/g, "");
@@ -47,16 +59,6 @@ export default function Contact() {
     }
   }
 
-  function Field({ id, label, required, error, children }: { id: string; label: string; required?: boolean; error?: string; children: React.ReactNode }) {
-    return (
-      <div className="space-y-1.5">
-        <label htmlFor={id} className="text-sm font-medium text-gray-300">
-          {label}{required && <span className="text-blue-400 ml-0.5">*</span>}
-        </label>
-        {children}
-        {error && <p className="text-xs text-red-400">{error}</p>}
-      </div>
-    );
   }
 
   return (
