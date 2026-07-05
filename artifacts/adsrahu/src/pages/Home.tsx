@@ -10,6 +10,9 @@ import { SiWhatsapp, SiX, SiFacebook, SiGoogleads } from "react-icons/si";
 import { Linkedin } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ParticleBackground } from "@/components/ui/ParticleBackground";
+import { TypewriterText } from "@/components/ui/TypewriterText";
+import { ROICalculator } from "@/components/ui/ROICalculator";
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -63,6 +66,7 @@ export default function Home() {
       <section className="relative min-h-[95vh] flex items-center overflow-hidden">
         {/* Layered background */}
         <div className="absolute inset-0 bg-[#020408]" />
+        <ParticleBackground />
         <div className="absolute inset-0" style={{background:'radial-gradient(ellipse 80% 60% at 20% 40%, rgba(59,130,246,0.18) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 80% 20%, rgba(99,102,241,0.12) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 60% 90%, rgba(16,185,129,0.05) 0%, transparent 50%)'}} />
         <div className="absolute inset-0 bg-grid opacity-[0.07]" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#020408]" />
@@ -81,9 +85,12 @@ export default function Home() {
               Premium Real Estate Growth Partner
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl lg:text-[72px] font-bold tracking-tight mb-6 leading-[1.05] bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent animate-gradient" style={{backgroundSize:'200% 200%'}}>
-              {settings.heroHeading}
+            <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl lg:text-[72px] font-bold tracking-tight mb-4 leading-[1.05]">
+              <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent animate-gradient" style={{backgroundSize:'200% 200%'}}>{settings.heroHeading}</span>
             </motion.h1>
+            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 leading-[1.1]">
+              We Grow <TypewriterText />
+            </motion.h2>
 
             <motion.p variants={fadeUp} className="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               {settings.heroSubheading}
@@ -740,6 +747,8 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      <ROICalculator />
 
     </div>
   );

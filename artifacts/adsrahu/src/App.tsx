@@ -7,6 +7,8 @@ import { Footer } from "@/components/layout/Footer";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { MobileBottomNav } from "@/components/ui/MobileBottomNav";
+import { FloatingWhatsApp, SocialProofToast } from "@/components/ui/GlobalWidgets";
+import { CursorSpotlight } from "@/components/ui/CursorSpotlight";
 
 // Public pages
 import Home from "@/pages/Home";
@@ -127,7 +129,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <CursorSpotlight />
           <Router />
+          <FloatingWhatsApp />
+          <SocialProofToast />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
