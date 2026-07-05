@@ -5,7 +5,10 @@ import {
   CheckCircle2, Zap, LayoutDashboard, MessageSquare, Database, 
   Smartphone, Code2, PenTool, X, Menu
 } from 'lucide-react';
+import { SiWhatsapp } from 'react-icons/si';
 import { Link } from 'wouter';
+
+const WhatsAppIcon = () => <SiWhatsapp size={18} />;
 
 // --- Theme Constants ---
 const theme = {
@@ -183,7 +186,7 @@ const Hero = () => (
               Book Free Strategy Call <ArrowRight size={18} />
             </a>
             <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className={`h-14 px-8 rounded-xl flex items-center justify-center gap-2 text-base font-medium text-white ${theme.card} ${theme.border} border hover:bg-[rgba(255,255,255,0.08)] transition-all duration-300`}>
-              <MessageSquare size={18} /> Chat on WhatsApp
+              <WhatsAppIcon /> Chat on WhatsApp
             </a>
           </motion.div>
         </motion.div>
@@ -390,7 +393,7 @@ const FounderSection = () => (
               Book Direct Call
             </a>
             <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className={`h-12 px-6 rounded-xl flex items-center justify-center gap-2 text-sm font-medium text-white bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.1)] transition-all`}>
-              <MessageSquare size={16} /> Connect on WhatsApp
+              <WhatsAppIcon /> Connect on WhatsApp
             </a>
           </div>
         </div>
@@ -419,7 +422,7 @@ const FinalCTA = () => (
             Book Free Strategy Call
           </a>
           <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className={`h-14 md:h-16 px-8 md:px-10 rounded-2xl flex items-center justify-center gap-2 text-base md:text-lg font-medium text-white bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.08)] transition-all duration-300`}>
-            <MessageSquare size={20} /> Chat on WhatsApp
+            <WhatsAppIcon /> Chat on WhatsApp
           </a>
         </div>
       </motion.div>
@@ -447,6 +450,31 @@ const Footer = () => (
 );
 
 export default function PremiumLanding() {
+  useEffect(() => {
+    // Meta Pixel - Real Estate Landing
+    const script = document.createElement('script');
+    script.innerHTML = `
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '2396302237502051');
+      fbq('track', 'PageView');
+    `;
+    document.head.appendChild(script);
+    const noscript = document.createElement('noscript');
+    noscript.innerHTML = '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2396302237502051&ev=PageView&noscript=1" />';
+    document.body.appendChild(noscript);
+    return () => {
+      if (document.head.contains(script)) document.head.removeChild(script);
+      if (document.body.contains(noscript)) document.body.removeChild(noscript);
+    };
+  }, []);
+
   return (
     <div className={`min-h-screen ${theme.bg} selection:bg-[#2D8CFF]/30 font-sans overflow-x-hidden`}>
       <Navbar />

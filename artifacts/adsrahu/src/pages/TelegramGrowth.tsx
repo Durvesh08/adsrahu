@@ -6,7 +6,11 @@ import {
   Smartphone, Code2, PenTool, X, Menu, Send, ShieldAlert, Award,
   Sparkles, Bell, Globe, Activity
 } from 'lucide-react';
+import { SiWhatsapp } from 'react-icons/si';
 import { Link } from 'wouter';
+
+// WhatsApp SVG icon component
+const WhatsAppIcon = () => <SiWhatsapp size={18} />;
 
 // --- Theme Constants ---
 const theme = {
@@ -189,7 +193,7 @@ const Hero = () => (
               <Send size={18} /> Join Our Telegram Channel
             </a>
             <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className="h-14 px-8 rounded-xl flex items-center justify-center gap-2 text-base font-medium text-white border hover:-translate-y-1 shadow-[0_0_30px_rgba(4,120,87,0.2)] transition-all duration-300" style={{ backgroundColor: '#047857', borderColor: '#10b981' }}>
-              <MessageSquare size={18} /> Chat on WhatsApp
+              <WhatsAppIcon /> Chat on WhatsApp
             </a>
           </motion.div>
         </motion.div>
@@ -424,7 +428,7 @@ const FounderSection = () => (
               <Send size={16} /> Join Telegram
             </a>
             <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className="h-12 px-6 rounded-xl flex items-center justify-center gap-2 text-sm font-medium text-white border hover:-translate-y-1 transition-all hover:opacity-90" style={{ backgroundColor: '#047857', borderColor: '#10b981' }}>
-              <MessageSquare size={16} /> WhatsApp
+              <WhatsAppIcon /> WhatsApp
             </a>
           </div>
         </div>
@@ -453,7 +457,7 @@ const FinalCTA = () => (
             <Send size={20} /> Join Telegram
           </a>
           <a href="https://wa.me/917485022937" target="_blank" rel="noreferrer" className="h-14 md:h-16 px-8 md:px-10 rounded-2xl flex items-center justify-center gap-2 text-base md:text-lg font-medium text-white border hover:-translate-y-1 shadow-[0_0_40px_rgba(4,120,87,0.2)] hover:shadow-[0_0_60px_rgba(4,120,87,0.4)] transition-all duration-300" style={{ backgroundColor: '#047857', borderColor: '#10b981' }}>
-            <MessageSquare size={20} /> Chat on WhatsApp
+            <WhatsAppIcon /> Chat on WhatsApp
           </a>
         </div>
       </motion.div>
@@ -481,6 +485,31 @@ const Footer = () => (
 );
 
 export default function TelegramGrowth() {
+  useEffect(() => {
+    // Meta Pixel - Telegram Growth
+    const script = document.createElement('script');
+    script.innerHTML = `
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '2043977229798979');
+      fbq('track', 'PageView');
+    `;
+    document.head.appendChild(script);
+    const noscript = document.createElement('noscript');
+    noscript.innerHTML = '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2043977229798979&ev=PageView&noscript=1" />';
+    document.body.appendChild(noscript);
+    return () => {
+      if (document.head.contains(script)) document.head.removeChild(script);
+      if (document.body.contains(noscript)) document.body.removeChild(noscript);
+    };
+  }, []);
+
   return (
     <div className={`min-h-screen ${theme.bg} selection:bg-[#229ED9]/30 font-sans overflow-x-hidden`}>
       <Navbar />
