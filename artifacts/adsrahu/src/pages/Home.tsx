@@ -4,7 +4,7 @@ import { useSettings } from "@/lib/useSettings";
 import {
   Phone, ArrowRight, CheckCircle2, TrendingUp, Users, Target,
   Activity, MessageSquare, X, Zap, BarChart2, Layers, Bell,
-  ChevronRight, Star, Shield
+  ChevronRight, Star, Shield, Send
 } from "lucide-react";
 import { SiWhatsapp, SiX, SiFacebook, SiGoogleads } from "react-icons/si";
 import { Linkedin } from "lucide-react";
@@ -307,6 +307,48 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
+          2.5 INFINITE INTEGRATION MARQUEE
+      ═══════════════════════════════════════════════════════ */}
+      <section className="py-8 bg-black/40 border-b border-white/5 overflow-hidden">
+        <div className="relative w-full flex items-center overflow-hidden">
+          {/* Edge fade masks */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#020408] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#020408] to-transparent z-10 pointer-events-none" />
+          
+          <div className="animate-marquee flex gap-20 py-2">
+            {[
+              { name: "Google Ads", icon: SiGoogleads, color: "#ea4335" },
+              { name: "Meta Ads", icon: SiFacebook, color: "#1877f2" },
+              { name: "WhatsApp Business", icon: SiWhatsapp, color: "#25d366" },
+              { name: "Telegram Native", icon: Send, color: "#229ed9" },
+              { name: "X Campaigns", icon: SiX, color: "#ffffff" },
+              { name: "CRM Automations", icon: BarChart2, color: "#6366f1" },
+            ].map((p, i) => (
+              <div key={i} className="flex items-center gap-3 text-sm font-semibold text-gray-500 select-none hover:text-gray-300 transition-colors">
+                <p.icon className="w-5 h-5 opacity-70" style={{ color: p.color }} />
+                <span>{p.name}</span>
+              </div>
+            ))}
+            {/* Duplicate for infinite loop */}
+            {[
+              { name: "Google Ads", icon: SiGoogleads, color: "#ea4335" },
+              { name: "Meta Ads", icon: SiFacebook, color: "#1877f2" },
+              { name: "WhatsApp Business", icon: SiWhatsapp, color: "#25d366" },
+              { name: "Telegram Native", icon: Send, color: "#229ed9" },
+              { name: "X Campaigns", icon: SiX, color: "#ffffff" },
+              { name: "CRM Automations", icon: BarChart2, color: "#6366f1" },
+            ].map((p, i) => (
+              <div key={`dup-${i}`} className="flex items-center gap-3 text-sm font-semibold text-gray-500 select-none hover:text-gray-300 transition-colors">
+                <p.icon className="w-5 h-5 opacity-70" style={{ color: p.color }} />
+                <span>{p.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ═══════════════════════════════════════════════════════
           3. PROBLEM vs SOLUTION — Dramatic split
       ═══════════════════════════════════════════════════════ */}
       <section className="py-28 relative overflow-hidden">
@@ -425,13 +467,13 @@ export default function Home() {
                 whileInView={{opacity:1, y:0}}
                 viewport={{once:true}}
                 transition={{duration:0.5, delay:i*0.07}}
-                className="group relative rounded-2xl p-[1px] cursor-default min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0"
-                style={{background:'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)'}}
+                className="premium-glow-card group rounded-2xl cursor-default min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)',
+                  ['--hover-glow-color' as any]: `${service.color}20`,
+                }}
               >
-                <div className="rounded-2xl bg-[#080c14] p-7 h-full transition-all duration-500 group-hover:-translate-y-1 group-hover:bg-[#0c1220]" style={{boxShadow:'0 0 0 0 transparent'}}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `0 20px 60px ${service.color}20, 0 0 1px rgba(255,255,255,0.05)`; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 0 0 transparent'; }}
-                >
+                <div className="rounded-2xl p-7 h-full transition-all duration-500 group-hover:bg-[#0c1220]">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110" style={{background:`${service.color}18`, border:`1px solid ${service.color}30`}}>
                     <service.icon className="w-6 h-6" style={{color:service.color}} />
                   </div>

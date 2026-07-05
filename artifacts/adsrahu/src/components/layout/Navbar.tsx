@@ -18,7 +18,7 @@ export function Navbar() {
                   <div className="absolute inset-0 rounded-full bg-amber-400/30 blur-md animate-pulse-glow" />
                   <div className="relative w-10 h-10 rounded-full border border-amber-400/40 overflow-hidden" style={{boxShadow:'0 0 20px rgba(251,191,36,0.35), inset 0 1px 0 rgba(251,191,36,0.2)'}}>
                     <img
-                      src="/logo.jpg"
+                      src="/adsrahu-logo.jpg"
                       alt="Adsrahu logo"
                       className="absolute w-full h-full object-cover"
                     />
@@ -29,11 +29,11 @@ export function Navbar() {
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/services" className="text-sm text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 hover:after:w-full after:bg-blue-500 after:transition-all after:duration-300">Services</Link>
-              <Link href="/results" className="text-sm text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 hover:after:w-full after:bg-blue-500 after:transition-all after:duration-300">Results</Link>
-              <Link href="/industries" className="text-sm text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 hover:after:w-full after:bg-blue-500 after:transition-all after:duration-300">Industries</Link>
-              <Link href="/about" className="text-sm text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 hover:after:w-full after:bg-blue-500 after:transition-all after:duration-300">About</Link>
-              <Link href="/blog" className="text-sm text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 hover:after:w-full after:bg-blue-500 after:transition-all after:duration-300">Blog</Link>
+              <Link href="/services" className="text-sm text-gray-300 hover:text-white transition-colors nav-link-underline">Services</Link>
+              <Link href="/results" className="text-sm text-gray-300 hover:text-white transition-colors nav-link-underline">Results</Link>
+              <Link href="/industries" className="text-sm text-gray-300 hover:text-white transition-colors nav-link-underline">Industries</Link>
+              <Link href="/about" className="text-sm text-gray-300 hover:text-white transition-colors nav-link-underline">About</Link>
+              <Link href="/blog" className="text-sm text-gray-300 hover:text-white transition-colors nav-link-underline">Blog</Link>
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
