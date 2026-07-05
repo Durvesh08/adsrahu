@@ -12,7 +12,6 @@ import { motion, useInView } from "framer-motion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ParticleBackground } from "@/components/ui/ParticleBackground";
 import { TypewriterText } from "@/components/ui/TypewriterText";
-import { ROICalculator } from "@/components/ui/ROICalculator";
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -747,8 +746,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      <ROICalculator />
 
     </div>
   );
