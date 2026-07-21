@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { getSql, checkAuth, cors } from "./_lib/db.js";
 
-export const maxDuration = 60; // Allow 60 seconds for AI text generation on Vercel
+export const maxDuration = 60; // Allow 60 seconds for AI text & poster generation on Vercel
 
 export const config = {
   api: { bodyParser: { sizeLimit: "10mb" } },
