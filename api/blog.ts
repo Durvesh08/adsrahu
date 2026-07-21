@@ -318,7 +318,6 @@ function generateSelfGeneratedPosterCard(
 
       <!-- Category Badge -->
       <g transform="translate(0, 65)">
-        <rect x="0" y="0" width="auto" height="34" rx="17" fill="${t.pillBg}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
         <rect x="0" y="0" width="${Math.max(safeCategory.length * 10 + 36, 140)}" height="34" rx="17" fill="${t.pillBg}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
         <circle cx="18" cy="17" r="4" fill="${t.accent1}" opacity="0.6"/>
         <text x="30" y="22" fill="${t.accent1}" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="2.5">${safeCategory.toUpperCase()}</text>
@@ -377,7 +376,7 @@ function generateSelfGeneratedPosterCard(
       <rect x="1" y="1" width="508" height="508" rx="23" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
 
       <!-- Top accent bar on card -->
-      <rect x="0" y="0" width="510" height="3" rx="0" fill="url(#accent-grad)" opacity="0.6" clip-path="inset(0 round 24px 24px 0 0)"/>
+      <rect x="0" y="0" width="510" height="3" rx="1.5" fill="url(#accent-grad)" opacity="0.6"/>
 
       <!-- Card corner decorative dots -->
       <circle cx="28" cy="28" r="3" fill="${t.accent1}" opacity="0.15"/>
