@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { getSql, checkAuth, cors } from "./_lib/db.js";
 
+export const maxDuration = 60; // Allow 60 seconds for AI text + image generation on Vercel
+
 export const config = {
   api: { bodyParser: { sizeLimit: "10mb" } },
 };
@@ -147,12 +149,49 @@ async function generatePosterWithAI(
   const creativePrompt = await createCustomPosterPrompt(apiKey, title, excerpt, category, content);
   console.log("Creative AI Poster Prompt:", creativePrompt);
 
-  // 1. Try Imagen 3 models first
   const imagenModels = [
     "imagen-3.0-generate-002",
     "imagen-3.0-fast-generate-001"
   ];
 
+  // 1. Try Imagen 3 predict endpoint
+  for (const model of imagenModels) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
+          body: JSON.stringify({
+            instances: [{ prompt: creativePrompt }],
+            parameters: {
+              sampleCount: 1,
+              aspectRatio: "16:9",
+              outputMimeType: "image/jpeg",
+            },
+          }),
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const base64Bytes = data?.predictions?.[0]?.bytesBase64Encoded || data?.generatedImages?.[0]?.image?.imageBytes;
+        if (base64Bytes) {
+          return `data:image/jpeg;base64,${base64Bytes}`;
+        }
+      } else {
+        const errTxt = await res.text().catch(() => "");
+        console.error(`Imagen model ${model}:predict response ${res.status}:`, errTxt.substring(0, 150));
+      }
+    } catch (e) {
+      console.error(`Error calling ${model}:predict:`, e?.message || e);
+    }
+  }
+
+  // 2. Try Imagen 3 generateImages endpoint
   for (const model of imagenModels) {
     try {
       const res = await fetch(
@@ -176,20 +215,20 @@ async function generatePosterWithAI(
 
       if (res.ok) {
         const data = await res.json();
-        const base64Bytes = data?.generatedImages?.[0]?.image?.imageBytes;
+        const base64Bytes = data?.generatedImages?.[0]?.image?.imageBytes || data?.predictions?.[0]?.bytesBase64Encoded;
         if (base64Bytes) {
           return `data:image/jpeg;base64,${base64Bytes}`;
         }
       } else {
         const errTxt = await res.text().catch(() => "");
-        console.error(`Imagen model ${model} response ${res.status}:`, errTxt.substring(0, 150));
+        console.error(`Imagen model ${model}:generateImages response ${res.status}:`, errTxt.substring(0, 150));
       }
     } catch (e) {
-      console.error(`Error calling ${model}:`, e?.message || e);
+      console.error(`Error calling ${model}:generateImages:`, e?.message || e);
     }
   }
 
-  // 2. Try Gemini 2.0 multimodal image generation
+  // 3. Try Gemini 2.0 multimodal image generation
   try {
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`,
@@ -220,7 +259,7 @@ async function generatePosterWithAI(
     console.error("Gemini multimodal image gen error:", e?.message || e);
   }
 
-  // 3. Fallback SVG generator
+  // 4. Fallback SVG generator
   return generateCustomDynamicPosterSvg(title, excerpt, category);
 }
 
