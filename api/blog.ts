@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { getSql, checkAuth, cors } from "./_lib/db.js";
 
-export const maxDuration = 60; // Allow 60 seconds for AI text + image generation on Vercel
+export const maxDuration = 60; // Allow 60 seconds for AI text generation on Vercel
 
 export const config = {
   api: { bodyParser: { sizeLimit: "10mb" } },
@@ -20,85 +20,88 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
-// ── Step 1: Deep AI Creative Reasoning for Poster Concept ───────────────
-async function createCustomPosterPrompt(
-  apiKey: string,
+// ── Self-Generated Infographic Poster Card Generator ─────────────────────
+function generateSelfGeneratedPosterCard(
   title: string,
   excerpt: string,
   category: string,
-  content: string
-): Promise<string> {
-  const promptDesignMeta = `You are a visionary Creative Director and AI Visual Artist creating featured cover artwork for digital growth agency "Adsrahu".
-
-ANALYZE THIS BLOG CONTENT DEEPLY:
-- TITLE: "${title}"
-- CATEGORY: "${category}"
-- EXCERPT: "${excerpt}"
-- FULL BLOG SNIPPET: "${(content || "").substring(0, 800)}"
-
-YOUR TASK:
-Think step-by-step about the core theme, key concepts, technical tools, and overall mood of this specific blog post.
-Brainstorm a completely bespoke, cinematic, high-impact 3D visual concept for a 16:9 featured cover image.
-
-CREATIVE GUIDELINES FOR MAXIMUM VISUAL VARIETY & QUALITY:
-1. NO FIXED TEMPLATES OR STEREOTYPES: Invent a totally original visual metaphor tailored specifically to what this blog teaches. Do NOT inject unmentioned real estate or fixed industry tropes unless explicitly part of the topic!
-2. ARTISTIC DIRECTION: Think about camera angles (macro close-up, wide isometric, dramatic low angle), lighting (volumetric rays, neon glow, soft studio, raytraced glass caustics), materials (metallic chrome, frosted glass, neon LED, matte obsidian), and depth of field.
-3. ELEVATED AESTHETIC: Create a sleek, premium SaaS / high-tech performance agency look. Avoid cheap clipart, stock photos, or generic icons.
-4. BRAND WATERMARK: Include a subtle glowing title or brand visual element for "${title}" and "Adsrahu".
-
-OUTPUT: Write a single, highly descriptive English prompt (100-150 words) ready to send directly to an AI image generator (Imagen 3). Describe scene geometry, objects, colors, atmosphere, lighting, and style.`;
-
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptDesignMeta }] }],
-          generationConfig: { temperature: 0.95, maxOutputTokens: 400 },
-        }),
-      }
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const thinkingText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (thinkingText && thinkingText.trim().length > 20) {
-        return thinkingText.trim();
-      }
-    }
-  } catch (err) {
-    console.error("Thinking prompt generation error:", err?.message || err);
+  posterInfo?: {
+    theme?: string;
+    icon?: string;
+    headline?: string;
+    subheading?: string;
+    keyTakeaways?: string[];
   }
-
-  // Generic fallback if thinking call fails
-  return `A futuristic, high-end 3D digital cover art poster for a blog titled "${title}". Category: ${category}. Photorealistic Octane render, cinematic lighting, 8k resolution, elegant dark theme, glassmorphic floating elements, sleek Adsrahu branding.`;
-}
-
-// ── Dynamic SVG Fallback Poster (XML Escaped for Safari/Chrome) ─────────
-function generateCustomDynamicPosterSvg(
-  title: string,
-  excerpt: string,
-  category: string
 ): string {
   const safeTitle = escapeXml(title);
   const safeExcerpt = escapeXml(excerpt);
-  const safeCategory = escapeXml(category);
+  const safeCategory = escapeXml(category || "BUSINESS GROWTH");
 
-  const hash = title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const colorPalettes = [
-    { bg1: "#0a0f1e", bg2: "#1e1b4b", accent1: "#38bdf8", accent2: "#818cf8" },
-    { bg1: "#06101e", bg2: "#022c22", accent1: "#34d399", accent2: "#059669" },
-    { bg1: "#180828", bg2: "#31103f", accent1: "#f472b6", accent2: "#c084fc" },
-    { bg1: "#0f172a", bg2: "#1e293b", accent1: "#fbbf24", accent2: "#f97316" }
-  ];
-  const pal = colorPalettes[hash % colorPalettes.length];
+  const themes = {
+    "dark-tech": {
+      bgStart: "#080d1a",
+      bgEnd: "#0f172a",
+      accent1: "#38bdf8",
+      accent2: "#2563eb",
+      cardBg: "rgba(255, 255, 255, 0.03)",
+      cardStroke: "rgba(56, 189, 248, 0.2)",
+      gridColor: "rgba(56, 189, 248, 0.04)"
+    },
+    "emerald-growth": {
+      bgStart: "#022c22",
+      bgEnd: "#064e3b",
+      accent1: "#34d399",
+      accent2: "#059669",
+      cardBg: "rgba(255, 255, 255, 0.03)",
+      cardStroke: "rgba(52, 211, 153, 0.2)",
+      gridColor: "rgba(52, 211, 153, 0.04)"
+    },
+    "neon-purple": {
+      bgStart: "#090314",
+      bgEnd: "#1c0734",
+      accent1: "#c084fc",
+      accent2: "#7e22ce",
+      cardBg: "rgba(255, 255, 255, 0.03)",
+      cardStroke: "rgba(192, 132, 252, 0.2)",
+      gridColor: "rgba(192, 132, 252, 0.04)"
+    },
+    "royal-blue": {
+      bgStart: "#03081e",
+      bgEnd: "#0b2154",
+      accent1: "#00d2ff",
+      accent2: "#0066ff",
+      cardBg: "rgba(255, 255, 255, 0.03)",
+      cardStroke: "rgba(0, 210, 255, 0.2)",
+      gridColor: "rgba(0, 210, 255, 0.04)"
+    },
+    "amber-glow": {
+      bgStart: "#1a0c03",
+      bgEnd: "#361904",
+      accent1: "#fbbf24",
+      accent2: "#ea580c",
+      cardBg: "rgba(255, 255, 255, 0.03)",
+      cardStroke: "rgba(251, 191, 36, 0.2)",
+      gridColor: "rgba(251, 191, 36, 0.04)"
+    }
+  };
+
+  const themeName = posterInfo?.theme || "dark-tech";
+  const t = themes[themeName] || themes["dark-tech"];
+
+  const icons = {
+    "zap": `<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>`,
+    "chart": `<path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+    "trending": `<path d="M23 6l-9.5 9.5-5-5L1 18" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M17 6h6v6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+    "target": `<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="2" fill="currentColor"/>`,
+    "shield": `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+    "layers": `<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+    "cpu": `<rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="9" y="9" width="6" height="6" fill="currentColor"/>`
+  };
+
+  const selectedIcon = icons[posterInfo?.icon || "zap"] || icons["zap"];
 
   const wrapText = (str: string, maxChar: number) => {
-    const words = str.split(" ");
+    const words = (str || "").split(" ");
     const lines = [];
     let cur = "";
     for (const w of words) {
@@ -113,183 +116,112 @@ function generateCustomDynamicPosterSvg(
     return lines;
   };
 
-  const titleLines = wrapText(safeTitle, 26).slice(0, 3);
-  const subLines = wrapText(safeExcerpt || "High Performance Growth Strategies", 42).slice(0, 2);
+  const displayHeadline = escapeXml(posterInfo?.headline || safeTitle);
+  const displaySubheading = escapeXml(posterInfo?.subheading || safeExcerpt);
+
+  const titleLines = wrapText(displayHeadline, 22).slice(0, 3);
+  const subLines = wrapText(displaySubheading, 36).slice(0, 2);
+
+  const rawPoints = posterInfo?.keyTakeaways && posterInfo.keyTakeaways.length >= 3
+    ? posterInfo.keyTakeaways
+    : [
+        "1. High-converting growth strategies",
+        "2. Automated workflows & data tracking",
+        "3. Scalable customer acquisition"
+      ];
+
+  const points = rawPoints.slice(0, 3).map(pt => escapeXml(pt));
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
     <defs>
-      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="${pal.bg1}"/>
-        <stop offset="100%" stop-color="${pal.bg2}"/>
+      <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${t.bgStart}"/>
+        <stop offset="100%" stop-color="${t.bgEnd}"/>
       </linearGradient>
-      <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+      <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="${t.accent1}"/>
+        <stop offset="100%" stop-color="${t.accent2}"/>
+      </linearGradient>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="${t.gridColor}" stroke-width="1"/>
       </pattern>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="80" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
     </defs>
 
-    <rect width="1200" height="630" fill="url(#bg)"/>
+    <!-- Background -->
+    <rect width="1200" height="630" fill="url(#bg-grad)"/>
     <rect width="1200" height="630" fill="url(#grid)"/>
 
-    <circle cx="1050" cy="150" r="250" fill="${pal.accent1}" opacity="0.12" filter="blur(60px)"/>
-    <circle cx="150" cy="500" r="200" fill="${pal.accent2}" opacity="0.15" filter="blur(60px)"/>
+    <!-- Decorative blur lighting -->
+    <circle cx="180" cy="140" r="180" fill="${t.accent2}" opacity="0.15" filter="url(#glow)"/>
+    <circle cx="1020" cy="460" r="220" fill="${t.accent1}" opacity="0.12" filter="url(#glow)"/>
 
-    <g transform="translate(90, 110)">
-      <text x="0" y="0" fill="${pal.accent1}" font-family="system-ui, sans-serif" font-size="14" font-weight="800" letter-spacing="2">${(safeCategory || "GROWTH").toUpperCase()}</text>
+    <!-- Left Column: Title & Header -->
+    <g transform="translate(80, 0)">
+      <!-- Category Badge -->
+      <rect x="0" y="75" width="220" height="36" rx="18" fill="rgba(255, 255, 255, 0.05)" stroke="${t.accent1}" stroke-width="1.2" opacity="0.8"/>
+      <text x="110" y="98" fill="${t.accent1}" font-family="system-ui, sans-serif" font-size="13" font-weight="800" letter-spacing="1.5" text-anchor="middle">${safeCategory.toUpperCase()}</text>
 
-      <g transform="translate(0, 60)">
-        ${titleLines.map((line, idx) => `<text x="0" y="${idx * 68}" fill="#ffffff" font-family="system-ui, sans-serif" font-size="52" font-weight="900" letter-spacing="-1">${line}</text>`).join("")}
+      <!-- Main Title -->
+      <g transform="translate(0, 145)">
+        ${titleLines.map((line, idx) => `<text x="0" y="${idx * 66}" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="900" letter-spacing="-1">${line}</text>`).join("")}
       </g>
 
-      <g transform="translate(0, ${90 + titleLines.length * 68})">
-        ${subLines.map((line, idx) => `<text x="0" y="${idx * 32}" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="22" font-weight="500">${line}</text>`).join("")}
+      <!-- Subheading -->
+      <g transform="translate(0, ${160 + titleLines.length * 66})">
+        ${subLines.map((line, idx) => `<text x="0" y="${idx * 32}" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" opacity="0.95">${line}</text>`).join("")}
       </g>
 
-      <g transform="translate(0, 390)">
-        <text fill="#ffffff" font-family="system-ui, sans-serif" font-size="22" font-weight="800">Adsrahu <tspan fill="${pal.accent1}">📈</tspan></text>
+      <!-- Icon Badge Frame -->
+      <g transform="translate(0, 420)">
+        <rect width="80" height="80" rx="24" fill="url(#accent-grad)" opacity="0.15"/>
+        <rect width="80" height="80" rx="24" fill="none" stroke="${t.accent1}" stroke-width="2" opacity="0.3"/>
+        <g transform="translate(22, 22) scale(1.5)" color="${t.accent1}">
+          ${selectedIcon}
+        </g>
       </g>
+    </g>
+
+    <!-- Right Column: Key Takeaways Card -->
+    <g transform="translate(630, 75)">
+      <!-- Card Container -->
+      <rect width="490" height="470" rx="30" fill="${t.cardBg}" stroke="${t.cardStroke}" stroke-width="2"/>
+      
+      <!-- Key takeaways header -->
+      <text x="45" y="55" fill="${t.accent1}" font-family="system-ui, sans-serif" font-size="15" font-weight="900" letter-spacing="2">KEY TAKEAWAYS</text>
+      <line x1="45" y1="75" x2="160" y2="75" stroke="${t.accent1}" stroke-width="3"/>
+
+      <!-- Takeaway Items -->
+      ${points.map((pt, idx) => {
+        const ptLines = wrapText(pt, 30).slice(0, 2);
+        const yOffset = 120 + idx * 110;
+        return `<g transform="translate(45, ${yOffset})">
+          <circle cx="16" cy="18" r="12" fill="url(#accent-grad)" opacity="0.2"/>
+          <circle cx="16" cy="18" r="12" fill="none" stroke="${t.accent1}" stroke-width="2"/>
+          <path d="M12 18 l3 3 l5 -5" fill="none" stroke="${t.accent1}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <g transform="translate(45, 0)">
+            ${ptLines.map((line, lIdx) => `<text x="0" y="${18 + lIdx * 26}" fill="#f1f5f9" font-family="system-ui, sans-serif" font-size="19" font-weight="600">${line}</text>`).join("")}
+          </g>
+        </g>`;
+      }).join("")}
+    </g>
+
+    <!-- Footer -->
+    <text x="80" y="580" fill="#ffffff" font-family="system-ui, sans-serif" font-size="24" font-weight="bold" letter-spacing="-0.5">Adsrahu <tspan fill="${t.accent1}">📈</tspan></text>
+    
+    <g transform="translate(1010, 565)" opacity="0.8">
+      <text x="0" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="15" font-weight="bold" letter-spacing="1" text-anchor="end">READ FULL ARTICLE</text>
+      <path d="M15 12 l5 5 l-5 5" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(10, 0)"/>
     </g>
   </svg>`;
 
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
-}
-
-// ── Step 2: Generate AI Poster (Imagen 3, Gemini Multimodal & Pollinations)
-async function generatePosterWithAI(
-  apiKey: string,
-  title: string,
-  excerpt: string,
-  category: string,
-  content: string
-): Promise<string> {
-  const creativePrompt = await createCustomPosterPrompt(apiKey, title, excerpt, category, content);
-  console.log("Creative AI Poster Prompt:", creativePrompt);
-
-  const imagenModels = [
-    "imagen-3.0-generate-002",
-    "imagen-3.0-fast-generate-001"
-  ];
-
-  // 1. Try Imagen 3 predict endpoint
-  for (const model of imagenModels) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-          body: JSON.stringify({
-            instances: [{ prompt: creativePrompt }],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: "16:9",
-              outputMimeType: "image/jpeg",
-            },
-          }),
-        }
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        const base64Bytes = data?.predictions?.[0]?.bytesBase64Encoded || data?.generatedImages?.[0]?.image?.imageBytes;
-        if (base64Bytes) {
-          return `data:image/jpeg;base64,${base64Bytes}`;
-        }
-      } else {
-        const errTxt = await res.text().catch(() => "");
-        console.error(`Imagen model ${model}:predict response ${res.status}:`, errTxt.substring(0, 150));
-      }
-    } catch (e) {
-      console.error(`Error calling ${model}:predict:`, e?.message || e);
-    }
-  }
-
-  // 2. Try Imagen 3 generateImages endpoint
-  for (const model of imagenModels) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateImages`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-          body: JSON.stringify({
-            prompt: creativePrompt,
-            config: {
-              numberOfImages: 1,
-              outputMimeType: "image/jpeg",
-              aspectRatio: "16:9",
-            },
-          }),
-        }
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        const base64Bytes = data?.generatedImages?.[0]?.image?.imageBytes || data?.predictions?.[0]?.bytesBase64Encoded;
-        if (base64Bytes) {
-          return `data:image/jpeg;base64,${base64Bytes}`;
-        }
-      } else {
-        const errTxt = await res.text().catch(() => "");
-        console.error(`Imagen model ${model}:generateImages response ${res.status}:`, errTxt.substring(0, 150));
-      }
-    } catch (e) {
-      console.error(`Error calling ${model}:generateImages:`, e?.message || e);
-    }
-  }
-
-  // 3. Try Gemini 2.0 multimodal image generation
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: creativePrompt }] }],
-          generationConfig: { responseModalities: ["IMAGE"] },
-        }),
-      }
-    );
-
-    if (res.ok) {
-      const data = await res.json();
-      const parts = data?.candidates?.[0]?.content?.parts || [];
-      for (const part of parts) {
-        if (part.inlineData && part.inlineData.data) {
-          const mime = part.inlineData.mimeType || "image/jpeg";
-          return `data:${mime};base64,${part.inlineData.data}`;
-        }
-      }
-    }
-  } catch (e) {
-    console.error("Gemini multimodal image gen error:", e?.message || e);
-  }
-
-  // 4. Pollinations AI Image API (Instant, high quality 16:9 AI artwork)
-  const seed = Math.floor(Math.random() * 1000000);
-  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(creativePrompt)}?width=1200&height=630&nologo=true&seed=${seed}`;
-  
-  // Verify Pollinations URL is reachable
-  try {
-    const pCheck = await fetch(pollinationsUrl, { method: "HEAD" });
-    if (pCheck.ok) {
-      return pollinationsUrl;
-    }
-  } catch (e) {
-    console.error("Pollinations check failed:", e?.message || e);
-  }
-
-  // 5. Fallback SVG generator
-  return generateCustomDynamicPosterSvg(title, excerpt, category);
 }
 
 // ── AI Blog Content & Poster Generation Handler ─────────────────────────
@@ -316,7 +248,7 @@ Tone of Voice: "${tone || "Professional and authoritative"}"
 Target Audience: "${targetAudience || "Business owners, founders, and industry professionals"}"
 Key Points to Include: "${keyPoints || "High-value, actionable strategies"}"
 
-CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
+CRITICAL INSTRUCTIONS:
 1. Adapt fully to the specified Topic, Category, and Target Audience. Do NOT inject unmentioned niches or industries unless specified in the topic!
 2. Provide specific, actionable strategies (e.g., mention specific ad strategies, automation flows, analytics, tool integrations relevant to the topic).
 3. Avoid generic fluff. Use realistic data points, market trends, and modern digital marketing methodologies.
@@ -325,7 +257,7 @@ CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
    - Use 3-5 clearly defined ## headings.
    - Include bullet points, numbered lists, and bold text for readability.
 5. End with a strong Call-To-Action (CTA) encouraging the reader to implement these strategies or consult with Adsrahu.
-6. The blog must be comprehensive and well-structured.`;
+6. Design a sleek 16:9 social poster card for this blog. Choose the most relevant theme and icon, and extract exactly 3 distinct key takeaways from the blog post.`;
 
   const textResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
@@ -360,8 +292,35 @@ CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
                 type: "STRING",
                 description: "The full blog body in Markdown format. Use \\n for newlines.",
               },
+              poster: {
+                type: "OBJECT",
+                properties: {
+                  theme: {
+                    type: "STRING",
+                    description: "Theme name for poster card. One of: 'dark-tech', 'emerald-growth', 'neon-purple', 'royal-blue', 'amber-glow'",
+                  },
+                  icon: {
+                    type: "STRING",
+                    description: "Icon representing topic. One of: 'zap', 'chart', 'trending', 'target', 'shield', 'layers', 'cpu'",
+                  },
+                  headline: {
+                    type: "STRING",
+                    description: "Short punchy headline for the poster (1-4 words max)",
+                  },
+                  subheading: {
+                    type: "STRING",
+                    description: "Punchy 1-sentence subtitle explaining the goal",
+                  },
+                  keyTakeaways: {
+                    type: "ARRAY",
+                    items: { type: "STRING" },
+                    description: "Exactly 3 distinct, highly informative key takeaway points from this blog to feature on the poster card.",
+                  },
+                },
+                required: ["theme", "icon", "headline", "subheading", "keyTakeaways"],
+              },
             },
-            required: ["title", "slug", "excerpt", "content"],
+            required: ["title", "slug", "excerpt", "content", "poster"],
           },
         },
       }),
@@ -402,20 +361,13 @@ CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
     }
   }
 
-  // Generate creative AI poster
-  let posterUrl: string = "";
-  try {
-    posterUrl = await generatePosterWithAI(
-      apiKey,
-      parsed.title,
-      parsed.excerpt,
-      category,
-      parsed.content
-    );
-  } catch (posterErr) {
-    console.error("Poster generation failed:", posterErr?.message || posterErr);
-    posterUrl = generateCustomDynamicPosterSvg(parsed.title, parsed.excerpt, category);
-  }
+  // Generate self-contained high-converting poster card using blog's key takeaways
+  const posterSvgUrl = generateSelfGeneratedPosterCard(
+    parsed.title,
+    parsed.excerpt,
+    category,
+    parsed.poster
+  );
 
   return {
     title: parsed.title,
@@ -423,7 +375,7 @@ CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
     category,
     excerpt: parsed.excerpt,
     content: parsed.content,
-    imageUrl: posterUrl,
+    imageUrl: posterSvgUrl,
   };
 }
 
