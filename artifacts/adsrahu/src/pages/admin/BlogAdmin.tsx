@@ -2,13 +2,23 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Loader2, AlertCircle, Upload, ImageIcon, Sparkles, Wand2 } from "lucide-react";
 import { blogApi, type ApiPost } from "@/lib/api";
 
-const CATEGORIES = ["Real Estate Lead Generation","Facebook Ads","Google Ads","WhatsApp Funnels","CRM Automation","Marketing Strategies","Business Growth"];
+const SUGGESTED_CATEGORIES = [
+  "Business Growth",
+  "AI & Automation",
+  "Digital Marketing",
+  "SaaS & Tech",
+  "Facebook & Meta Ads",
+  "Google Ads",
+  "WhatsApp Funnels",
+  "E-Commerce",
+  "Sales Strategies"
+];
 
 function autoSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
 }
 
-const emptyForm = { title:"", slug:"", category:CATEGORIES[0], excerpt:"", content:"", published:false, imageUrl:"" };
+const emptyForm = { title:"", slug:"", category:"Business Growth", excerpt:"", content:"", published:false, imageUrl:"" };
 
 /** Compress an image File to a JPEG base64 data-URL (max 1200px wide, 0.75 quality) */
 function compressImage(file: File, maxWidth = 1200, quality = 0.75): Promise<string> {
@@ -49,7 +59,7 @@ export default function AdminBlog() {
   
   // AI Generator State
   const [aiTopic, setAiTopic] = useState("");
-  const [aiCategory, setAiCategory] = useState(CATEGORIES[0]);
+  const [aiCategory, setAiCategory] = useState("Business Growth");
   const [aiTone, setAiTone] = useState("Professional & Authoritative");
   const [aiTargetAudience, setAiTargetAudience] = useState("");
   const [aiKeyPoints, setAiKeyPoints] = useState("");
@@ -159,7 +169,7 @@ export default function AdminBlog() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-purple-400" />
             </div>
-            AI Blog Generator
+            AI Blog & Poster Generator
           </h1>
           <button onClick={() => { setView("list"); setAiError(""); }} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white border border-white/10 rounded-xl px-4 py-2 hover:bg-white/5 transition-colors">
             <X className="w-4 h-4" /> Cancel
@@ -175,8 +185,8 @@ export default function AdminBlog() {
               <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-blue-500/30 animate-ping" />
               <div className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full bg-purple-500/30 animate-ping" style={{animationDelay: '0.5s'}} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Generating Your Blog...</h3>
-            <p className="text-gray-500 text-sm text-center max-w-md">Gemini AI is writing a professional, SEO-optimized blog post on <span className="text-blue-400 font-medium">"{aiTopic}"</span>. This usually takes 10-15 seconds.</p>
+            <h3 className="text-xl font-bold text-white mb-2">Generating Blog & Custom AI Poster...</h3>
+            <p className="text-gray-500 text-sm text-center max-w-md">Gemini AI is writing an SEO blog on <span className="text-blue-400 font-medium">"{aiTopic}"</span> and creating a custom visual cover poster. This usually takes 10-15 seconds.</p>
             <div className="mt-8 w-48 h-1.5 bg-white/5 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full animate-[shimmer_2s_ease-in-out_infinite]" style={{width: '60%'}} />
             </div>
@@ -192,7 +202,7 @@ export default function AdminBlog() {
             <div className="rounded-2xl border border-white/10 bg-[#060912] p-8 space-y-6">
               <div className="text-center mb-2">
                 <h3 className="text-lg font-semibold text-white mb-1">What should the blog be about?</h3>
-                <p className="text-sm text-gray-500">Describe the topic and Gemini AI will write a complete blog post.</p>
+                <p className="text-sm text-gray-500">Type any topic or industry idea. Gemini AI will generate a complete blog and custom poster artwork.</p>
               </div>
 
               <div>
@@ -201,22 +211,37 @@ export default function AdminBlog() {
                   value={aiTopic}
                   onChange={e => setAiTopic(e.target.value)}
                   rows={3}
-                  placeholder="e.g. How to generate qualified real estate leads using Facebook ads in Mumbai..."
+                  placeholder="e.g. AI automation tricks for business growth in 2026, scaling e-commerce ads, SaaS acquisition strategies..."
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-600 resize-none transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Category</label>
-                  <select
+                  <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Category / Niche (Type Anything)</label>
+                  <input
+                    type="text"
                     value={aiCategory}
                     onChange={e => setAiCategory(e.target.value)}
-                    className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50"
-                  >
-                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                  </select>
+                    placeholder="e.g. AI & Tech, Fitness, E-commerce, Finance..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-600"
+                  />
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {SUGGESTED_CATEGORIES.slice(0, 5).map(c => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setAiCategory(c)}
+                        className={`text-[11px] px-2 py-0.5 rounded-md border transition-all ${
+                          aiCategory === c ? "bg-purple-500/20 text-purple-300 border-purple-500/40" : "bg-white/5 text-gray-400 border-white/5 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
                 <div>
                   <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Tone of Voice</label>
                   <select
@@ -250,7 +275,7 @@ export default function AdminBlog() {
                       type="text"
                       value={aiTargetAudience}
                       onChange={e => setAiTargetAudience(e.target.value)}
-                      placeholder="e.g. NRI Investors, First-time Homebuyers, Commercial Tenants..."
+                      placeholder="e.g. Founders, Agency Owners, Fitness Enthusiasts, SaaS Marketers..."
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-600"
                     />
                   </div>
@@ -260,7 +285,7 @@ export default function AdminBlog() {
                       value={aiKeyPoints}
                       onChange={e => setAiKeyPoints(e.target.value)}
                       rows={2}
-                      placeholder="e.g. Mention our new VR property tour feature, highlight 12% ROI..."
+                      placeholder="e.g. Include 5 specific steps, highlight ROI case studies, mention CRM tools..."
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-600 resize-none"
                     />
                   </div>
@@ -278,7 +303,7 @@ export default function AdminBlog() {
                       setForm({
                         title: result.title || "",
                         slug: result.slug || autoSlug(result.title || ""),
-                        category: result.category || aiCategory,
+                        category: result.category || aiCategory || "General",
                         excerpt: result.excerpt || "",
                         content: result.content || "",
                         published: false,
@@ -298,12 +323,12 @@ export default function AdminBlog() {
                   style={{background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', boxShadow: '0 0 20px rgba(139,92,246,0.3), 0 4px 15px rgba(0,0,0,0.5)'}}
                 >
                   <Sparkles className="w-4 h-4" />
-                  Generate Blog with AI
+                  Generate Blog & AI Poster
                 </button>
               </div>
 
               <div className="border-t border-white/5 pt-4">
-                <p className="text-[11px] text-gray-600 text-center">Powered by Gemini 2.5 Flash · Blog will be saved as Draft for your review</p>
+                <p className="text-[11px] text-gray-600 text-center">Powered by Gemini AI · Blog will be saved as Draft for your review</p>
               </div>
             </div>
           </div>
@@ -339,14 +364,22 @@ export default function AdminBlog() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600 resize-none transition-all" />
             </div>
 
-            {/* ── Cover Image Uploader ─────────────────────────────── */}
+            {/* ── Cover Image Uploader / AI Preview ───────────────────── */}
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Cover Image</label>
+              <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Cover Image (AI Generated or Uploaded)</label>
               <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleImageFile(f); }} />
 
               {form.imageUrl ? (
                 <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-[#0a0a12]">
-                  <img src={form.imageUrl} alt="Cover preview" className="w-full aspect-video object-cover" />
+                  <img
+                    src={form.imageUrl}
+                    alt="Cover preview"
+                    className="w-full aspect-video object-cover"
+                    onError={(e) => {
+                      // Fallback if base64/URL fails to load
+                      console.error("Cover image failed to load");
+                    }}
+                  />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button type="button" onClick={() => fileInputRef.current?.click()}
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-2">
@@ -382,21 +415,21 @@ export default function AdminBlog() {
                       </div>
                       <div className="text-center">
                         <p className="text-sm text-gray-300 font-medium">Drop an image here or <span className="text-blue-400">click to browse</span></p>
-                        <p className="text-xs text-gray-500 mt-1">JPG, PNG, WebP up to 10 MB · Auto-compressed to JPEG</p>
+                        <p className="text-xs text-gray-500 mt-1">JPG, PNG, WebP up to 10 MB · Auto-compressed</p>
                       </div>
                     </>
                   )}
                 </div>
               )}
 
-              {/* Also allow pasting a URL directly */}
+              {/* URL paste input */}
               <div className="mt-2 flex items-center gap-2">
-                <span className="text-[10px] text-gray-600 uppercase tracking-wider shrink-0">Or paste URL:</span>
+                <span className="text-[10px] text-gray-600 uppercase tracking-wider shrink-0">Image URL:</span>
                 <input
-                  value={form.imageUrl.startsWith("data:") ? "" : form.imageUrl}
+                  value={form.imageUrl.startsWith("data:") ? "[AI Base64 Image Generated]" : form.imageUrl}
                   onChange={e => setForm({...form, imageUrl: e.target.value})}
-                  placeholder="/blog/image.jpg or https://..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                  placeholder="Paste https://... or leave AI generated image"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs focus:outline-none focus:border-blue-500/50 placeholder-gray-600 truncate"
                 />
               </div>
             </div>
@@ -407,6 +440,7 @@ export default function AdminBlog() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600 resize-none font-mono transition-all" />
             </div>
           </div>
+
           <div className="space-y-5">
             <div className="rounded-2xl border border-white/5 bg-[#060912] p-5 space-y-4">
               <h3 className="text-sm font-semibold text-white">Post Settings</h3>
@@ -417,9 +451,13 @@ export default function AdminBlog() {
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Category</label>
-                <select value={form.category} onChange={e => setForm({...form, category:e.target.value})} className="w-full bg-[#0d1220] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none">
-                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
+                <input
+                  type="text"
+                  value={form.category}
+                  onChange={e => setForm({...form, category:e.target.value})}
+                  placeholder="e.g. AI & Automation, E-Commerce, Tech..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-white/5">
                 <span className="text-sm text-gray-300">Published</span>
@@ -448,7 +486,7 @@ export default function AdminBlog() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => { setAiTopic(""); setAiCategory(CATEGORIES[0]); setAiError(""); setView("generate"); }}
+            onClick={() => { setAiTopic(""); setAiCategory("Business Growth"); setAiError(""); setView("generate"); }}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-xl transition-all hover:scale-[1.02]"
             style={{background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', boxShadow: '0 0 15px rgba(139,92,246,0.25)'}}
           >

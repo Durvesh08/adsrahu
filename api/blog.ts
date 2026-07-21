@@ -9,6 +9,17 @@ export const config = {
 
 const GEMINI_TEXT_MODEL = "gemini-2.5-flash";
 
+// Helper to escape XML special characters for safe SVG rendering
+function escapeXml(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 // ── Step 1: Deep AI Creative Reasoning for Poster Concept ───────────────
 async function createCustomPosterPrompt(
   apiKey: string,
@@ -17,7 +28,7 @@ async function createCustomPosterPrompt(
   category: string,
   content: string
 ): Promise<string> {
-  const promptDesignMeta = `You are a visionary Creative Director and AI Visual Artist creating featured cover artwork for top digital marketing agency "Adsrahu".
+  const promptDesignMeta = `You are a visionary Creative Director and AI Visual Artist creating featured cover artwork for digital growth agency "Adsrahu".
 
 ANALYZE THIS BLOG CONTENT DEEPLY:
 - TITLE: "${title}"
@@ -30,10 +41,10 @@ Think step-by-step about the core theme, key concepts, technical tools, and over
 Brainstorm a completely bespoke, cinematic, high-impact 3D visual concept for a 16:9 featured cover image.
 
 CREATIVE GUIDELINES FOR MAXIMUM VISUAL VARIETY & QUALITY:
-1. NO FIXED TEMPLATES OR STEREOTYPES: Invent a totally original visual metaphor tailored specifically to what this blog teaches.
+1. NO FIXED TEMPLATES OR STEREOTYPES: Invent a totally original visual metaphor tailored specifically to what this blog teaches. Do NOT inject unmentioned real estate or fixed industry tropes unless explicitly part of the topic!
 2. ARTISTIC DIRECTION: Think about camera angles (macro close-up, wide isometric, dramatic low angle), lighting (volumetric rays, neon glow, soft studio, raytraced glass caustics), materials (metallic chrome, frosted glass, neon LED, matte obsidian), and depth of field.
 3. ELEVATED AESTHETIC: Create a sleek, premium SaaS / high-tech performance agency look. Avoid cheap clipart, stock photos, or generic icons.
-4. TEXT & BRANDING: Incorporate elegant 3D typography or subtle glowing title elements for "${title}" and brand watermark "Adsrahu".
+4. BRAND WATERMARK: Include a subtle glowing title or brand visual element for "${title}" and "Adsrahu".
 
 OUTPUT: Write a single, highly descriptive English prompt (100-150 words) ready to send directly to an AI image generator (Imagen 3). Describe scene geometry, objects, colors, atmosphere, lighting, and style.`;
 
@@ -64,15 +75,19 @@ OUTPUT: Write a single, highly descriptive English prompt (100-150 words) ready 
   }
 
   // Generic fallback if thinking call fails
-  return `A futuristic, high-end 3D digital cover art poster for a digital marketing blog titled "${title}". Photorealistic Octane render, cinematic lighting, 8k resolution, elegant dark theme, glassmorphic floating elements, sleek Adsrahu branding.`;
+  return `A futuristic, high-end 3D digital cover art poster for a blog titled "${title}". Category: ${category}. Photorealistic Octane render, cinematic lighting, 8k resolution, elegant dark theme, glassmorphic floating elements, sleek Adsrahu branding.`;
 }
 
-// ── Dynamic SVG Fallback Poster ─────────────────────────────────────────
+// ── Dynamic SVG Fallback Poster (XML Escaped for Safari/Chrome) ─────────
 function generateCustomDynamicPosterSvg(
   title: string,
   excerpt: string,
   category: string
 ): string {
+  const safeTitle = escapeXml(title);
+  const safeExcerpt = escapeXml(excerpt);
+  const safeCategory = escapeXml(category);
+
   const hash = title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const colorPalettes = [
     { bg1: "#0a0f1e", bg2: "#1e1b4b", accent1: "#38bdf8", accent2: "#818cf8" },
@@ -98,8 +113,8 @@ function generateCustomDynamicPosterSvg(
     return lines;
   };
 
-  const titleLines = wrapText(title, 26).slice(0, 3);
-  const subLines = wrapText(excerpt || "High Performance Digital Growth Strategies", 42).slice(0, 2);
+  const titleLines = wrapText(safeTitle, 26).slice(0, 3);
+  const subLines = wrapText(safeExcerpt || "High Performance Growth Strategies", 42).slice(0, 2);
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
     <defs>
@@ -119,7 +134,7 @@ function generateCustomDynamicPosterSvg(
     <circle cx="150" cy="500" r="200" fill="${pal.accent2}" opacity="0.15" filter="blur(60px)"/>
 
     <g transform="translate(90, 110)">
-      <text x="0" y="0" fill="${pal.accent1}" font-family="system-ui, sans-serif" font-size="14" font-weight="800" letter-spacing="2">${(category || "GROWTH").toUpperCase()}</text>
+      <text x="0" y="0" fill="${pal.accent1}" font-family="system-ui, sans-serif" font-size="14" font-weight="800" letter-spacing="2">${(safeCategory || "GROWTH").toUpperCase()}</text>
 
       <g transform="translate(0, 60)">
         ${titleLines.map((line, idx) => `<text x="0" y="${idx * 68}" fill="#ffffff" font-family="system-ui, sans-serif" font-size="52" font-weight="900" letter-spacing="-1">${line}</text>`).join("")}
@@ -138,7 +153,7 @@ function generateCustomDynamicPosterSvg(
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
 }
 
-// ── Step 2: Generate AI Poster (Imagen 3 & Gemini Multimodal) ─────────────
+// ── Step 2: Generate AI Poster (Imagen 3, Gemini Multimodal & Pollinations)
 async function generatePosterWithAI(
   apiKey: string,
   title: string,
@@ -259,7 +274,21 @@ async function generatePosterWithAI(
     console.error("Gemini multimodal image gen error:", e?.message || e);
   }
 
-  // 4. Fallback SVG generator
+  // 4. Pollinations AI Image API (Instant, high quality 16:9 AI artwork)
+  const seed = Math.floor(Math.random() * 1000000);
+  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(creativePrompt)}?width=1200&height=630&nologo=true&seed=${seed}`;
+  
+  // Verify Pollinations URL is reachable
+  try {
+    const pCheck = await fetch(pollinationsUrl, { method: "HEAD" });
+    if (pCheck.ok) {
+      return pollinationsUrl;
+    }
+  } catch (e) {
+    console.error("Pollinations check failed:", e?.message || e);
+  }
+
+  // 5. Fallback SVG generator
   return generateCustomDynamicPosterSvg(title, excerpt, category);
 }
 
@@ -278,26 +307,25 @@ async function generateBlogWithAI(
     );
   }
 
-  const prompt = `You are a world-class digital marketing and real estate lead generation expert writing for "Adsrahu". Adsrahu is a premium performance marketing agency in India that helps real estate developers and startups scale their leads and sales.
+  const prompt = `You are a world-class performance marketing, growth, and content expert writing for "Adsrahu". Adsrahu is a high-growth digital agency and media platform.
 
 Write a highly detailed, professional, and actionable SEO-optimized blog post based on these exact requirements:
 Topic: "${topic}"
-Category: "${category}"
+Category: "${category || "General"}"
 Tone of Voice: "${tone || "Professional and authoritative"}"
-Target Audience: "${targetAudience || "Real estate developers, founders, and business owners"}"
-Key Points to Include: "${keyPoints || "General high-value industry strategies"}"
+Target Audience: "${targetAudience || "Business owners, founders, and industry professionals"}"
+Key Points to Include: "${keyPoints || "High-value, actionable strategies"}"
 
 CRITICAL INSTRUCTIONS FOR ACCURACY & QUALITY:
-1. Speak directly to the Target Audience using the specified Tone of Voice.
-2. Ensure you weave the "Key Points to Include" naturally into the content.
-3. Provide specific, actionable strategies (e.g., mention specific Facebook Ad strategies, Google Ads intent targeting, WhatsApp automation flows, CRM integrations).
-4. Avoid generic fluff. Use realistic data points, market trends, and modern SaaS/digital marketing methodologies.
-5. Format the content beautifully in Markdown:
+1. Adapt fully to the specified Topic, Category, and Target Audience. Do NOT inject unmentioned niches or industries unless specified in the topic!
+2. Provide specific, actionable strategies (e.g., mention specific ad strategies, automation flows, analytics, tool integrations relevant to the topic).
+3. Avoid generic fluff. Use realistic data points, market trends, and modern digital marketing methodologies.
+4. Format the content beautifully in Markdown:
    - Start with an engaging hook.
    - Use 3-5 clearly defined ## headings.
    - Include bullet points, numbered lists, and bold text for readability.
-6. End with a strong Call-To-Action (CTA) encouraging the reader to book a consultation or contact Adsrahu to implement these strategies.
-7. The blog must be comprehensive and well-structured.`;
+5. End with a strong Call-To-Action (CTA) encouraging the reader to implement these strategies or consult with Adsrahu.
+6. The blog must be comprehensive and well-structured.`;
 
   const textResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
@@ -423,7 +451,7 @@ export default async function handler(req: any, res: any) {
       let b = req.body ?? {};
       if (typeof b === "string") { try { b = JSON.parse(b); } catch (e) {} }
       const topic = b.topic || b.title || "";
-      const category = b.category || "Real Estate Lead Generation";
+      const category = b.category || "General";
       const tone = b.tone || "";
       const targetAudience = b.targetAudience || "";
       const keyPoints = b.keyPoints || "";
