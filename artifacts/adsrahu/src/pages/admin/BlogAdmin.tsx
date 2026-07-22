@@ -421,17 +421,6 @@ export default function AdminBlog() {
                   )}
                 </div>
               )}
-
-              {/* URL paste input */}
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-[10px] text-gray-600 uppercase tracking-wider shrink-0">Image URL:</span>
-                <input
-                  value={form.imageUrl.startsWith("data:") ? "[AI Base64 Image Generated]" : form.imageUrl}
-                  onChange={e => setForm({...form, imageUrl: e.target.value})}
-                  placeholder="Paste https://... or leave AI generated image"
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs focus:outline-none focus:border-blue-500/50 placeholder-gray-600 truncate"
-                />
-              </div>
             </div>
 
             <div>
