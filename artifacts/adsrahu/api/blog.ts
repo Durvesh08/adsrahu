@@ -126,7 +126,7 @@ const ADSRAHU_LOGO_SVG = `
   </g>
 `;
 
-// ── Ultra-Premium Safari-Compatible Poster Generator ──────────────────
+// ── Ultra-Premium Safari-Compatible SVG 1.1 Poster Generator ───────────
 function generateSelfGeneratedPosterCard(
   title: string,
   excerpt: string,
@@ -148,62 +148,82 @@ function generateSelfGeneratedPosterCard(
     "dark-tech": {
       bgStart: "#020817", bgMid: "#0a1628", bgEnd: "#111d35",
       accent1: "#38bdf8", accent2: "#0ea5e9", accent3: "#7dd3fc",
-      cardBg: "rgba(8, 20, 42, 0.85)", cardStroke: "rgba(56, 189, 248, 0.25)",
-      gridColor: "rgba(56, 189, 248, 0.05)", pillBg: "rgba(56, 189, 248, 0.12)"
+      cardBg: "#08142a", cardBgOpacity: "0.85",
+      cardStroke: "#38bdf8", cardStrokeOpacity: "0.25",
+      gridColor: "#38bdf8", gridColorOpacity: "0.05",
+      pillBg: "#38bdf8", pillBgOpacity: "0.12"
     },
     "emerald-growth": {
       bgStart: "#011c14", bgMid: "#042d1f", bgEnd: "#064e3b",
       accent1: "#34d399", accent2: "#10b981", accent3: "#6ee7b7",
-      cardBg: "rgba(4, 40, 28, 0.85)", cardStroke: "rgba(52, 211, 153, 0.25)",
-      gridColor: "rgba(52, 211, 153, 0.05)", pillBg: "rgba(52, 211, 153, 0.12)"
+      cardBg: "#04281c", cardBgOpacity: "0.85",
+      cardStroke: "#34d399", cardStrokeOpacity: "0.25",
+      gridColor: "#34d399", gridColorOpacity: "0.05",
+      pillBg: "#34d399", pillBgOpacity: "0.12"
     },
     "neon-purple": {
       bgStart: "#0a0118", bgMid: "#150830", bgEnd: "#1e0b48",
       accent1: "#c084fc", accent2: "#a855f7", accent3: "#e9d5ff",
-      cardBg: "rgba(22, 8, 52, 0.85)", cardStroke: "rgba(168, 85, 247, 0.25)",
-      gridColor: "rgba(168, 85, 247, 0.05)", pillBg: "rgba(168, 85, 247, 0.12)"
+      cardBg: "#160834", cardBgOpacity: "0.85",
+      cardStroke: "#a855f7", cardStrokeOpacity: "0.25",
+      gridColor: "#a855f7", gridColorOpacity: "0.05",
+      pillBg: "#a855f7", pillBgOpacity: "0.12"
     },
     "royal-blue": {
       bgStart: "#020620", bgMid: "#071340", bgEnd: "#0c1d5e",
       accent1: "#60a5fa", accent2: "#3b82f6", accent3: "#93c5fd",
-      cardBg: "rgba(7, 15, 55, 0.85)", cardStroke: "rgba(59, 130, 246, 0.25)",
-      gridColor: "rgba(59, 130, 246, 0.05)", pillBg: "rgba(59, 130, 246, 0.12)"
+      cardBg: "#070f37", cardBgOpacity: "0.85",
+      cardStroke: "#3b82f6", cardStrokeOpacity: "0.25",
+      gridColor: "#3b82f6", gridColorOpacity: "0.05",
+      pillBg: "#3b82f6", pillBgOpacity: "0.12"
     },
     "amber-glow": {
       bgStart: "#120800", bgMid: "#231004", bgEnd: "#3a1c08",
       accent1: "#fbbf24", accent2: "#f59e0b", accent3: "#fde68a",
-      cardBg: "rgba(42, 22, 6, 0.85)", cardStroke: "rgba(245, 158, 11, 0.25)",
-      gridColor: "rgba(245, 158, 11, 0.05)", pillBg: "rgba(245, 158, 11, 0.12)"
+      cardBg: "#2a1606", cardBgOpacity: "0.85",
+      cardStroke: "#f59e0b", cardStrokeOpacity: "0.25",
+      gridColor: "#f59e0b", gridColorOpacity: "0.05",
+      pillBg: "#f59e0b", pillBgOpacity: "0.12"
     },
     "rose-premium": {
       bgStart: "#1a0510", bgMid: "#2a0a1a", bgEnd: "#3d1028",
       accent1: "#fb7185", accent2: "#f43f5e", accent3: "#fda4af",
-      cardBg: "rgba(45, 10, 28, 0.85)", cardStroke: "rgba(244, 63, 94, 0.25)",
-      gridColor: "rgba(244, 63, 94, 0.05)", pillBg: "rgba(244, 63, 94, 0.12)"
+      cardBg: "#2d0a1c", cardBgOpacity: "0.85",
+      cardStroke: "#f43f5e", cardStrokeOpacity: "0.25",
+      gridColor: "#f43f5e", gridColorOpacity: "0.05",
+      pillBg: "#f43f5e", pillBgOpacity: "0.12"
     },
     "cyber-teal": {
       bgStart: "#021215", bgMid: "#042028", bgEnd: "#063040",
       accent1: "#2dd4bf", accent2: "#14b8a6", accent3: "#99f6e4",
-      cardBg: "rgba(4, 28, 35, 0.85)", cardStroke: "rgba(20, 184, 166, 0.25)",
-      gridColor: "rgba(20, 184, 166, 0.05)", pillBg: "rgba(20, 184, 166, 0.12)"
+      cardBg: "#041c23", cardBgOpacity: "0.85",
+      cardStroke: "#14b8a6", cardStrokeOpacity: "0.25",
+      gridColor: "#14b8a6", gridColorOpacity: "0.05",
+      pillBg: "#14b8a6", pillBgOpacity: "0.12"
     },
     "midnight-indigo": {
       bgStart: "#080420", bgMid: "#0f0838", bgEnd: "#180e55",
       accent1: "#818cf8", accent2: "#6366f1", accent3: "#c7d2fe",
-      cardBg: "rgba(15, 8, 50, 0.85)", cardStroke: "rgba(99, 102, 241, 0.25)",
-      gridColor: "rgba(99, 102, 241, 0.05)", pillBg: "rgba(99, 102, 241, 0.12)"
+      cardBg: "#0f0832", cardBgOpacity: "0.85",
+      cardStroke: "#6366f1", cardStrokeOpacity: "0.25",
+      gridColor: "#6366f1", gridColorOpacity: "0.05",
+      pillBg: "#6366f1", pillBgOpacity: "0.12"
     },
     "solar-orange": {
       bgStart: "#150600", bgMid: "#251000", bgEnd: "#3b1a02",
       accent1: "#fb923c", accent2: "#f97316", accent3: "#fdba74",
-      cardBg: "rgba(40, 16, 2, 0.85)", cardStroke: "rgba(249, 115, 22, 0.25)",
-      gridColor: "rgba(249, 115, 22, 0.05)", pillBg: "rgba(249, 115, 22, 0.12)"
+      cardBg: "#281002", cardBgOpacity: "0.85",
+      cardStroke: "#f97316", cardStrokeOpacity: "0.25",
+      gridColor: "#f97316", gridColorOpacity: "0.05",
+      pillBg: "#f97316", pillBgOpacity: "0.12"
     },
     "arctic-slate": {
       bgStart: "#0c0f1a", bgMid: "#141828", bgEnd: "#1c2238",
       accent1: "#94a3b8", accent2: "#64748b", accent3: "#cbd5e1",
-      cardBg: "rgba(18, 22, 38, 0.85)", cardStroke: "rgba(148, 163, 184, 0.25)",
-      gridColor: "rgba(148, 163, 184, 0.05)", pillBg: "rgba(148, 163, 184, 0.12)"
+      cardBg: "#121626", cardBgOpacity: "0.85",
+      cardStroke: "#64748b", cardStrokeOpacity: "0.25",
+      gridColor: "#64748b", gridColorOpacity: "0.05",
+      pillBg: "#64748b", pillBgOpacity: "0.12"
     }
   };
 
@@ -299,7 +319,7 @@ function generateSelfGeneratedPosterCard(
 
       <!-- Grid Pattern -->
       <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="${t.gridColor}" stroke-width="0.8"/>
+        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="${t.gridColor}" stroke-opacity="${t.gridColorOpacity}" stroke-width="0.8"/>
       </pattern>
 
       <!-- Dot Pattern -->
@@ -349,14 +369,14 @@ function generateSelfGeneratedPosterCard(
 
       <!-- Category Badge -->
       <g transform="translate(0, 65)">
-        <rect x="0" y="0" width="${categoryBadgeWidth}" height="34" rx="17" fill="${t.pillBg}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
+        <rect x="0" y="0" width="${categoryBadgeWidth}" height="34" rx="17" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
         <circle cx="18" cy="17" r="4" fill="${t.accent1}" opacity="0.6"/>
         <text x="30" y="22" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="2.5">${safeCategory.toUpperCase()}</text>
       </g>
 
       <!-- Stat Badge -->
       <g transform="translate(${categoryBadgeWidth + 16}, 65)">
-        <rect x="0" y="0" width="${statBadgeWidth}" height="34" rx="17" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <rect x="0" y="0" width="${statBadgeWidth}" height="34" rx="17" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
         <text x="${statBadgeWidth / 2}" y="22" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="800" letter-spacing="2" text-anchor="middle">${statBadgeText}</text>
       </g>
 
@@ -378,7 +398,7 @@ function generateSelfGeneratedPosterCard(
       <!-- Topic Icon Badge -->
       <g transform="translate(0, 420)">
         <circle cx="38" cy="38" r="42" fill="${t.accent1}" opacity="0.05"/>
-        <rect width="76" height="76" rx="22" fill="${t.pillBg}" stroke="${t.cardStroke}" stroke-width="1.5"/>
+        <rect width="76" height="76" rx="22" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1.5"/>
         <rect x="3" y="3" width="70" height="70" rx="19" fill="url(#accent-grad)" opacity="0.1"/>
         <g transform="translate(18, 18) scale(1.65)" color="${t.accent1}">
           ${selectedIcon}
@@ -397,9 +417,9 @@ function generateSelfGeneratedPosterCard(
     <g transform="translate(620, 55)">
 
       <!-- Card Background -->
-      <rect width="510" height="510" rx="24" fill="${t.cardBg}"/>
+      <rect width="510" height="510" rx="24" fill="${t.cardBg}" fill-opacity="${t.cardBgOpacity}"/>
       <rect width="510" height="510" rx="24" fill="url(#card-glass)"/>
-      <rect width="510" height="510" rx="24" fill="none" stroke="${t.cardStroke}" stroke-width="1.5"/>
+      <rect width="510" height="510" rx="24" fill="none" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1.5"/>
 
       <!-- Top accent bar on card -->
       <rect x="0" y="0" width="510" height="4" rx="2" fill="url(#accent-grad)" opacity="0.8"/>
@@ -419,8 +439,8 @@ function generateSelfGeneratedPosterCard(
         const ptLines = wrapText(pt, 28).slice(0, 2);
         const yOffset = 95 + idx * 130;
         return `<g transform="translate(28, ${yOffset})">
-          <rect x="0" y="0" width="454" height="108" rx="16" fill="${t.pillBg}"/>
-          <rect x="0" y="0" width="454" height="108" rx="16" fill="none" stroke="${t.cardStroke}" stroke-width="1"/>
+          <rect x="0" y="0" width="454" height="108" rx="16" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}"/>
+          <rect x="0" y="0" width="454" height="108" rx="16" fill="none" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1"/>
           <rect x="0" y="20" width="4" height="68" rx="2" fill="url(#accent-grad)"/>
 
           <!-- Number badge -->
@@ -460,7 +480,7 @@ function generateSelfGeneratedPosterCard(
 
     <!-- Read Article CTA (bottom-right) -->
     <g transform="translate(1000, 562)">
-      <rect x="0" y="0" width="150" height="38" rx="19" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <rect x="0" y="0" width="150" height="38" rx="19" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
       <text x="22" y="24" fill="#cbd5e1" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="1.5">READ ARTICLE</text>
       <path d="M 130 19 L 136 19 M 133 15 L 137 19 L 133 23" fill="none" stroke="${t.accent1}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
@@ -471,7 +491,7 @@ function generateSelfGeneratedPosterCard(
     </g>
   </svg>`;
 
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
 // ── AI Blog Content & Poster Generation Handler ─────────────────────────
@@ -593,7 +613,7 @@ CRITICAL INSTRUCTIONS:
   // Parse output with robust safeJsonParse
   const parsed = safeJsonParse(text);
 
-  // Generate 100% Safari-compatible ultra-premium infographic poster card
+  // Generate 100% Safari SVG 1.1 compliant ultra-premium infographic poster card
   const posterSvgUrl = generateSelfGeneratedPosterCard(
     parsed.title,
     parsed.excerpt,

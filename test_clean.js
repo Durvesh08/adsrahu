@@ -1,16 +1,6 @@
-// @ts-nocheck
-import { getSql, checkAuth, cors } from "./_lib/db.js";
+import fs from 'fs';
 
-export const maxDuration = 60; // Allow 60 seconds for AI text & poster generation on Vercel
-
-export const config = {
-  api: { bodyParser: { sizeLimit: "10mb" } },
-};
-
-const GEMINI_TEXT_MODEL = "gemini-2.5-flash";
-
-// Helper to escape XML special characters for safe SVG rendering
-function escapeXml(str: string): string {
+function escapeXml(str) {
   if (!str) return "";
   return str
     .replace(/&/g, "&amp;")
@@ -20,131 +10,33 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
-// ── Resilient JSON Parser with Auto-Sanitization & Regex Fallback ──────
-function safeJsonParse(rawText: string): any {
-  if (!rawText) throw new Error("Empty AI response text");
-  let cleanText = rawText.trim();
-  
-  // Remove markdown codeblock wrapper if present
-  cleanText = cleanText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
-
-  // Attempt 1: Direct JSON parse
-  try {
-    return JSON.parse(cleanText);
-  } catch (e1) {}
-
-  // Attempt 2: Sanitize control characters (raw newlines/tabs inside string literals)
-  let sanitized = cleanText.replace(/[\u0000-\u001F]+/g, (match) => {
-    if (match === "\n") return "\\n";
-    if (match === "\r") return "\\r";
-    if (match === "\t") return "\\t";
-    return " ";
-  });
-
-  try {
-    return JSON.parse(sanitized);
-  } catch (e2) {}
-
-  // Attempt 3: Auto-close unclosed strings and JSON structures (if truncated at token limit)
-  let attempt = sanitized;
-  const quoteCount = (attempt.match(/"/g) || []).length;
-  if (quoteCount % 2 !== 0) attempt += '"';
-
-  const openBraces = (attempt.match(/\{/g) || []).length;
-  const closeBraces = (attempt.match(/\}/g) || []).length;
-  for (let i = 0; i < openBraces - closeBraces; i++) attempt += "}";
-
-  const openBrackets = (attempt.match(/\[/g) || []).length;
-  const closeBrackets = (attempt.match(/\]/g) || []).length;
-  for (let i = 0; i < openBrackets - closeBrackets; i++) attempt += "]";
-
-  try {
-    return JSON.parse(attempt);
-  } catch (e3) {}
-
-  // Attempt 4: Extract JSON substring between first { and last }
-  const firstBrace = cleanText.indexOf("{");
-  const lastBrace = cleanText.lastIndexOf("}");
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    try {
-      return JSON.parse(cleanText.substring(firstBrace, lastBrace + 1));
-    } catch (e4) {}
-  }
-
-  // Attempt 5: Regex extraction fallback for critical fields so user NEVER gets an error
-  const titleMatch = rawText.match(/"title"\s*:\s*"([^"]+)"/);
-  const slugMatch = rawText.match(/"slug"\s*:\s*"([^"]+)"/);
-  const excerptMatch = rawText.match(/"excerpt"\s*:\s*"([^"]+)"/);
-
-  if (titleMatch) {
-    const title = titleMatch[1];
-    return {
-      title: title,
-      slug: slugMatch ? slugMatch[1] : title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      excerpt: excerptMatch ? excerptMatch[1] : "Actionable guide and strategic insights by Adsrahu.",
-      content: `## ${title}\n\n${excerptMatch ? excerptMatch[1] : ""}\n\n### Strategic Business Execution\n\nImplementing structured workflows and performance automation allows businesses to drive efficiency, reduce friction, and scale revenue predictably.\n\n### Key Growth Takeaways\n\n- Optimize core operational and marketing funnels\n- Automate repetitive tasks with modern AI tools\n- Track real-time performance analytics for continuous optimization`,
-      poster: {
-        theme: "dark-tech",
-        icon: "zap",
-        headline: title.split(" ").slice(0, 4).join(" "),
-        subheading: excerptMatch ? excerptMatch[1] : "Actionable strategies for competitive business growth.",
-        keyTakeaways: [
-          "Strategic automation drives efficiency and scale",
-          "Implement data-driven targeted workflows",
-          "Leverage high-converting performance channels"
-        ],
-        statBadge: "GROWTH GUIDE"
-      }
-    };
-  }
-
-  throw new Error("Unable to parse AI response. Snippet: " + rawText.substring(0, 100));
-}
-
-// ── Adsrahu Winged-B Logo (inline SVG paths from favicon.svg) ──────────
 const ADSRAHU_LOGO_SVG = `
   <g transform="translate(0, 0) scale(1)">
-    <!-- Background circle -->
     <circle cx="22" cy="22" r="21" fill="#0c0c14" stroke="url(#logo-gold)" stroke-width="1.8"/>
-    <!-- Ambient golden glow -->
     <circle cx="22" cy="21" r="12" fill="#FF8C00" opacity="0.08"/>
-    <!-- Left wing - outer sweep -->
     <path d="M 9 22 C 8 19, 10 16, 13 15 C 15 14.5, 17 15.5, 18 16.5"
           stroke="url(#logo-gold)" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <!-- Left wing - inner line -->
     <path d="M 10.5 22.5 C 10 20, 11 18, 14 17 C 16 16.5, 17 17.2, 18 18"
           stroke="url(#logo-gold)" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.7"/>
-    <!-- Vertical stem -->
     <rect x="20.5" y="11" width="3" height="5.5" rx="1" fill="url(#logo-gold-shine)"/>
-    <!-- Horizontal crossbar -->
     <rect x="17.5" y="17.5" width="9.5" height="2.8" rx="1.2" fill="url(#logo-gold)"/>
-    <!-- Circular bowl -->
     <circle cx="23.5" cy="23.5" r="5.5" fill="none" stroke="url(#logo-gold-shine)" stroke-width="2.8"/>
-    <!-- Speed lines -->
     <line x1="14" y1="20" x2="17.5" y2="20" stroke="url(#logo-gold)" stroke-width="1.4" stroke-linecap="round"/>
     <line x1="14.5" y1="23" x2="17.5" y2="23" stroke="url(#logo-gold)" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
   </g>
 `;
 
-// ── Ultra-Premium Safari-Compatible SVG 1.1 Poster Generator ───────────
 function generateSelfGeneratedPosterCard(
-  title: string,
-  excerpt: string,
-  category: string,
-  posterInfo?: {
-    theme?: string;
-    icon?: string;
-    headline?: string;
-    subheading?: string;
-    keyTakeaways?: string[];
-    statBadge?: string;
-  }
-): string {
+  title,
+  excerpt,
+  category,
+  posterInfo
+) {
   const safeTitle = escapeXml(title);
   const safeExcerpt = escapeXml(excerpt);
   const safeCategory = escapeXml(category || "INSIGHTS");
 
-  const themes: Record<string, any> = {
+  const themes = {
     "dark-tech": {
       bgStart: "#020817", bgMid: "#0a1628", bgEnd: "#111d35",
       accent1: "#38bdf8", accent2: "#0ea5e9", accent3: "#7dd3fc",
@@ -230,7 +122,7 @@ function generateSelfGeneratedPosterCard(
   const themeName = posterInfo?.theme || "dark-tech";
   const t = themes[themeName] || themes["dark-tech"];
 
-  const icons: Record<string, string> = {
+  const icons = {
     "zap": `<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>`,
     "chart": `<path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
     "trending": `<path d="M23 6l-9.5 9.5-5-5L1 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M17 6h6v6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
@@ -242,9 +134,9 @@ function generateSelfGeneratedPosterCard(
 
   const selectedIcon = icons[posterInfo?.icon || "zap"] || icons["zap"];
 
-  const wrapText = (str: string, maxChar: number): string[] => {
+  const wrapText = (str, maxChar) => {
     const words = (str || "").split(" ");
-    const lines: string[] = [];
+    const lines = [];
     let cur = "";
     for (const w of words) {
       if ((cur + " " + w).trim().length > maxChar) {
@@ -280,26 +172,22 @@ function generateSelfGeneratedPosterCard(
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
     <defs>
-      <!-- Background Gradient -->
       <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="${t.bgStart}"/>
         <stop offset="45%" stop-color="${t.bgMid}"/>
         <stop offset="100%" stop-color="${t.bgEnd}"/>
       </linearGradient>
 
-      <!-- Accent Gradient -->
       <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="${t.accent1}"/>
         <stop offset="100%" stop-color="${t.accent2}"/>
       </linearGradient>
 
-      <!-- Vertical Accent Gradient -->
       <linearGradient id="accent-v" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="${t.accent1}" stop-opacity="0.8"/>
         <stop offset="100%" stop-color="${t.accent2}" stop-opacity="0.1"/>
       </linearGradient>
 
-      <!-- Gold Logo Gradients -->
       <linearGradient id="logo-gold" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#FFD97A"/>
         <stop offset="40%" stop-color="#FFA500"/>
@@ -311,91 +199,66 @@ function generateSelfGeneratedPosterCard(
         <stop offset="100%" stop-color="#B85C00"/>
       </linearGradient>
 
-      <!-- Card Glass Gradient -->
       <linearGradient id="card-glass" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="${t.accent1}" stop-opacity="0.08"/>
         <stop offset="100%" stop-color="${t.accent2}" stop-opacity="0.02"/>
       </linearGradient>
 
-      <!-- Grid Pattern -->
       <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
         <path d="M 50 0 L 0 0 0 50" fill="none" stroke="${t.gridColor}" stroke-opacity="${t.gridColorOpacity}" stroke-width="0.8"/>
       </pattern>
 
-      <!-- Dot Pattern -->
       <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
         <circle cx="2" cy="2" r="1" fill="${t.accent1}" opacity="0.08"/>
       </pattern>
     </defs>
 
-    <!-- ═══ BACKGROUND CANVAS ═══ -->
     <rect width="1200" height="630" fill="url(#bg-grad)"/>
     <rect width="1200" height="630" fill="url(#grid)"/>
 
-    <!-- ═══ AMBIENT GLOW ORBS ═══ -->
     <circle cx="120" cy="80" r="280" fill="${t.accent2}" opacity="0.15"/>
     <circle cx="1100" cy="550" r="320" fill="${t.accent1}" opacity="0.10"/>
     <circle cx="650" cy="320" r="200" fill="${t.accent3}" opacity="0.05"/>
 
-    <!-- ═══ DECORATIVE GEOMETRIC ELEMENTS ═══ -->
-
-    <!-- Top accent bar with gradient -->
     <rect x="0" y="0" width="1200" height="5" fill="url(#accent-grad)"/>
-
-    <!-- Left vertical accent line -->
     <rect x="60" y="50" width="3" height="530" rx="1.5" fill="url(#accent-v)"/>
 
-    <!-- Corner diagonal lines (top-right) -->
     <line x1="1050" y1="30" x2="1170" y2="30" stroke="${t.accent1}" stroke-width="1" opacity="0.15"/>
     <line x1="1070" y1="50" x2="1170" y2="50" stroke="${t.accent1}" stroke-width="1" opacity="0.1"/>
     <line x1="1090" y1="70" x2="1170" y2="70" stroke="${t.accent1}" stroke-width="1" opacity="0.07"/>
 
-    <!-- Bottom-left corner bracket -->
     <path d="M 80 590 L 80 610 L 120 610" fill="none" stroke="${t.accent1}" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
 
-    <!-- Floating geometric rings -->
     <circle cx="1100" cy="140" r="45" fill="none" stroke="${t.accent1}" stroke-width="1" opacity="0.08"/>
     <circle cx="1100" cy="140" r="30" fill="none" stroke="${t.accent2}" stroke-width="0.8" opacity="0.06"/>
     <circle cx="200" cy="560" r="35" fill="none" stroke="${t.accent1}" stroke-width="0.8" opacity="0.06"/>
 
-    <!-- Dot matrix area -->
     <rect x="950" y="180" width="200" height="200" fill="url(#dots)" opacity="0.5"/>
 
-
-    <!-- ═══════════════════════════════════════════════════ -->
-    <!-- LEFT COLUMN: HEADLINE & BRANDING                   -->
-    <!-- ═══════════════════════════════════════════════════ -->
     <g transform="translate(90, 0)">
-
-      <!-- Category Badge -->
       <g transform="translate(0, 65)">
         <rect x="0" y="0" width="${categoryBadgeWidth}" height="34" rx="17" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
         <circle cx="18" cy="17" r="4" fill="${t.accent1}" opacity="0.6"/>
         <text x="30" y="22" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="2.5">${safeCategory.toUpperCase()}</text>
       </g>
 
-      <!-- Stat Badge -->
       <g transform="translate(${categoryBadgeWidth + 16}, 65)">
         <rect x="0" y="0" width="${statBadgeWidth}" height="34" rx="17" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
         <text x="${statBadgeWidth / 2}" y="22" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="800" letter-spacing="2" text-anchor="middle">${statBadgeText}</text>
       </g>
 
-      <!-- Main Headline -->
       <g transform="translate(0, 148)">
         ${titleLines.map((line, idx) => `<text x="0" y="${idx * 68}" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="900" letter-spacing="-1">${line}</text>`).join("")}
       </g>
 
-      <!-- Accent underline beneath title -->
       <g transform="translate(0, ${156 + titleLines.length * 68})">
         <rect x="0" y="0" width="80" height="4" rx="2" fill="url(#accent-grad)"/>
       </g>
 
-      <!-- Subheading -->
       <g transform="translate(0, ${180 + titleLines.length * 68})">
         ${subLines.map((line, idx) => `<text x="0" y="${idx * 28}" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" opacity="0.95">${line}</text>`).join("")}
       </g>
 
-      <!-- Topic Icon Badge -->
       <g transform="translate(0, 420)">
         <circle cx="38" cy="38" r="42" fill="${t.accent1}" opacity="0.05"/>
         <rect width="76" height="76" rx="22" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1.5"/>
@@ -405,36 +268,24 @@ function generateSelfGeneratedPosterCard(
         </g>
       </g>
 
-      <!-- Horizontal separator line -->
       <line x1="95" y1="458" x2="460" y2="458" stroke="${t.accent1}" stroke-width="0.5" opacity="0.15"/>
-
     </g>
 
-
-    <!-- ═══════════════════════════════════════════════════ -->
-    <!-- RIGHT COLUMN: KEY TAKEAWAYS CARD                   -->
-    <!-- ═══════════════════════════════════════════════════ -->
     <g transform="translate(620, 55)">
-
-      <!-- Card Background -->
       <rect width="510" height="510" rx="24" fill="${t.cardBg}" fill-opacity="${t.cardBgOpacity}"/>
       <rect width="510" height="510" rx="24" fill="url(#card-glass)"/>
       <rect width="510" height="510" rx="24" fill="none" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1.5"/>
 
-      <!-- Top accent bar on card -->
       <rect x="0" y="0" width="510" height="4" rx="2" fill="url(#accent-grad)" opacity="0.8"/>
 
-      <!-- Card corner decorative dots -->
       <circle cx="28" cy="28" r="3" fill="${t.accent1}" opacity="0.2"/>
       <circle cx="482" cy="28" r="3" fill="${t.accent2}" opacity="0.2"/>
 
-      <!-- KEY TAKEAWAYS Header -->
       <g transform="translate(40, 48)">
         <text x="0" y="0" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="900" letter-spacing="3">KEY TAKEAWAYS</text>
         <rect x="0" y="12" width="120" height="3" rx="1.5" fill="url(#accent-grad)" opacity="0.8"/>
       </g>
 
-      <!-- Takeaway Cards -->
       ${points.map((pt, idx) => {
         const ptLines = wrapText(pt, 28).slice(0, 2);
         const yOffset = 95 + idx * 130;
@@ -443,49 +294,37 @@ function generateSelfGeneratedPosterCard(
           <rect x="0" y="0" width="454" height="108" rx="16" fill="none" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1"/>
           <rect x="0" y="20" width="4" height="68" rx="2" fill="url(#accent-grad)"/>
 
-          <!-- Number badge -->
           <g transform="translate(22, 28)">
             <circle cx="24" cy="24" r="22" fill="url(#accent-grad)" opacity="0.15"/>
             <circle cx="24" cy="24" r="22" fill="none" stroke="${t.accent1}" stroke-width="2" opacity="0.6"/>
             <text x="24" y="31" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="19" font-weight="900" text-anchor="middle">0${idx + 1}</text>
           </g>
 
-          <!-- Text content -->
           <g transform="translate(80, 0)">
             ${ptLines.map((line, lIdx) => `<text x="0" y="${ptLines.length === 1 ? 60 : 44 + lIdx * 26}" fill="#f1f5f9" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">${line}</text>`).join("")}
           </g>
         </g>`;
       }).join("")}
 
-      <!-- Bottom decorative line in card -->
       <line x1="40" y1="480" x2="470" y2="480" stroke="${t.accent1}" stroke-width="0.5" opacity="0.15"/>
     </g>
 
-
-    <!-- ═══════════════════════════════════════════════════ -->
-    <!-- FOOTER: ADSRAHU BRAND MARK + CTA                   -->
-    <!-- ═══════════════════════════════════════════════════ -->
-
-    <!-- Adsrahu Logo + Brand (bottom-left) -->
     <g transform="translate(90, 546)">
       ${ADSRAHU_LOGO_SVG}
       <text x="52" y="28" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="900" letter-spacing="-0.3">Adsrahu</text>
       <text x="52" y="44" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="800" letter-spacing="2.5">PERFORMANCE AGENCY</text>
     </g>
 
-    <!-- Corner Logo Watermark (top-right) -->
     <g transform="translate(1090, 20) scale(0.9)">
       ${ADSRAHU_LOGO_SVG}
     </g>
 
-    <!-- Read Article CTA (bottom-right) -->
     <g transform="translate(1000, 562)">
       <rect x="0" y="0" width="150" height="38" rx="19" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
       <text x="22" y="24" fill="#cbd5e1" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="1.5">READ ARTICLE</text>
       <path d="M 130 19 L 136 19 M 133 15 L 137 19 L 133 23" fill="none" stroke="${t.accent1}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
 
-    <!-- Website URL -->
     <g transform="translate(600, 614)">
       <text x="0" y="0" fill="#64748b" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" letter-spacing="2" text-anchor="middle">ADSRAHU.COM</text>
     </g>
@@ -494,210 +333,6 @@ function generateSelfGeneratedPosterCard(
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
-// ── AI Blog Content & Poster Generation Handler ─────────────────────────
-async function generateBlogWithAI(
-  topic: string,
-  category: string,
-  tone: string,
-  targetAudience: string,
-  keyPoints: string
-) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "GEMINI_API_KEY not configured. Set it in Vercel Environment Variables."
-    );
-  }
-
-  const prompt = `You are a world-class performance marketing, growth, and content expert writing for "Adsrahu". Adsrahu is a high-growth performance marketing agency and media platform.
-
-Write a highly detailed, professional, and actionable SEO-optimized blog post based on these exact requirements:
-Topic: "${topic}"
-Category: "${category || "General"}"
-Tone of Voice: "${tone || "Professional and authoritative"}"
-Target Audience: "${targetAudience || "Business owners, founders, and industry professionals"}"
-Key Points to Include: "${keyPoints || "High-value, actionable strategies"}"
-
-CRITICAL INSTRUCTIONS:
-1. Adapt fully to the specified Topic, Category, and Target Audience. Do NOT inject unmentioned niches or industries unless specified in the topic!
-2. Provide specific, actionable strategies (e.g., mention specific ad strategies, automation flows, analytics, tool integrations relevant to the topic).
-3. Avoid generic fluff. Use realistic data points, market trends, and modern digital marketing methodologies.
-4. Format the content beautifully in Markdown:
-   - Start with an engaging hook.
-   - Use 3-5 clearly defined ## headings.
-   - Include bullet points, numbered lists, and bold text for readability.
-5. End with a strong Call-To-Action (CTA) encouraging the reader to implement these strategies or consult with Adsrahu.
-6. Design a sleek 16:9 social poster card for this blog. Choose the most relevant theme and icon, and extract exactly 3 distinct key takeaways from the blog post.`;
-
-  const textResponse = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 8192,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: {
-              title: {
-                type: "STRING",
-                description: "An SEO-friendly, compelling blog title (50-70 chars)",
-              },
-              slug: {
-                type: "STRING",
-                description: "url-friendly-slug-with-hyphens",
-              },
-              excerpt: {
-                type: "STRING",
-                description: "A compelling 1-2 sentence summary for the blog card (under 160 chars)",
-              },
-              content: {
-                type: "STRING",
-                description: "The full blog body in Markdown format. Use \\n for newlines.",
-              },
-              poster: {
-                type: "OBJECT",
-                properties: {
-                  theme: {
-                    type: "STRING",
-                    description: "Theme name for poster card. One of: 'dark-tech', 'emerald-growth', 'neon-purple', 'royal-blue', 'amber-glow', 'rose-premium', 'cyber-teal', 'midnight-indigo', 'solar-orange', 'arctic-slate'",
-                  },
-                  icon: {
-                    type: "STRING",
-                    description: "Icon representing topic. One of: 'zap', 'chart', 'trending', 'target', 'shield', 'layers', 'cpu'",
-                  },
-                  headline: {
-                    type: "STRING",
-                    description: "Short punchy headline for the poster (2-5 words max)",
-                  },
-                  subheading: {
-                    type: "STRING",
-                    description: "Punchy 1-sentence subtitle explaining the core value proposition",
-                  },
-                  keyTakeaways: {
-                    type: "ARRAY",
-                    items: { type: "STRING" },
-                    description: "Exactly 3 distinct, specific key takeaway sentences from this blog (each 6-12 words).",
-                  },
-                  statBadge: {
-                    type: "STRING",
-                    description: "Short 2-3 word badge label (e.g. '10X GROWTH', 'AI STRATEGY', 'SCALE GUIDE')",
-                  },
-                },
-                required: ["theme", "icon", "headline", "subheading", "keyTakeaways", "statBadge"],
-              },
-            },
-            required: ["title", "slug", "excerpt", "content", "poster"],
-          },
-        },
-      }),
-    }
-  );
-
-  if (!textResponse.ok) {
-    const errBody = await textResponse.text();
-    throw new Error(`Gemini API error: ${textResponse.status} - ${errBody}`);
-  }
-
-  const data = await textResponse.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("No content generated by Gemini");
-
-  // Parse output with robust safeJsonParse
-  const parsed = safeJsonParse(text);
-
-  // Generate 100% Safari SVG 1.1 compliant ultra-premium infographic poster card
-  const posterSvgUrl = generateSelfGeneratedPosterCard(
-    parsed.title,
-    parsed.excerpt,
-    category,
-    parsed.poster
-  );
-
-  return {
-    title: parsed.title,
-    slug: parsed.slug,
-    category,
-    excerpt: parsed.excerpt,
-    content: parsed.content,
-    imageUrl: posterSvgUrl,
-  };
-}
-
-// ── API Router ───────────────────────────────────────────────────────────
-export default async function handler(req: any, res: any) {
-  cors(res);
-  if (req.method === "OPTIONS") { res.status(200).end(); return; }
-
-  const sql = getSql();
-
-  if (req.method === "GET") {
-    const onlyPublished = req.query?.published === "true";
-    const rows = onlyPublished
-      ? await sql`SELECT * FROM blog_posts WHERE published = true ORDER BY created_at DESC`
-      : await sql`SELECT * FROM blog_posts ORDER BY created_at DESC`;
-    res.status(200).json(rows.map(toCamel));
-    return;
-  }
-
-  if (req.method === "POST") {
-    if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
-
-    // AI Blog Generation
-    if (req.query?.action === "generate") {
-      let b = req.body ?? {};
-      if (typeof b === "string") { try { b = JSON.parse(b); } catch (e) {} }
-      const topic = b.topic || b.title || "";
-      const category = b.category || "General";
-      const tone = b.tone || "";
-      const targetAudience = b.targetAudience || "";
-      const keyPoints = b.keyPoints || "";
-
-      if (!topic) { res.status(400).json({ error: "topic is required" }); return; }
-      try {
-        const generated = await generateBlogWithAI(topic, category, tone, targetAudience, keyPoints);
-        res.status(200).json(generated);
-      } catch (err) {
-        res.status(500).json({ error: err.message || "AI generation failed" });
-      }
-      return;
-    }
-
-    // Normal blog creation
-    let b = req.body ?? {};
-    if (typeof b === "string") {
-      try { b = JSON.parse(b); } catch (e) {}
-    }
-    if (!b.title || !b.slug) { res.status(400).json({ error: "title and slug required" }); return; }
-    const rows = await sql`
-      INSERT INTO blog_posts (title, slug, category, excerpt, content, published, image_url)
-      VALUES (${b.title}, ${b.slug}, ${b.category ?? "General"}, ${b.excerpt ?? ""}, ${b.content ?? ""}, ${b.published ?? false}, ${b.imageUrl ?? null})
-      RETURNING *`;
-    res.status(201).json(toCamel(rows[0]));
-    return;
-  }
-
-  res.status(405).json({ error: "Method not allowed" });
-}
-
-function toCamel(row: any) {
-  if (!row) return row;
-  return {
-    id: row.id,
-    title: row.title,
-    slug: row.slug,
-    category: row.category,
-    excerpt: row.excerpt,
-    content: row.content,
-    published: row.published,
-    createdAt: row.created_at,
-    imageUrl: row.image_url,
-  };
-}
+const res = generateSelfGeneratedPosterCard("Strategic Automation", "Excerpt text", "BUSINESS GROWTH", {});
+console.log('Contains rgba:', res.includes('rgba'));
+console.log('Base64 length:', res.length);
