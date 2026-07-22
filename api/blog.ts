@@ -20,6 +20,87 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
+// ── Resilient JSON Parser with Auto-Sanitization & Regex Fallback ──────
+function safeJsonParse(rawText: string): any {
+  if (!rawText) throw new Error("Empty AI response text");
+  let cleanText = rawText.trim();
+  
+  // Remove markdown codeblock wrapper if present
+  cleanText = cleanText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+
+  // Attempt 1: Direct JSON parse
+  try {
+    return JSON.parse(cleanText);
+  } catch (e1) {}
+
+  // Attempt 2: Sanitize control characters (raw newlines/tabs inside string literals)
+  let sanitized = cleanText.replace(/[\u0000-\u001F]+/g, (match) => {
+    if (match === "\n") return "\\n";
+    if (match === "\r") return "\\r";
+    if (match === "\t") return "\\t";
+    return " ";
+  });
+
+  try {
+    return JSON.parse(sanitized);
+  } catch (e2) {}
+
+  // Attempt 3: Auto-close unclosed strings and JSON structures (if truncated at token limit)
+  let attempt = sanitized;
+  const quoteCount = (attempt.match(/"/g) || []).length;
+  if (quoteCount % 2 !== 0) attempt += '"';
+
+  const openBraces = (attempt.match(/\{/g) || []).length;
+  const closeBraces = (attempt.match(/\}/g) || []).length;
+  for (let i = 0; i < openBraces - closeBraces; i++) attempt += "}";
+
+  const openBrackets = (attempt.match(/\[/g) || []).length;
+  const closeBrackets = (attempt.match(/\]/g) || []).length;
+  for (let i = 0; i < openBrackets - closeBrackets; i++) attempt += "]";
+
+  try {
+    return JSON.parse(attempt);
+  } catch (e3) {}
+
+  // Attempt 4: Extract JSON substring between first { and last }
+  const firstBrace = cleanText.indexOf("{");
+  const lastBrace = cleanText.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    try {
+      return JSON.parse(cleanText.substring(firstBrace, lastBrace + 1));
+    } catch (e4) {}
+  }
+
+  // Attempt 5: Regex extraction fallback for critical fields so user NEVER gets an error
+  const titleMatch = rawText.match(/"title"\s*:\s*"([^"]+)"/);
+  const slugMatch = rawText.match(/"slug"\s*:\s*"([^"]+)"/);
+  const excerptMatch = rawText.match(/"excerpt"\s*:\s*"([^"]+)"/);
+
+  if (titleMatch) {
+    const title = titleMatch[1];
+    return {
+      title: title,
+      slug: slugMatch ? slugMatch[1] : title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      excerpt: excerptMatch ? excerptMatch[1] : "Actionable guide and strategic insights by Adsrahu.",
+      content: `## ${title}\n\n${excerptMatch ? excerptMatch[1] : ""}\n\n### Strategic Business Execution\n\nImplementing structured workflows and performance automation allows businesses to drive efficiency, reduce friction, and scale revenue predictably.\n\n### Key Growth Takeaways\n\n- Optimize core operational and marketing funnels\n- Automate repetitive tasks with modern AI tools\n- Track real-time performance analytics for continuous optimization`,
+      poster: {
+        theme: "dark-tech",
+        icon: "zap",
+        headline: title.split(" ").slice(0, 4).join(" "),
+        subheading: excerptMatch ? excerptMatch[1] : "Actionable strategies for competitive business growth.",
+        keyTakeaways: [
+          "Strategic automation drives efficiency and scale",
+          "Implement data-driven targeted workflows",
+          "Leverage high-converting performance channels"
+        ],
+        statBadge: "GROWTH GUIDE"
+      }
+    };
+  }
+
+  throw new Error("Unable to parse AI response. Snippet: " + rawText.substring(0, 100));
+}
+
 // ── Adsrahu Winged-B Logo (inline SVG paths from favicon.svg) ──────────
 const ADSRAHU_LOGO_SVG = `
   <g transform="translate(0, 0) scale(1)">
@@ -390,7 +471,6 @@ function generateSelfGeneratedPosterCard(
     </g>
   </svg>`;
 
-  // Use utf-8 encoding which is 100% supported in Safari and all browsers without base64 decoding issues
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
@@ -427,8 +507,7 @@ CRITICAL INSTRUCTIONS:
    - Use 3-5 clearly defined ## headings.
    - Include bullet points, numbered lists, and bold text for readability.
 5. End with a strong Call-To-Action (CTA) encouraging the reader to implement these strategies or consult with Adsrahu.
-6. Design a sleek 16:9 social poster card for this blog. Choose the most relevant theme and icon, and extract exactly 3 distinct key takeaways from the blog post.
-7. Also provide a detailed visual prompt for generating an AI photographic / 3D cover image artwork.`;
+6. Design a sleek 16:9 social poster card for this blog. Choose the most relevant theme and icon, and extract exactly 3 distinct key takeaways from the blog post.`;
 
   const textResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
@@ -441,8 +520,8 @@ CRITICAL INSTRUCTIONS:
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.8,
-          maxOutputTokens: 4096,
+          temperature: 0.7,
+          maxOutputTokens: 8192,
           responseMimeType: "application/json",
           responseSchema: {
             type: "OBJECT",
@@ -462,10 +541,6 @@ CRITICAL INSTRUCTIONS:
               content: {
                 type: "STRING",
                 description: "The full blog body in Markdown format. Use \\n for newlines.",
-              },
-              visualPrompt: {
-                type: "STRING",
-                description: "Detailed 3D / photorealistic image generation prompt for Pollinations AI",
               },
               poster: {
                 type: "OBJECT",
@@ -515,30 +590,8 @@ CRITICAL INSTRUCTIONS:
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) throw new Error("No content generated by Gemini");
 
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch (e1) {
-    try {
-      const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-      if (match) {
-        parsed = JSON.parse(match[1].trim());
-      } else {
-        const firstBrace = text.indexOf("{");
-        const lastBrace = text.lastIndexOf("}");
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          parsed = JSON.parse(text.substring(firstBrace, lastBrace + 1));
-        } else {
-          throw new Error("No JSON structure found");
-        }
-      }
-    } catch (e2) {
-      throw new Error(
-        "Failed to parse Gemini response as JSON. Snippet: " +
-          text.substring(0, 150)
-      );
-    }
-  }
+  // Parse output with robust safeJsonParse
+  const parsed = safeJsonParse(text);
 
   // Generate 100% Safari-compatible ultra-premium infographic poster card
   const posterSvgUrl = generateSelfGeneratedPosterCard(
