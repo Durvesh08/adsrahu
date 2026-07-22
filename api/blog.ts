@@ -1,500 +1,89 @@
 // @ts-nocheck
 import { getSql, checkAuth, cors } from "./_lib/db.js";
 
-export const maxDuration = 60; // Allow 60 seconds for AI text & poster generation on Vercel
+export const maxDuration = 60;
+export const config = { api: { bodyParser: { sizeLimit: "10mb" } } };
 
-export const config = {
-  api: { bodyParser: { sizeLimit: "10mb" } },
-};
+const GEMINI_MODEL = "gemini-2.5-flash";
+const IMAGEN_MODEL = "imagen-3.0-generate-002";
 
-const GEMINI_TEXT_MODEL = "gemini-2.5-flash";
+// ── Robust JSON parser (handles markdown fences, truncation, control chars) ──
+function safeJsonParse(raw: string): any {
+  if (!raw) throw new Error("Empty AI response");
+  let s = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
 
-// Helper to escape XML special characters for safe SVG rendering
-function escapeXml(str: string): string {
-  if (!str) return "";
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+  try { return JSON.parse(s); } catch {}
+
+  s = s.replace(/[\u0000-\u001F]+/g, m =>
+    m === "\n" ? "\\n" : m === "\r" ? "\\r" : m === "\t" ? "\\t" : " "
+  );
+  try { return JSON.parse(s); } catch {}
+
+  const q = (s.match(/"/g) || []).length;
+  let a = q % 2 !== 0 ? s + '"' : s;
+  const ob = (a.match(/\{/g) || []).length, cb = (a.match(/\}/g) || []).length;
+  for (let i = 0; i < ob - cb; i++) a += "}";
+  const oB = (a.match(/\[/g) || []).length, cB = (a.match(/\]/g) || []).length;
+  for (let i = 0; i < oB - cB; i++) a += "]";
+  try { return JSON.parse(a); } catch {}
+
+  const f = raw.indexOf("{"), l = raw.lastIndexOf("}");
+  if (f !== -1 && l > f) try { return JSON.parse(raw.substring(f, l + 1)); } catch {}
+
+  throw new Error("Cannot parse AI response. Snippet: " + raw.substring(0, 120));
 }
 
-// ── Resilient JSON Parser with Auto-Sanitization & Regex Fallback ──────
-function safeJsonParse(rawText: string): any {
-  if (!rawText) throw new Error("Empty AI response text");
-  let cleanText = rawText.trim();
-  
-  // Remove markdown codeblock wrapper if present
-  cleanText = cleanText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
-
-  // Attempt 1: Direct JSON parse
-  try {
-    return JSON.parse(cleanText);
-  } catch (e1) {}
-
-  // Attempt 2: Sanitize control characters (raw newlines/tabs inside string literals)
-  let sanitized = cleanText.replace(/[\u0000-\u001F]+/g, (match) => {
-    if (match === "\n") return "\\n";
-    if (match === "\r") return "\\r";
-    if (match === "\t") return "\\t";
-    return " ";
-  });
+// ── Generate real AI image via Google Imagen API ──────────────────────────
+async function generateImageWithImagen(prompt: string): Promise<string | null> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
 
   try {
-    return JSON.parse(sanitized);
-  } catch (e2) {}
-
-  // Attempt 3: Auto-close unclosed strings and JSON structures (if truncated at token limit)
-  let attempt = sanitized;
-  const quoteCount = (attempt.match(/"/g) || []).length;
-  if (quoteCount % 2 !== 0) attempt += '"';
-
-  const openBraces = (attempt.match(/\{/g) || []).length;
-  const closeBraces = (attempt.match(/\}/g) || []).length;
-  for (let i = 0; i < openBraces - closeBraces; i++) attempt += "}";
-
-  const openBrackets = (attempt.match(/\[/g) || []).length;
-  const closeBrackets = (attempt.match(/\]/g) || []).length;
-  for (let i = 0; i < openBrackets - closeBrackets; i++) attempt += "]";
-
-  try {
-    return JSON.parse(attempt);
-  } catch (e3) {}
-
-  // Attempt 4: Extract JSON substring between first { and last }
-  const firstBrace = cleanText.indexOf("{");
-  const lastBrace = cleanText.lastIndexOf("}");
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    try {
-      return JSON.parse(cleanText.substring(firstBrace, lastBrace + 1));
-    } catch (e4) {}
-  }
-
-  // Attempt 5: Regex extraction fallback for critical fields so user NEVER gets an error
-  const titleMatch = rawText.match(/"title"\s*:\s*"([^"]+)"/);
-  const slugMatch = rawText.match(/"slug"\s*:\s*"([^"]+)"/);
-  const excerptMatch = rawText.match(/"excerpt"\s*:\s*"([^"]+)"/);
-
-  if (titleMatch) {
-    const title = titleMatch[1];
-    return {
-      title: title,
-      slug: slugMatch ? slugMatch[1] : title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      excerpt: excerptMatch ? excerptMatch[1] : "Actionable guide and strategic insights by Adsrahu.",
-      content: `## ${title}\n\n${excerptMatch ? excerptMatch[1] : ""}\n\n### Strategic Business Execution\n\nImplementing structured workflows and performance automation allows businesses to drive efficiency, reduce friction, and scale revenue predictably.\n\n### Key Growth Takeaways\n\n- Optimize core operational and marketing funnels\n- Automate repetitive tasks with modern AI tools\n- Track real-time performance analytics for continuous optimization`,
-      poster: {
-        theme: "dark-tech",
-        icon: "zap",
-        headline: title.split(" ").slice(0, 4).join(" "),
-        subheading: excerptMatch ? excerptMatch[1] : "Actionable strategies for competitive business growth.",
-        keyTakeaways: [
-          "Strategic automation drives efficiency and scale",
-          "Implement data-driven targeted workflows",
-          "Leverage high-converting performance channels"
-        ],
-        statBadge: "GROWTH GUIDE"
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${IMAGEN_MODEL}:predict?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instances: [{ prompt }],
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: "16:9",
+            safetyFilterLevel: "BLOCK_ONLY_HIGH",
+            personGeneration: "ALLOW_ADULT",
+          },
+        }),
       }
-    };
-  }
+    );
 
-  throw new Error("Unable to parse AI response. Snippet: " + rawText.substring(0, 100));
+    if (!res.ok) {
+      const err = await res.text();
+      console.error("Imagen API error:", res.status, err);
+      return null;
+    }
+
+    const data = await res.json();
+    const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
+    if (!b64) return null;
+
+    return `data:image/png;base64,${b64}`;
+  } catch (e) {
+    console.error("Imagen generation error:", e);
+    return null;
+  }
 }
 
-// ── Adsrahu Winged-B Logo (inline SVG paths from favicon.svg) ──────────
-const ADSRAHU_LOGO_SVG = `
-  <g transform="translate(0, 0) scale(1)">
-    <!-- Background circle -->
-    <circle cx="22" cy="22" r="21" fill="#0c0c14" stroke="url(#logo-gold)" stroke-width="1.8"/>
-    <!-- Ambient golden glow -->
-    <circle cx="22" cy="21" r="12" fill="#FF8C00" opacity="0.08"/>
-    <!-- Left wing - outer sweep -->
-    <path d="M 9 22 C 8 19, 10 16, 13 15 C 15 14.5, 17 15.5, 18 16.5"
-          stroke="url(#logo-gold)" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <!-- Left wing - inner line -->
-    <path d="M 10.5 22.5 C 10 20, 11 18, 14 17 C 16 16.5, 17 17.2, 18 18"
-          stroke="url(#logo-gold)" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.7"/>
-    <!-- Vertical stem -->
-    <rect x="20.5" y="11" width="3" height="5.5" rx="1" fill="url(#logo-gold-shine)"/>
-    <!-- Horizontal crossbar -->
-    <rect x="17.5" y="17.5" width="9.5" height="2.8" rx="1.2" fill="url(#logo-gold)"/>
-    <!-- Circular bowl -->
-    <circle cx="23.5" cy="23.5" r="5.5" fill="none" stroke="url(#logo-gold-shine)" stroke-width="2.8"/>
-    <!-- Speed lines -->
-    <line x1="14" y1="20" x2="17.5" y2="20" stroke="url(#logo-gold)" stroke-width="1.4" stroke-linecap="round"/>
-    <line x1="14.5" y1="23" x2="17.5" y2="23" stroke="url(#logo-gold)" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
-  </g>
-`;
-
-// ── Ultra-Premium Safari-Compatible SVG 1.1 Poster Generator ───────────
-function generateSelfGeneratedPosterCard(
-  title: string,
-  excerpt: string,
-  category: string,
-  posterInfo?: {
-    theme?: string;
-    icon?: string;
-    headline?: string;
-    subheading?: string;
-    keyTakeaways?: string[];
-    statBadge?: string;
-  }
-): string {
-  const safeTitle = escapeXml(title);
-  const safeExcerpt = escapeXml(excerpt);
-  const safeCategory = escapeXml(category || "INSIGHTS");
-
-  const themes: Record<string, any> = {
-    "dark-tech": {
-      bgStart: "#020817", bgMid: "#0a1628", bgEnd: "#111d35",
-      accent1: "#38bdf8", accent2: "#0ea5e9", accent3: "#7dd3fc",
-      cardBg: "#08142a", cardBgOpacity: "0.85",
-      cardStroke: "#38bdf8", cardStrokeOpacity: "0.25",
-      gridColor: "#38bdf8", gridColorOpacity: "0.05",
-      pillBg: "#38bdf8", pillBgOpacity: "0.12"
-    },
-    "emerald-growth": {
-      bgStart: "#011c14", bgMid: "#042d1f", bgEnd: "#064e3b",
-      accent1: "#34d399", accent2: "#10b981", accent3: "#6ee7b7",
-      cardBg: "#04281c", cardBgOpacity: "0.85",
-      cardStroke: "#34d399", cardStrokeOpacity: "0.25",
-      gridColor: "#34d399", gridColorOpacity: "0.05",
-      pillBg: "#34d399", pillBgOpacity: "0.12"
-    },
-    "neon-purple": {
-      bgStart: "#0a0118", bgMid: "#150830", bgEnd: "#1e0b48",
-      accent1: "#c084fc", accent2: "#a855f7", accent3: "#e9d5ff",
-      cardBg: "#160834", cardBgOpacity: "0.85",
-      cardStroke: "#a855f7", cardStrokeOpacity: "0.25",
-      gridColor: "#a855f7", gridColorOpacity: "0.05",
-      pillBg: "#a855f7", pillBgOpacity: "0.12"
-    },
-    "royal-blue": {
-      bgStart: "#020620", bgMid: "#071340", bgEnd: "#0c1d5e",
-      accent1: "#60a5fa", accent2: "#3b82f6", accent3: "#93c5fd",
-      cardBg: "#070f37", cardBgOpacity: "0.85",
-      cardStroke: "#3b82f6", cardStrokeOpacity: "0.25",
-      gridColor: "#3b82f6", gridColorOpacity: "0.05",
-      pillBg: "#3b82f6", pillBgOpacity: "0.12"
-    },
-    "amber-glow": {
-      bgStart: "#120800", bgMid: "#231004", bgEnd: "#3a1c08",
-      accent1: "#fbbf24", accent2: "#f59e0b", accent3: "#fde68a",
-      cardBg: "#2a1606", cardBgOpacity: "0.85",
-      cardStroke: "#f59e0b", cardStrokeOpacity: "0.25",
-      gridColor: "#f59e0b", gridColorOpacity: "0.05",
-      pillBg: "#f59e0b", pillBgOpacity: "0.12"
-    },
-    "rose-premium": {
-      bgStart: "#1a0510", bgMid: "#2a0a1a", bgEnd: "#3d1028",
-      accent1: "#fb7185", accent2: "#f43f5e", accent3: "#fda4af",
-      cardBg: "#2d0a1c", cardBgOpacity: "0.85",
-      cardStroke: "#f43f5e", cardStrokeOpacity: "0.25",
-      gridColor: "#f43f5e", gridColorOpacity: "0.05",
-      pillBg: "#f43f5e", pillBgOpacity: "0.12"
-    },
-    "cyber-teal": {
-      bgStart: "#021215", bgMid: "#042028", bgEnd: "#063040",
-      accent1: "#2dd4bf", accent2: "#14b8a6", accent3: "#99f6e4",
-      cardBg: "#041c23", cardBgOpacity: "0.85",
-      cardStroke: "#14b8a6", cardStrokeOpacity: "0.25",
-      gridColor: "#14b8a6", gridColorOpacity: "0.05",
-      pillBg: "#14b8a6", pillBgOpacity: "0.12"
-    },
-    "midnight-indigo": {
-      bgStart: "#080420", bgMid: "#0f0838", bgEnd: "#180e55",
-      accent1: "#818cf8", accent2: "#6366f1", accent3: "#c7d2fe",
-      cardBg: "#0f0832", cardBgOpacity: "0.85",
-      cardStroke: "#6366f1", cardStrokeOpacity: "0.25",
-      gridColor: "#6366f1", gridColorOpacity: "0.05",
-      pillBg: "#6366f1", pillBgOpacity: "0.12"
-    },
-    "solar-orange": {
-      bgStart: "#150600", bgMid: "#251000", bgEnd: "#3b1a02",
-      accent1: "#fb923c", accent2: "#f97316", accent3: "#fdba74",
-      cardBg: "#281002", cardBgOpacity: "0.85",
-      cardStroke: "#f97316", cardStrokeOpacity: "0.25",
-      gridColor: "#f97316", gridColorOpacity: "0.05",
-      pillBg: "#f97316", pillBgOpacity: "0.12"
-    },
-    "arctic-slate": {
-      bgStart: "#0c0f1a", bgMid: "#141828", bgEnd: "#1c2238",
-      accent1: "#94a3b8", accent2: "#64748b", accent3: "#cbd5e1",
-      cardBg: "#121626", cardBgOpacity: "0.85",
-      cardStroke: "#64748b", cardStrokeOpacity: "0.25",
-      gridColor: "#64748b", gridColorOpacity: "0.05",
-      pillBg: "#64748b", pillBgOpacity: "0.12"
-    }
-  };
-
-  const themeName = posterInfo?.theme || "dark-tech";
-  const t = themes[themeName] || themes["dark-tech"];
-
-  const icons: Record<string, string> = {
-    "zap": `<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>`,
-    "chart": `<path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
-    "trending": `<path d="M23 6l-9.5 9.5-5-5L1 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M17 6h6v6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
-    "target": `<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>`,
-    "shield": `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
-    "layers": `<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
-    "cpu": `<rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/><line x1="9" y1="1" x2="9" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="15" y1="1" x2="15" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="20" x2="9" y2="23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="15" y1="20" x2="15" y2="23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>`
-  };
-
-  const selectedIcon = icons[posterInfo?.icon || "zap"] || icons["zap"];
-
-  const wrapText = (str: string, maxChar: number): string[] => {
-    const words = (str || "").split(" ");
-    const lines: string[] = [];
-    let cur = "";
-    for (const w of words) {
-      if ((cur + " " + w).trim().length > maxChar) {
-        if (cur) lines.push(cur.trim());
-        cur = w;
-      } else {
-        cur += " " + w;
-      }
-    }
-    if (cur.trim()) lines.push(cur.trim());
-    return lines;
-  };
-
-  const displayHeadline = posterInfo?.headline || safeTitle;
-  const displaySubheading = posterInfo?.subheading || safeExcerpt;
-
-  const titleLines = wrapText(escapeXml(displayHeadline), 20).slice(0, 3);
-  const subLines = wrapText(escapeXml(displaySubheading), 36).slice(0, 2);
-
-  const rawPoints = posterInfo?.keyTakeaways && posterInfo.keyTakeaways.length >= 3
-    ? posterInfo.keyTakeaways
-    : [
-        "Strategic automation drives efficiency and scalable growth",
-        "Implement data-driven workflows for measurable results",
-        "Leverage high-converting modern marketing channels"
-      ];
-
-  const points = rawPoints.slice(0, 3).map(pt => escapeXml(pt));
-  const statBadgeText = escapeXml(posterInfo?.statBadge || "PERFORMANCE GUIDE");
-
-  const categoryBadgeWidth = Math.max(safeCategory.length * 10 + 36, 140);
-  const statBadgeWidth = Math.max(statBadgeText.length * 8 + 32, 160);
-
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
-    <defs>
-      <!-- Background Gradient -->
-      <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="${t.bgStart}"/>
-        <stop offset="45%" stop-color="${t.bgMid}"/>
-        <stop offset="100%" stop-color="${t.bgEnd}"/>
-      </linearGradient>
-
-      <!-- Accent Gradient -->
-      <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="${t.accent1}"/>
-        <stop offset="100%" stop-color="${t.accent2}"/>
-      </linearGradient>
-
-      <!-- Vertical Accent Gradient -->
-      <linearGradient id="accent-v" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="${t.accent1}" stop-opacity="0.8"/>
-        <stop offset="100%" stop-color="${t.accent2}" stop-opacity="0.1"/>
-      </linearGradient>
-
-      <!-- Gold Logo Gradients -->
-      <linearGradient id="logo-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FFD97A"/>
-        <stop offset="40%" stop-color="#FFA500"/>
-        <stop offset="100%" stop-color="#CC6A00"/>
-      </linearGradient>
-      <linearGradient id="logo-gold-shine" x1="0%" y1="0%" x2="60%" y2="100%">
-        <stop offset="0%" stop-color="#FFE599"/>
-        <stop offset="50%" stop-color="#FF9500"/>
-        <stop offset="100%" stop-color="#B85C00"/>
-      </linearGradient>
-
-      <!-- Card Glass Gradient -->
-      <linearGradient id="card-glass" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="${t.accent1}" stop-opacity="0.08"/>
-        <stop offset="100%" stop-color="${t.accent2}" stop-opacity="0.02"/>
-      </linearGradient>
-
-      <!-- Grid Pattern -->
-      <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="${t.gridColor}" stroke-opacity="${t.gridColorOpacity}" stroke-width="0.8"/>
-      </pattern>
-
-      <!-- Dot Pattern -->
-      <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
-        <circle cx="2" cy="2" r="1" fill="${t.accent1}" opacity="0.08"/>
-      </pattern>
-    </defs>
-
-    <!-- ═══ BACKGROUND CANVAS ═══ -->
-    <rect width="1200" height="630" fill="url(#bg-grad)"/>
-    <rect width="1200" height="630" fill="url(#grid)"/>
-
-    <!-- ═══ AMBIENT GLOW ORBS ═══ -->
-    <circle cx="120" cy="80" r="280" fill="${t.accent2}" opacity="0.15"/>
-    <circle cx="1100" cy="550" r="320" fill="${t.accent1}" opacity="0.10"/>
-    <circle cx="650" cy="320" r="200" fill="${t.accent3}" opacity="0.05"/>
-
-    <!-- ═══ DECORATIVE GEOMETRIC ELEMENTS ═══ -->
-
-    <!-- Top accent bar with gradient -->
-    <rect x="0" y="0" width="1200" height="5" fill="url(#accent-grad)"/>
-
-    <!-- Left vertical accent line -->
-    <rect x="60" y="50" width="3" height="530" rx="1.5" fill="url(#accent-v)"/>
-
-    <!-- Corner diagonal lines (top-right) -->
-    <line x1="1050" y1="30" x2="1170" y2="30" stroke="${t.accent1}" stroke-width="1" opacity="0.15"/>
-    <line x1="1070" y1="50" x2="1170" y2="50" stroke="${t.accent1}" stroke-width="1" opacity="0.1"/>
-    <line x1="1090" y1="70" x2="1170" y2="70" stroke="${t.accent1}" stroke-width="1" opacity="0.07"/>
-
-    <!-- Bottom-left corner bracket -->
-    <path d="M 80 590 L 80 610 L 120 610" fill="none" stroke="${t.accent1}" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
-
-    <!-- Floating geometric rings -->
-    <circle cx="1100" cy="140" r="45" fill="none" stroke="${t.accent1}" stroke-width="1" opacity="0.08"/>
-    <circle cx="1100" cy="140" r="30" fill="none" stroke="${t.accent2}" stroke-width="0.8" opacity="0.06"/>
-    <circle cx="200" cy="560" r="35" fill="none" stroke="${t.accent1}" stroke-width="0.8" opacity="0.06"/>
-
-    <!-- Dot matrix area -->
-    <rect x="950" y="180" width="200" height="200" fill="url(#dots)" opacity="0.5"/>
-
-
-    <!-- ═══════════════════════════════════════════════════ -->
-    <!-- LEFT COLUMN: HEADLINE & BRANDING                   -->
-    <!-- ═══════════════════════════════════════════════════ -->
-    <g transform="translate(90, 0)">
-
-      <!-- Category Badge -->
-      <g transform="translate(0, 65)">
-        <rect x="0" y="0" width="${categoryBadgeWidth}" height="34" rx="17" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
-        <circle cx="18" cy="17" r="4" fill="${t.accent1}" opacity="0.6"/>
-        <text x="30" y="22" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="2.5">${safeCategory.toUpperCase()}</text>
-      </g>
-
-      <!-- Stat Badge -->
-      <g transform="translate(${categoryBadgeWidth + 16}, 65)">
-        <rect x="0" y="0" width="${statBadgeWidth}" height="34" rx="17" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
-        <text x="${statBadgeWidth / 2}" y="22" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="800" letter-spacing="2" text-anchor="middle">${statBadgeText}</text>
-      </g>
-
-      <!-- Main Headline -->
-      <g transform="translate(0, 148)">
-        ${titleLines.map((line, idx) => `<text x="0" y="${idx * 68}" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="900" letter-spacing="-1">${line}</text>`).join("")}
-      </g>
-
-      <!-- Accent underline beneath title -->
-      <g transform="translate(0, ${156 + titleLines.length * 68})">
-        <rect x="0" y="0" width="80" height="4" rx="2" fill="url(#accent-grad)"/>
-      </g>
-
-      <!-- Subheading -->
-      <g transform="translate(0, ${180 + titleLines.length * 68})">
-        ${subLines.map((line, idx) => `<text x="0" y="${idx * 28}" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" opacity="0.95">${line}</text>`).join("")}
-      </g>
-
-      <!-- Topic Icon Badge -->
-      <g transform="translate(0, 420)">
-        <circle cx="38" cy="38" r="42" fill="${t.accent1}" opacity="0.05"/>
-        <rect width="76" height="76" rx="22" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1.5"/>
-        <rect x="3" y="3" width="70" height="70" rx="19" fill="url(#accent-grad)" opacity="0.1"/>
-        <g transform="translate(18, 18) scale(1.65)" color="${t.accent1}">
-          ${selectedIcon}
-        </g>
-      </g>
-
-      <!-- Horizontal separator line -->
-      <line x1="95" y1="458" x2="460" y2="458" stroke="${t.accent1}" stroke-width="0.5" opacity="0.15"/>
-
-    </g>
-
-
-    <!-- ═══════════════════════════════════════════════════ -->
-    <!-- RIGHT COLUMN: KEY TAKEAWAYS CARD                   -->
-    <!-- ═══════════════════════════════════════════════════ -->
-    <g transform="translate(620, 55)">
-
-      <!-- Card Background -->
-      <rect width="510" height="510" rx="24" fill="${t.cardBg}" fill-opacity="${t.cardBgOpacity}"/>
-      <rect width="510" height="510" rx="24" fill="url(#card-glass)"/>
-      <rect width="510" height="510" rx="24" fill="none" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1.5"/>
-
-      <!-- Top accent bar on card -->
-      <rect x="0" y="0" width="510" height="4" rx="2" fill="url(#accent-grad)" opacity="0.8"/>
-
-      <!-- Card corner decorative dots -->
-      <circle cx="28" cy="28" r="3" fill="${t.accent1}" opacity="0.2"/>
-      <circle cx="482" cy="28" r="3" fill="${t.accent2}" opacity="0.2"/>
-
-      <!-- KEY TAKEAWAYS Header -->
-      <g transform="translate(40, 48)">
-        <text x="0" y="0" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="900" letter-spacing="3">KEY TAKEAWAYS</text>
-        <rect x="0" y="12" width="120" height="3" rx="1.5" fill="url(#accent-grad)" opacity="0.8"/>
-      </g>
-
-      <!-- Takeaway Cards -->
-      ${points.map((pt, idx) => {
-        const ptLines = wrapText(pt, 28).slice(0, 2);
-        const yOffset = 95 + idx * 130;
-        return `<g transform="translate(28, ${yOffset})">
-          <rect x="0" y="0" width="454" height="108" rx="16" fill="${t.pillBg}" fill-opacity="${t.pillBgOpacity}"/>
-          <rect x="0" y="0" width="454" height="108" rx="16" fill="none" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}" stroke-width="1"/>
-          <rect x="0" y="20" width="4" height="68" rx="2" fill="url(#accent-grad)"/>
-
-          <!-- Number badge -->
-          <g transform="translate(22, 28)">
-            <circle cx="24" cy="24" r="22" fill="url(#accent-grad)" opacity="0.15"/>
-            <circle cx="24" cy="24" r="22" fill="none" stroke="${t.accent1}" stroke-width="2" opacity="0.6"/>
-            <text x="24" y="31" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="19" font-weight="900" text-anchor="middle">0${idx + 1}</text>
-          </g>
-
-          <!-- Text content -->
-          <g transform="translate(80, 0)">
-            ${ptLines.map((line, lIdx) => `<text x="0" y="${ptLines.length === 1 ? 60 : 44 + lIdx * 26}" fill="#f1f5f9" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">${line}</text>`).join("")}
-          </g>
-        </g>`;
-      }).join("")}
-
-      <!-- Bottom decorative line in card -->
-      <line x1="40" y1="480" x2="470" y2="480" stroke="${t.accent1}" stroke-width="0.5" opacity="0.15"/>
-    </g>
-
-
-    <!-- ═══════════════════════════════════════════════════ -->
-    <!-- FOOTER: ADSRAHU BRAND MARK + CTA                   -->
-    <!-- ═══════════════════════════════════════════════════ -->
-
-    <!-- Adsrahu Logo + Brand (bottom-left) -->
-    <g transform="translate(90, 546)">
-      ${ADSRAHU_LOGO_SVG}
-      <text x="52" y="28" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="900" letter-spacing="-0.3">Adsrahu</text>
-      <text x="52" y="44" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="800" letter-spacing="2.5">PERFORMANCE AGENCY</text>
-    </g>
-
-    <!-- Corner Logo Watermark (top-right) -->
-    <g transform="translate(1090, 20) scale(0.9)">
-      ${ADSRAHU_LOGO_SVG}
-    </g>
-
-    <!-- Read Article CTA (bottom-right) -->
-    <g transform="translate(1000, 562)">
-      <rect x="0" y="0" width="150" height="38" rx="19" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
-      <text x="22" y="24" fill="#cbd5e1" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="1.5">READ ARTICLE</text>
-      <path d="M 130 19 L 136 19 M 133 15 L 137 19 L 133 23" fill="none" stroke="${t.accent1}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
-
-    <!-- Website URL -->
-    <g transform="translate(600, 614)">
-      <text x="0" y="0" fill="#64748b" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" letter-spacing="2" text-anchor="middle">ADSRAHU.COM</text>
-    </g>
-  </svg>`;
-
-  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+// ── Build a rich, visual image prompt from blog metadata ──────────────────
+function buildImagePrompt(title: string, category: string, topic: string): string {
+  return `Professional premium blog cover image for "${title}". Category: ${category}. Topic: ${topic}. 
+Style: Ultra-modern, cinematic, dark dramatic background with vibrant glowing neon accents in electric blue and gold. 
+Photorealistic 3D elements, bokeh depth of field, professional studio lighting with volumetric light beams.
+Include abstract geometric shapes, floating data nodes, holographic elements, and sleek tech-inspired visual metaphors.
+Text-free clean composition, 16:9 wide format, ultra high quality, magazine cover quality, 4K resolution.
+Mood: Futuristic, premium, high-performance, business authority.`;
 }
 
-// ── AI Blog Content & Poster Generation Handler ─────────────────────────
+// ── AI Blog + Image Generation ────────────────────────────────────────────
 async function generateBlogWithAI(
   topic: string,
   category: string,
@@ -503,42 +92,33 @@ async function generateBlogWithAI(
   keyPoints: string
 ) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "GEMINI_API_KEY not configured. Set it in Vercel Environment Variables."
-    );
-  }
+  if (!apiKey) throw new Error("GEMINI_API_KEY not set in Vercel environment variables.");
 
-  const prompt = `You are a world-class performance marketing, growth, and content expert writing for "Adsrahu". Adsrahu is a high-growth performance marketing agency and media platform.
-
-Write a highly detailed, professional, and actionable SEO-optimized blog post based on these exact requirements:
-Topic: "${topic}"
-Category: "${category || "General"}"
-Tone of Voice: "${tone || "Professional and authoritative"}"
-Target Audience: "${targetAudience || "Business owners, founders, and industry professionals"}"
-Key Points to Include: "${keyPoints || "High-value, actionable strategies"}"
-
-CRITICAL INSTRUCTIONS:
-1. Adapt fully to the specified Topic, Category, and Target Audience. Do NOT inject unmentioned niches or industries unless specified in the topic!
-2. Provide specific, actionable strategies (e.g., mention specific ad strategies, automation flows, analytics, tool integrations relevant to the topic).
-3. Avoid generic fluff. Use realistic data points, market trends, and modern digital marketing methodologies.
-4. Format the content beautifully in Markdown:
-   - Start with an engaging hook.
-   - Use 3-5 clearly defined ## headings.
-   - Include bullet points, numbered lists, and bold text for readability.
-5. End with a strong Call-To-Action (CTA) encouraging the reader to implement these strategies or consult with Adsrahu.
-6. Design a sleek 16:9 social poster card for this blog. Choose the most relevant theme and icon, and extract exactly 3 distinct key takeaways from the blog post.`;
-
-  const textResponse = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
+  // 1️⃣  Generate blog text (JSON) from Gemini
+  const textRes = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [{
+          parts: [{
+            text: `You are a world-class performance marketing expert writing for "Adsrahu" - a premium performance agency.
+
+Write a highly detailed, SEO-optimized blog post:
+Topic: "${topic}"
+Category: "${category || "General"}"
+Tone: "${tone || "Professional & Authoritative"}"
+Audience: "${targetAudience || "Business owners, founders, marketers"}"
+Key Points: "${keyPoints || "Actionable, data-driven strategies"}"
+
+Rules:
+1. Adapt fully to the topic. Do NOT inject unrelated industries.
+2. Specific strategies, real data points, modern methodologies.
+3. Beautiful Markdown: engaging hook → 3-5 ## headings → bullets/bold → strong CTA for Adsrahu.
+4. Also generate image prompt for a cinematic cover image for this blog.`
+          }]
+        }],
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 8192,
@@ -546,80 +126,40 @@ CRITICAL INSTRUCTIONS:
           responseSchema: {
             type: "OBJECT",
             properties: {
-              title: {
-                type: "STRING",
-                description: "An SEO-friendly, compelling blog title (50-70 chars)",
-              },
-              slug: {
-                type: "STRING",
-                description: "url-friendly-slug-with-hyphens",
-              },
-              excerpt: {
-                type: "STRING",
-                description: "A compelling 1-2 sentence summary for the blog card (under 160 chars)",
-              },
-              content: {
-                type: "STRING",
-                description: "The full blog body in Markdown format. Use \\n for newlines.",
-              },
-              poster: {
-                type: "OBJECT",
-                properties: {
-                  theme: {
-                    type: "STRING",
-                    description: "Theme name for poster card. One of: 'dark-tech', 'emerald-growth', 'neon-purple', 'royal-blue', 'amber-glow', 'rose-premium', 'cyber-teal', 'midnight-indigo', 'solar-orange', 'arctic-slate'",
-                  },
-                  icon: {
-                    type: "STRING",
-                    description: "Icon representing topic. One of: 'zap', 'chart', 'trending', 'target', 'shield', 'layers', 'cpu'",
-                  },
-                  headline: {
-                    type: "STRING",
-                    description: "Short punchy headline for the poster (2-5 words max)",
-                  },
-                  subheading: {
-                    type: "STRING",
-                    description: "Punchy 1-sentence subtitle explaining the core value proposition",
-                  },
-                  keyTakeaways: {
-                    type: "ARRAY",
-                    items: { type: "STRING" },
-                    description: "Exactly 3 distinct, specific key takeaway sentences from this blog (each 6-12 words).",
-                  },
-                  statBadge: {
-                    type: "STRING",
-                    description: "Short 2-3 word badge label (e.g. '10X GROWTH', 'AI STRATEGY', 'SCALE GUIDE')",
-                  },
-                },
-                required: ["theme", "icon", "headline", "subheading", "keyTakeaways", "statBadge"],
-              },
+              title: { type: "STRING", description: "SEO blog title (50-70 chars)" },
+              slug: { type: "STRING", description: "url-friendly-slug" },
+              excerpt: { type: "STRING", description: "1-2 sentence summary, max 160 chars" },
+              content: { type: "STRING", description: "Full blog in Markdown. Use \\n for newlines." },
+              imagePrompt: { type: "STRING", description: "Detailed visual prompt for generating a cinematic blog cover image. Be specific about style, lighting, colors, mood, visual elements. No text in image." },
             },
-            required: ["title", "slug", "excerpt", "content", "poster"],
+            required: ["title", "slug", "excerpt", "content", "imagePrompt"],
           },
         },
       }),
     }
   );
 
-  if (!textResponse.ok) {
-    const errBody = await textResponse.text();
-    throw new Error(`Gemini API error: ${textResponse.status} - ${errBody}`);
+  if (!textRes.ok) {
+    const err = await textRes.text();
+    throw new Error(`Gemini text API error ${textRes.status}: ${err.substring(0, 200)}`);
   }
 
-  const data = await textResponse.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("No content generated by Gemini");
+  const textData = await textRes.json();
+  const rawText = textData?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!rawText) throw new Error("Gemini returned empty content.");
 
-  // Parse output with robust safeJsonParse
-  const parsed = safeJsonParse(text);
+  const parsed = safeJsonParse(rawText);
 
-  // Generate 100% Safari SVG 1.1 compliant ultra-premium infographic poster card
-  const posterSvgUrl = generateSelfGeneratedPosterCard(
-    parsed.title,
-    parsed.excerpt,
-    category,
-    parsed.poster
-  );
+  // 2️⃣  Generate real AI image via Imagen
+  const rawImagePrompt = parsed.imagePrompt || buildImagePrompt(parsed.title, category, topic);
+  const richPrompt = `${rawImagePrompt}. Style: Ultra-premium dark cinematic, electric blue and gold neon glows, volumetric lighting, 3D geometric elements, photorealistic, no text, 16:9 wide format, 4K magazine-quality.`;
+
+  const imageUrl = await generateImageWithImagen(richPrompt);
+
+  if (!imageUrl) {
+    // If Imagen fails, return a premium SVG fallback (never a broken image)
+    console.warn("Imagen generation returned null – using SVG fallback.");
+  }
 
   return {
     title: parsed.title,
@@ -627,17 +167,61 @@ CRITICAL INSTRUCTIONS:
     category,
     excerpt: parsed.excerpt,
     content: parsed.content,
-    imageUrl: posterSvgUrl,
+    imageUrl: imageUrl || buildSvgFallback(parsed.title, category),
   };
 }
 
-// ── API Router ───────────────────────────────────────────────────────────
+// ── Premium SVG fallback (used only if Imagen is unavailable) ────────────
+function buildSvgFallback(title: string, category: string): string {
+  const t = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const words = t(title || "").split(" ");
+  const line1 = words.slice(0, 4).join(" ");
+  const line2 = words.slice(4, 8).join(" ");
+  const cat = t(category || "INSIGHTS").toUpperCase();
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020817"/>
+      <stop offset="50%" stop-color="#0a1628"/>
+      <stop offset="100%" stop-color="#111d35"/>
+    </linearGradient>
+    <linearGradient id="acc" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD97A"/>
+      <stop offset="100%" stop-color="#FFA500"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="150" cy="120" r="300" fill="#38bdf8" opacity="0.12"/>
+  <circle cx="1050" cy="555" r="350" fill="#0ea5e9" opacity="0.08"/>
+  <rect x="0" y="0" width="1200" height="6" fill="url(#acc)"/>
+  <rect x="70" y="60" width="4" height="555" rx="2" fill="#38bdf8" fill-opacity="0.4"/>
+  <rect x="0" y="0" width="1200" height="675" fill="#38bdf8" fill-opacity="0.01"/>
+  <text x="110" y="120" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="12" font-weight="800" letter-spacing="4" fill-opacity="0.7">${cat}</text>
+  <text x="110" y="220" fill="#ffffff" font-family="system-ui,sans-serif" font-size="64" font-weight="900" letter-spacing="-2">${line1}</text>
+  ${line2 ? `<text x="110" y="295" fill="#ffffff" font-family="system-ui,sans-serif" font-size="64" font-weight="900" letter-spacing="-2">${line2}</text>` : ""}
+  <rect x="110" y="330" width="90" height="5" rx="2.5" fill="url(#acc)"/>
+  <circle cx="110" cy="590" r="22" fill="url(#gold)" fill-opacity="0.15" stroke="url(#gold)" stroke-width="2"/>
+  <text x="110" y="586" fill="url(#gold)" font-family="system-ui,sans-serif" font-size="18" font-weight="900" letter-spacing="-0.5" dominant-baseline="middle">A</text>
+  <text x="142" y="582" fill="#ffffff" font-family="system-ui,sans-serif" font-size="20" font-weight="900">Adsrahu</text>
+  <text x="142" y="600" fill="#64748b" font-family="system-ui,sans-serif" font-size="9" font-weight="700" letter-spacing="2.5">PERFORMANCE AGENCY</text>
+  </svg>`;
+
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+}
+
+// ── Vercel API handler ─────────────────────────────────────────────────────
 export default async function handler(req: any, res: any) {
   cors(res);
   if (req.method === "OPTIONS") { res.status(200).end(); return; }
 
   const sql = getSql();
 
+  // GET – list posts
   if (req.method === "GET") {
     const onlyPublished = req.query?.published === "true";
     const rows = onlyPublished
@@ -647,40 +231,74 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
+  // POST
   if (req.method === "POST") {
-    if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
+    if (!checkAuth(req.headers["authorization"])) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
-    // AI Blog Generation
+    let b = req.body ?? {};
+    if (typeof b === "string") { try { b = JSON.parse(b); } catch {} }
+
+    // AI Generate action
     if (req.query?.action === "generate") {
-      let b = req.body ?? {};
-      if (typeof b === "string") { try { b = JSON.parse(b); } catch (e) {} }
       const topic = b.topic || b.title || "";
-      const category = b.category || "General";
-      const tone = b.tone || "";
-      const targetAudience = b.targetAudience || "";
-      const keyPoints = b.keyPoints || "";
-
       if (!topic) { res.status(400).json({ error: "topic is required" }); return; }
       try {
-        const generated = await generateBlogWithAI(topic, category, tone, targetAudience, keyPoints);
+        const generated = await generateBlogWithAI(
+          topic,
+          b.category || "General",
+          b.tone || "",
+          b.targetAudience || "",
+          b.keyPoints || ""
+        );
         res.status(200).json(generated);
-      } catch (err) {
+      } catch (err: any) {
+        console.error("AI generation error:", err);
         res.status(500).json({ error: err.message || "AI generation failed" });
       }
       return;
     }
 
-    // Normal blog creation
-    let b = req.body ?? {};
-    if (typeof b === "string") {
-      try { b = JSON.parse(b); } catch (e) {}
-    }
+    // Create post
     if (!b.title || !b.slug) { res.status(400).json({ error: "title and slug required" }); return; }
     const rows = await sql`
       INSERT INTO blog_posts (title, slug, category, excerpt, content, published, image_url)
       VALUES (${b.title}, ${b.slug}, ${b.category ?? "General"}, ${b.excerpt ?? ""}, ${b.content ?? ""}, ${b.published ?? false}, ${b.imageUrl ?? null})
       RETURNING *`;
     res.status(201).json(toCamel(rows[0]));
+    return;
+  }
+
+  // PATCH – update post
+  if (req.method === "PATCH") {
+    if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
+    let b = req.body ?? {};
+    if (typeof b === "string") { try { b = JSON.parse(b); } catch {} }
+    const id = req.query?.id;
+    if (!id) { res.status(400).json({ error: "id required" }); return; }
+    const rows = await sql`
+      UPDATE blog_posts SET
+        title = COALESCE(${b.title}, title),
+        slug = COALESCE(${b.slug}, slug),
+        category = COALESCE(${b.category}, category),
+        excerpt = COALESCE(${b.excerpt}, excerpt),
+        content = COALESCE(${b.content}, content),
+        published = COALESCE(${b.published}, published),
+        image_url = COALESCE(${b.imageUrl}, image_url)
+      WHERE id = ${id} RETURNING *`;
+    res.status(200).json(toCamel(rows[0]));
+    return;
+  }
+
+  // DELETE
+  if (req.method === "DELETE") {
+    if (!checkAuth(req.headers["authorization"])) { res.status(401).json({ error: "Unauthorized" }); return; }
+    const id = req.query?.id;
+    if (!id) { res.status(400).json({ error: "id required" }); return; }
+    await sql`DELETE FROM blog_posts WHERE id = ${id}`;
+    res.status(200).json({ success: true });
     return;
   }
 
