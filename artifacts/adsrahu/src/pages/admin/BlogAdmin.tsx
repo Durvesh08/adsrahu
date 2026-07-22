@@ -20,6 +20,59 @@ function autoSlug(title: string) {
 
 const emptyForm = { title:"", slug:"", category:"Business Growth", excerpt:"", content:"", published:false, imageUrl:"" };
 
+/** Cover image preview with loading shimmer (handles Pollinations slow load) */
+function CoverImagePreview({ src, onReplace, onRemove }: { src: string; onReplace: () => void; onRemove: () => void }) {
+  const [loaded, setLoaded] = React.useState(false);
+  const [errored, setErrored] = React.useState(false);
+
+  React.useEffect(() => { setLoaded(false); setErrored(false); }, [src]);
+
+  return (
+    <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-[#0a0a12] aspect-video">
+      {/* Loading shimmer */}
+      {!loaded && !errored && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a12] z-10">
+          <div className="w-10 h-10 rounded-full border-2 border-blue-500/30 border-t-blue-400 animate-spin" />
+          <p className="text-sm text-gray-400 font-medium">AI image generating…</p>
+          <p className="text-xs text-gray-600">Powered by Flux · 15-30 seconds</p>
+        </div>
+      )}
+      {/* Error state */}
+      {errored && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#0a0a12] z-10">
+          <div className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+            <ImageIcon className="w-6 h-6 text-yellow-400" />
+          </div>
+          <p className="text-sm text-yellow-400 font-medium">Image still loading</p>
+          <p className="text-xs text-gray-500 text-center max-w-xs">The AI image may take 30-60s on first load.<br/>It will appear on the public blog page.</p>
+        </div>
+      )}
+      <img
+        src={src}
+        alt="Cover preview"
+        className="w-full h-full object-cover"
+        style={{ opacity: loaded ? 1 : 0, transition: "opacity 0.4s ease" }}
+        onLoad={() => setLoaded(true)}
+        onError={() => setErrored(true)}
+        referrerPolicy="no-referrer"
+        crossOrigin="anonymous"
+      />
+      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
+        <button type="button" onClick={onReplace}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-2">
+          <Upload className="w-4 h-4" /> Replace
+        </button>
+        <button type="button" onClick={onRemove}
+          className="px-4 py-2 text-sm font-medium text-white bg-red-600/80 rounded-lg hover:bg-red-500 transition-colors flex items-center gap-2">
+          <Trash2 className="w-4 h-4" /> Remove
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
 /** Compress an image File to a JPEG base64 data-URL (max 1200px wide, 0.75 quality) */
 function compressImage(file: File, maxWidth = 1200, quality = 0.75): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -370,27 +423,11 @@ export default function AdminBlog() {
               <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleImageFile(f); }} />
 
               {form.imageUrl ? (
-                <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-[#0a0a12]">
-                  <img
-                    src={form.imageUrl}
-                    alt="Cover preview"
-                    className="w-full aspect-video object-cover"
-                    onError={(e) => {
-                      // Fallback if base64/URL fails to load
-                      console.error("Cover image failed to load");
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                    <button type="button" onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-2">
-                      <Upload className="w-4 h-4" /> Replace
-                    </button>
-                    <button type="button" onClick={() => setForm({...form, imageUrl: ""})}
-                      className="px-4 py-2 text-sm font-medium text-white bg-red-600/80 rounded-lg hover:bg-red-500 transition-colors flex items-center gap-2">
-                      <Trash2 className="w-4 h-4" /> Remove
-                    </button>
-                  </div>
-                </div>
+                <CoverImagePreview
+                  src={form.imageUrl}
+                  onReplace={() => fileInputRef.current?.click()}
+                  onRemove={() => setForm({...form, imageUrl: ""})}
+                />
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}

@@ -4,8 +4,7 @@ import { getSql, checkAuth, cors } from "./_lib/db.js";
 export const maxDuration = 60;
 export const config = { api: { bodyParser: { sizeLimit: "10mb" } } };
 
-const GEMINI_MODEL = "gemini-2.0-flash";
-const GEMINI_IMAGE_MODEL = "gemini-2.0-flash-preview-image-generation";
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 // ── Robust JSON parser ─────────────────────────────────────────────────────
 function safeJsonParse(raw: string): any {
@@ -29,55 +28,15 @@ function safeJsonParse(raw: string): any {
   throw new Error("Cannot parse AI response. Snippet: " + raw.substring(0, 120));
 }
 
-// ── Generate real AI image via Gemini 2.0 Flash Image Generation ──────────
-async function generateImageWithGemini(prompt: string): Promise<string | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_IMAGE_MODEL}:generateContent`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
-        }),
-      }
-    );
-
-    if (!res.ok) {
-      const errBody = await res.text();
-      console.error("Gemini Image API error:", res.status, errBody);
-      return null;
-    }
-
-    const data = await res.json();
-    const parts = data?.candidates?.[0]?.content?.parts ?? [];
-    const imgPart = parts.find((p: any) => p.inlineData?.mimeType?.startsWith("image/"));
-
-    if (!imgPart?.inlineData?.data) {
-      console.error("Gemini Image: no inlineData found", JSON.stringify(data).substring(0, 400));
-      return null;
-    }
-
-    return `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
-  } catch (e) {
-    console.error("Gemini Image exception:", e);
-    return null;
-  }
+// ── Build Pollinations.ai image URL (free, no API key needed) ─────────────
+// Pollinations.ai generates real AI images using Flux model, publicly accessible URLs
+function buildPollinationsImageUrl(topic: string, category: string, seed: number): string {
+  const prompt = `Ultra-premium professional blog cover for "${topic}" in ${category}. Dark cinematic background, electric blue and gold neon glows, volumetric light rays, 3D abstract geometric shapes, bokeh depth of field, futuristic holographic elements, photorealistic, no text, no letters, 16:9 wide format, magazine quality`;
+  const encoded = encodeURIComponent(prompt);
+  return `https://image.pollinations.ai/prompt/${encoded}?width=1200&height=675&model=flux&nologo=true&seed=${seed}`;
 }
 
-// ── Build image prompt from topic/category ────────────────────────────────
-function buildImagePrompt(topic: string, category: string): string {
-  return `Create a stunning professional blog cover image for an article about: "${topic}" in the "${category}" niche.
-Visual style: Ultra-premium dark cinematic background (deep navy/midnight blue), vibrant electric blue and gold neon accent glows, volumetric light beams, photorealistic 3D abstract geometric shapes, floating holographic elements, bokeh depth of field, premium studio lighting.
-Composition: Wide 16:9 landscape format. No text or letters anywhere. Clean, modern, magazine-cover quality.
-Mood: Futuristic, high-performance, authoritative, business-focused.`;
-}
-
-// ── AI Blog + Image Generation (PARALLEL for speed) ──────────────────────
+// ── AI Blog + Image Generation ────────────────────────────────────────────
 async function generateBlogWithAI(
   topic: string,
   category: string,
@@ -88,19 +47,21 @@ async function generateBlogWithAI(
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY not set in Vercel environment variables.");
 
-  const imagePrompt = buildImagePrompt(topic, category);
+  // Generate a deterministic but unique seed from topic
+  const seed = Array.from(topic).reduce((acc, c) => acc + c.charCodeAt(0), 0) % 999999 + 1;
 
-  // 🔥 Fire BOTH in parallel — total time = max(text, image) not text + image
-  const [textRes, imageUrl] = await Promise.all([
-    fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are an expert content strategist and blogger for "Adsrahu" – a premium performance marketing agency.
+  // 🔥 Fire text generation — image URL is instant (no API call needed)
+  const imageUrl = buildPollinationsImageUrl(topic, category, seed);
+
+  const textRes = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `You are an expert content strategist and blogger for "Adsrahu" – a premium performance marketing agency.
 
 Write a professional, detailed, SEO-optimized blog post on:
 Topic: "${topic}"
@@ -113,34 +74,32 @@ Requirements:
 - Engaging hook in the opening paragraph
 - 3-5 clear ## headings with actionable content under each
 - Use bullet points, bold key terms, and numbered steps where relevant
-- Real-world examples and data points
+- Real-world examples and specific data points
 - End with a strong CTA to partner with Adsrahu`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 6000,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                title:   { type: "STRING", description: "Compelling SEO blog title (50-70 chars)" },
-                slug:    { type: "STRING", description: "url-friendly-slug-with-hyphens (no spaces, lowercase)" },
-                excerpt: { type: "STRING", description: "Compelling 1-2 sentence blog summary for SEO (max 160 chars)" },
-                content: { type: "STRING", description: "Complete blog post in Markdown format. Use \\n for line breaks. Use ## for headings." },
-              },
-              required: ["title", "slug", "excerpt", "content"],
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 6000,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              title:   { type: "STRING", description: "Compelling SEO blog title (50-70 chars)" },
+              slug:    { type: "STRING", description: "url-friendly-slug-with-hyphens (lowercase, no spaces)" },
+              excerpt: { type: "STRING", description: "1-2 sentence blog summary for SEO (max 160 chars)" },
+              content: { type: "STRING", description: "Complete blog post in Markdown. Use \\n for line breaks. Use ## for headings." },
             },
+            required: ["title", "slug", "excerpt", "content"],
           },
-        }),
-      }
-    ),
-    generateImageWithGemini(imagePrompt),
-  ]);
+        },
+      }),
+    }
+  );
 
   if (!textRes.ok) {
     const err = await textRes.text();
-    throw new Error(`Gemini text API error ${textRes.status}: ${err.substring(0, 200)}`);
+    throw new Error(`Gemini API error ${textRes.status}: ${err.substring(0, 300)}`);
   }
 
   const textData = await textRes.json();
@@ -155,7 +114,7 @@ Requirements:
     category,
     excerpt:  parsed.excerpt,
     content:  parsed.content,
-    imageUrl: imageUrl || "",
+    imageUrl, // Real AI image URL from Pollinations.ai (loads in browser instantly)
   };
 }
 
@@ -186,7 +145,7 @@ export default async function handler(req: any, res: any) {
     let b = req.body ?? {};
     if (typeof b === "string") { try { b = JSON.parse(b); } catch {} }
 
-    // AI Generate
+    // AI Generate action
     if (req.query?.action === "generate") {
       const topic = b.topic || b.title || "";
       if (!topic) { res.status(400).json({ error: "topic is required" }); return; }
