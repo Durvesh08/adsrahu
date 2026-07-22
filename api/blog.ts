@@ -45,7 +45,7 @@ const ADSRAHU_LOGO_SVG = `
   </g>
 `;
 
-// ── Ultra-Premium Poster Generator ────────────────────────────────────
+// ── Ultra-Premium Safari-Compatible Poster Generator ──────────────────
 function generateSelfGeneratedPosterCard(
   title: string,
   excerpt: string,
@@ -67,82 +67,62 @@ function generateSelfGeneratedPosterCard(
     "dark-tech": {
       bgStart: "#020817", bgMid: "#0a1628", bgEnd: "#111d35",
       accent1: "#38bdf8", accent2: "#0ea5e9", accent3: "#7dd3fc",
-      accentGlow: "rgba(56, 189, 248, 0.35)",
-      cardBg: "rgba(8, 20, 42, 0.75)", cardStroke: "rgba(56, 189, 248, 0.2)",
-      gridColor: "rgba(56, 189, 248, 0.04)", pillBg: "rgba(56, 189, 248, 0.1)",
-      decoShape: "#0ea5e9"
+      cardBg: "rgba(8, 20, 42, 0.85)", cardStroke: "rgba(56, 189, 248, 0.25)",
+      gridColor: "rgba(56, 189, 248, 0.05)", pillBg: "rgba(56, 189, 248, 0.12)"
     },
     "emerald-growth": {
       bgStart: "#011c14", bgMid: "#042d1f", bgEnd: "#064e3b",
       accent1: "#34d399", accent2: "#10b981", accent3: "#6ee7b7",
-      accentGlow: "rgba(52, 211, 153, 0.35)",
-      cardBg: "rgba(4, 40, 28, 0.75)", cardStroke: "rgba(52, 211, 153, 0.2)",
-      gridColor: "rgba(52, 211, 153, 0.04)", pillBg: "rgba(52, 211, 153, 0.1)",
-      decoShape: "#10b981"
+      cardBg: "rgba(4, 40, 28, 0.85)", cardStroke: "rgba(52, 211, 153, 0.25)",
+      gridColor: "rgba(52, 211, 153, 0.05)", pillBg: "rgba(52, 211, 153, 0.12)"
     },
     "neon-purple": {
       bgStart: "#0a0118", bgMid: "#150830", bgEnd: "#1e0b48",
       accent1: "#c084fc", accent2: "#a855f7", accent3: "#e9d5ff",
-      accentGlow: "rgba(168, 85, 247, 0.35)",
-      cardBg: "rgba(22, 8, 52, 0.75)", cardStroke: "rgba(168, 85, 247, 0.2)",
-      gridColor: "rgba(168, 85, 247, 0.04)", pillBg: "rgba(168, 85, 247, 0.1)",
-      decoShape: "#a855f7"
+      cardBg: "rgba(22, 8, 52, 0.85)", cardStroke: "rgba(168, 85, 247, 0.25)",
+      gridColor: "rgba(168, 85, 247, 0.05)", pillBg: "rgba(168, 85, 247, 0.12)"
     },
     "royal-blue": {
       bgStart: "#020620", bgMid: "#071340", bgEnd: "#0c1d5e",
       accent1: "#60a5fa", accent2: "#3b82f6", accent3: "#93c5fd",
-      accentGlow: "rgba(59, 130, 246, 0.35)",
-      cardBg: "rgba(7, 15, 55, 0.75)", cardStroke: "rgba(59, 130, 246, 0.2)",
-      gridColor: "rgba(59, 130, 246, 0.04)", pillBg: "rgba(59, 130, 246, 0.1)",
-      decoShape: "#3b82f6"
+      cardBg: "rgba(7, 15, 55, 0.85)", cardStroke: "rgba(59, 130, 246, 0.25)",
+      gridColor: "rgba(59, 130, 246, 0.05)", pillBg: "rgba(59, 130, 246, 0.12)"
     },
     "amber-glow": {
       bgStart: "#120800", bgMid: "#231004", bgEnd: "#3a1c08",
       accent1: "#fbbf24", accent2: "#f59e0b", accent3: "#fde68a",
-      accentGlow: "rgba(245, 158, 11, 0.35)",
-      cardBg: "rgba(42, 22, 6, 0.75)", cardStroke: "rgba(245, 158, 11, 0.2)",
-      gridColor: "rgba(245, 158, 11, 0.04)", pillBg: "rgba(245, 158, 11, 0.1)",
-      decoShape: "#f59e0b"
+      cardBg: "rgba(42, 22, 6, 0.85)", cardStroke: "rgba(245, 158, 11, 0.25)",
+      gridColor: "rgba(245, 158, 11, 0.05)", pillBg: "rgba(245, 158, 11, 0.12)"
     },
     "rose-premium": {
       bgStart: "#1a0510", bgMid: "#2a0a1a", bgEnd: "#3d1028",
       accent1: "#fb7185", accent2: "#f43f5e", accent3: "#fda4af",
-      accentGlow: "rgba(244, 63, 94, 0.35)",
-      cardBg: "rgba(45, 10, 28, 0.75)", cardStroke: "rgba(244, 63, 94, 0.2)",
-      gridColor: "rgba(244, 63, 94, 0.04)", pillBg: "rgba(244, 63, 94, 0.1)",
-      decoShape: "#f43f5e"
+      cardBg: "rgba(45, 10, 28, 0.85)", cardStroke: "rgba(244, 63, 94, 0.25)",
+      gridColor: "rgba(244, 63, 94, 0.05)", pillBg: "rgba(244, 63, 94, 0.12)"
     },
     "cyber-teal": {
       bgStart: "#021215", bgMid: "#042028", bgEnd: "#063040",
       accent1: "#2dd4bf", accent2: "#14b8a6", accent3: "#99f6e4",
-      accentGlow: "rgba(20, 184, 166, 0.35)",
-      cardBg: "rgba(4, 28, 35, 0.75)", cardStroke: "rgba(20, 184, 166, 0.2)",
-      gridColor: "rgba(20, 184, 166, 0.04)", pillBg: "rgba(20, 184, 166, 0.1)",
-      decoShape: "#14b8a6"
+      cardBg: "rgba(4, 28, 35, 0.85)", cardStroke: "rgba(20, 184, 166, 0.25)",
+      gridColor: "rgba(20, 184, 166, 0.05)", pillBg: "rgba(20, 184, 166, 0.12)"
     },
     "midnight-indigo": {
       bgStart: "#080420", bgMid: "#0f0838", bgEnd: "#180e55",
       accent1: "#818cf8", accent2: "#6366f1", accent3: "#c7d2fe",
-      accentGlow: "rgba(99, 102, 241, 0.35)",
-      cardBg: "rgba(15, 8, 50, 0.75)", cardStroke: "rgba(99, 102, 241, 0.2)",
-      gridColor: "rgba(99, 102, 241, 0.04)", pillBg: "rgba(99, 102, 241, 0.1)",
-      decoShape: "#6366f1"
+      cardBg: "rgba(15, 8, 50, 0.85)", cardStroke: "rgba(99, 102, 241, 0.25)",
+      gridColor: "rgba(99, 102, 241, 0.05)", pillBg: "rgba(99, 102, 241, 0.12)"
     },
     "solar-orange": {
       bgStart: "#150600", bgMid: "#251000", bgEnd: "#3b1a02",
       accent1: "#fb923c", accent2: "#f97316", accent3: "#fdba74",
-      accentGlow: "rgba(249, 115, 22, 0.35)",
-      cardBg: "rgba(40, 16, 2, 0.75)", cardStroke: "rgba(249, 115, 22, 0.2)",
-      gridColor: "rgba(249, 115, 22, 0.04)", pillBg: "rgba(249, 115, 22, 0.1)",
-      decoShape: "#f97316"
+      cardBg: "rgba(40, 16, 2, 0.85)", cardStroke: "rgba(249, 115, 22, 0.25)",
+      gridColor: "rgba(249, 115, 22, 0.05)", pillBg: "rgba(249, 115, 22, 0.12)"
     },
     "arctic-slate": {
       bgStart: "#0c0f1a", bgMid: "#141828", bgEnd: "#1c2238",
       accent1: "#94a3b8", accent2: "#64748b", accent3: "#cbd5e1",
-      accentGlow: "rgba(148, 163, 184, 0.3)",
-      cardBg: "rgba(18, 22, 38, 0.75)", cardStroke: "rgba(148, 163, 184, 0.18)",
-      gridColor: "rgba(148, 163, 184, 0.04)", pillBg: "rgba(148, 163, 184, 0.08)",
-      decoShape: "#64748b"
+      cardBg: "rgba(18, 22, 38, 0.85)", cardStroke: "rgba(148, 163, 184, 0.25)",
+      gridColor: "rgba(148, 163, 184, 0.05)", pillBg: "rgba(148, 163, 184, 0.12)"
     }
   };
 
@@ -194,6 +174,9 @@ function generateSelfGeneratedPosterCard(
   const points = rawPoints.slice(0, 3).map(pt => escapeXml(pt));
   const statBadgeText = escapeXml(posterInfo?.statBadge || "PERFORMANCE GUIDE");
 
+  const categoryBadgeWidth = Math.max(safeCategory.length * 10 + 36, 140);
+  const statBadgeWidth = Math.max(statBadgeText.length * 8 + 32, 160);
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
     <defs>
       <!-- Background Gradient -->
@@ -242,41 +225,16 @@ function generateSelfGeneratedPosterCard(
       <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
         <circle cx="2" cy="2" r="1" fill="${t.accent1}" opacity="0.08"/>
       </pattern>
-
-      <!-- Glow Filter -->
-      <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="60" result="coloredBlur"/>
-        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-
-      <!-- Soft Glow for small elements -->
-      <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="8" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-
-      <!-- Card Shadow -->
-      <filter id="card-shadow" x="-10%" y="-10%" width="125%" height="130%">
-        <feDropShadow dx="0" dy="16" stdDeviation="28" flood-color="#000000" flood-opacity="0.6"/>
-      </filter>
-
-      <!-- Noise Texture -->
-      <filter id="noise">
-        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
-        <feColorMatrix type="saturate" values="0"/>
-      </filter>
     </defs>
 
     <!-- ═══ BACKGROUND CANVAS ═══ -->
     <rect width="1200" height="630" fill="url(#bg-grad)"/>
     <rect width="1200" height="630" fill="url(#grid)"/>
-    <!-- Subtle noise overlay for texture -->
-    <rect width="1200" height="630" filter="url(#noise)" opacity="0.025"/>
 
     <!-- ═══ AMBIENT GLOW ORBS ═══ -->
-    <circle cx="120" cy="80" r="280" fill="${t.accent2}" opacity="0.12" filter="url(#glow)"/>
-    <circle cx="1100" cy="550" r="320" fill="${t.accent1}" opacity="0.08" filter="url(#glow)"/>
-    <circle cx="650" cy="320" r="200" fill="${t.accent3}" opacity="0.04" filter="url(#glow)"/>
+    <circle cx="120" cy="80" r="280" fill="${t.accent2}" opacity="0.15"/>
+    <circle cx="1100" cy="550" r="320" fill="${t.accent1}" opacity="0.10"/>
+    <circle cx="650" cy="320" r="200" fill="${t.accent3}" opacity="0.05"/>
 
     <!-- ═══ DECORATIVE GEOMETRIC ELEMENTS ═══ -->
 
@@ -299,15 +257,7 @@ function generateSelfGeneratedPosterCard(
     <circle cx="1100" cy="140" r="30" fill="none" stroke="${t.accent2}" stroke-width="0.8" opacity="0.06"/>
     <circle cx="200" cy="560" r="35" fill="none" stroke="${t.accent1}" stroke-width="0.8" opacity="0.06"/>
 
-    <!-- Decorative diamond shapes -->
-    <g transform="translate(1140, 300) rotate(45)" opacity="0.06">
-      <rect x="-15" y="-15" width="30" height="30" fill="none" stroke="${t.accent1}" stroke-width="1.5"/>
-    </g>
-    <g transform="translate(1160, 340) rotate(45)" opacity="0.04">
-      <rect x="-10" y="-10" width="20" height="20" fill="none" stroke="${t.accent2}" stroke-width="1"/>
-    </g>
-
-    <!-- Dot matrix area (right side decorative) -->
+    <!-- Dot matrix area -->
     <rect x="950" y="180" width="200" height="200" fill="url(#dots)" opacity="0.5"/>
 
 
@@ -318,20 +268,20 @@ function generateSelfGeneratedPosterCard(
 
       <!-- Category Badge -->
       <g transform="translate(0, 65)">
-        <rect x="0" y="0" width="${Math.max(safeCategory.length * 10 + 36, 140)}" height="34" rx="17" fill="${t.pillBg}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
+        <rect x="0" y="0" width="${categoryBadgeWidth}" height="34" rx="17" fill="${t.pillBg}" stroke="${t.accent1}" stroke-width="1.2" stroke-opacity="0.5"/>
         <circle cx="18" cy="17" r="4" fill="${t.accent1}" opacity="0.6"/>
-        <text x="30" y="22" fill="${t.accent1}" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="2.5">${safeCategory.toUpperCase()}</text>
+        <text x="30" y="22" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="2.5">${safeCategory.toUpperCase()}</text>
       </g>
 
       <!-- Stat Badge -->
-      <g transform="translate(${Math.max(safeCategory.length * 10 + 52, 160)}, 65)">
-        <rect x="0" y="0" width="${Math.max(statBadgeText.length * 8 + 32, 160)}" height="34" rx="17" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-        <text x="${Math.max(statBadgeText.length * 4 + 16, 80)}" y="22" fill="#64748b" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="10" font-weight="800" letter-spacing="2" text-anchor="middle">${statBadgeText}</text>
+      <g transform="translate(${categoryBadgeWidth + 16}, 65)">
+        <rect x="0" y="0" width="${statBadgeWidth}" height="34" rx="17" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <text x="${statBadgeWidth / 2}" y="22" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="800" letter-spacing="2" text-anchor="middle">${statBadgeText}</text>
       </g>
 
       <!-- Main Headline -->
       <g transform="translate(0, 148)">
-        ${titleLines.map((line, idx) => `<text x="0" y="${idx * 68}" fill="#ffffff" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="52" font-weight="900" letter-spacing="-1.5">${line}</text>`).join("")}
+        ${titleLines.map((line, idx) => `<text x="0" y="${idx * 68}" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="900" letter-spacing="-1">${line}</text>`).join("")}
       </g>
 
       <!-- Accent underline beneath title -->
@@ -341,15 +291,13 @@ function generateSelfGeneratedPosterCard(
 
       <!-- Subheading -->
       <g transform="translate(0, ${180 + titleLines.length * 68})">
-        ${subLines.map((line, idx) => `<text x="0" y="${idx * 28}" fill="${t.accent1}" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" opacity="0.9" letter-spacing="0.2">${line}</text>`).join("")}
+        ${subLines.map((line, idx) => `<text x="0" y="${idx * 28}" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" opacity="0.95">${line}</text>`).join("")}
       </g>
 
       <!-- Topic Icon Badge -->
       <g transform="translate(0, 420)">
-        <!-- Outer glow ring -->
-        <circle cx="38" cy="38" r="42" fill="${t.accent1}" opacity="0.04"/>
+        <circle cx="38" cy="38" r="42" fill="${t.accent1}" opacity="0.05"/>
         <rect width="76" height="76" rx="22" fill="${t.pillBg}" stroke="${t.cardStroke}" stroke-width="1.5"/>
-        <!-- Inner gradient accent -->
         <rect x="3" y="3" width="70" height="70" rx="19" fill="url(#accent-grad)" opacity="0.1"/>
         <g transform="translate(18, 18) scale(1.65)" color="${t.accent1}">
           ${selectedIcon}
@@ -357,7 +305,7 @@ function generateSelfGeneratedPosterCard(
       </g>
 
       <!-- Horizontal separator line -->
-      <line x1="95" y1="458" x2="460" y2="458" stroke="${t.accent1}" stroke-width="0.5" opacity="0.12"/>
+      <line x1="95" y1="458" x2="460" y2="458" stroke="${t.accent1}" stroke-width="0.5" opacity="0.15"/>
 
     </g>
 
@@ -365,29 +313,24 @@ function generateSelfGeneratedPosterCard(
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- RIGHT COLUMN: KEY TAKEAWAYS CARD                   -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <g transform="translate(620, 55)" filter="url(#card-shadow)">
+    <g transform="translate(620, 55)">
 
-      <!-- Card Background with glass effect -->
+      <!-- Card Background -->
       <rect width="510" height="510" rx="24" fill="${t.cardBg}"/>
       <rect width="510" height="510" rx="24" fill="url(#card-glass)"/>
-
-      <!-- Card border (double stroke for depth) -->
       <rect width="510" height="510" rx="24" fill="none" stroke="${t.cardStroke}" stroke-width="1.5"/>
-      <rect x="1" y="1" width="508" height="508" rx="23" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
 
       <!-- Top accent bar on card -->
-      <rect x="0" y="0" width="510" height="3" rx="1.5" fill="url(#accent-grad)" opacity="0.6"/>
+      <rect x="0" y="0" width="510" height="4" rx="2" fill="url(#accent-grad)" opacity="0.8"/>
 
       <!-- Card corner decorative dots -->
-      <circle cx="28" cy="28" r="3" fill="${t.accent1}" opacity="0.15"/>
-      <circle cx="482" cy="28" r="3" fill="${t.accent2}" opacity="0.15"/>
+      <circle cx="28" cy="28" r="3" fill="${t.accent1}" opacity="0.2"/>
+      <circle cx="482" cy="28" r="3" fill="${t.accent2}" opacity="0.2"/>
 
       <!-- KEY TAKEAWAYS Header -->
       <g transform="translate(40, 48)">
-        <text x="0" y="0" fill="${t.accent1}" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="13" font-weight="900" letter-spacing="3">KEY TAKEAWAYS</text>
-        <rect x="0" y="12" width="120" height="3" rx="1.5" fill="url(#accent-grad)" opacity="0.6"/>
-        <!-- Small decorative square -->
-        <rect x="130" y="9" width="8" height="8" rx="2" fill="${t.accent1}" opacity="0.1" stroke="${t.accent1}" stroke-width="0.5" stroke-opacity="0.2"/>
+        <text x="0" y="0" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="900" letter-spacing="3">KEY TAKEAWAYS</text>
+        <rect x="0" y="12" width="120" height="3" rx="1.5" fill="url(#accent-grad)" opacity="0.8"/>
       </g>
 
       <!-- Takeaway Cards -->
@@ -395,29 +338,26 @@ function generateSelfGeneratedPosterCard(
         const ptLines = wrapText(pt, 28).slice(0, 2);
         const yOffset = 95 + idx * 130;
         return `<g transform="translate(28, ${yOffset})">
-          <!-- Card item background -->
           <rect x="0" y="0" width="454" height="108" rx="16" fill="${t.pillBg}"/>
-          <rect x="0" y="0" width="454" height="108" rx="16" fill="none" stroke="${t.cardStroke}" stroke-width="0.8"/>
-
-          <!-- Left accent bar -->
-          <rect x="0" y="20" width="3.5" height="68" rx="1.75" fill="url(#accent-grad)" opacity="0.5"/>
+          <rect x="0" y="0" width="454" height="108" rx="16" fill="none" stroke="${t.cardStroke}" stroke-width="1"/>
+          <rect x="0" y="20" width="4" height="68" rx="2" fill="url(#accent-grad)"/>
 
           <!-- Number badge -->
           <g transform="translate(22, 28)">
-            <circle cx="24" cy="24" r="22" fill="url(#accent-grad)" opacity="0.12"/>
-            <circle cx="24" cy="24" r="22" fill="none" stroke="${t.accent1}" stroke-width="1.8" opacity="0.5"/>
-            <text x="24" y="30" fill="${t.accent1}" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="20" font-weight="900" text-anchor="middle">0${idx + 1}</text>
+            <circle cx="24" cy="24" r="22" fill="url(#accent-grad)" opacity="0.15"/>
+            <circle cx="24" cy="24" r="22" fill="none" stroke="${t.accent1}" stroke-width="2" opacity="0.6"/>
+            <text x="24" y="31" fill="${t.accent1}" font-family="system-ui, -apple-system, sans-serif" font-size="19" font-weight="900" text-anchor="middle">0${idx + 1}</text>
           </g>
 
           <!-- Text content -->
           <g transform="translate(80, 0)">
-            ${ptLines.map((line, lIdx) => `<text x="0" y="${ptLines.length === 1 ? 60 : 44 + lIdx * 26}" fill="#f1f5f9" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" letter-spacing="0.1">${line}</text>`).join("")}
+            ${ptLines.map((line, lIdx) => `<text x="0" y="${ptLines.length === 1 ? 60 : 44 + lIdx * 26}" fill="#f1f5f9" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">${line}</text>`).join("")}
           </g>
         </g>`;
       }).join("")}
 
       <!-- Bottom decorative line in card -->
-      <line x1="40" y1="480" x2="470" y2="480" stroke="${t.accent1}" stroke-width="0.5" opacity="0.1"/>
+      <line x1="40" y1="480" x2="470" y2="480" stroke="${t.accent1}" stroke-width="0.5" opacity="0.15"/>
     </g>
 
 
@@ -425,14 +365,11 @@ function generateSelfGeneratedPosterCard(
     <!-- FOOTER: ADSRAHU BRAND MARK + CTA                   -->
     <!-- ═══════════════════════════════════════════════════ -->
 
-    <!-- Bottom gradient fade -->
-    <rect x="0" y="580" width="1200" height="50" fill="url(#bg-grad)" opacity="0.5"/>
-
     <!-- Adsrahu Logo + Brand (bottom-left) -->
     <g transform="translate(90, 546)">
       ${ADSRAHU_LOGO_SVG}
-      <text x="52" y="28" fill="#ffffff" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="20" font-weight="900" letter-spacing="-0.3">Adsrahu</text>
-      <text x="52" y="44" fill="#64748b" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" letter-spacing="2.5">PERFORMANCE AGENCY</text>
+      <text x="52" y="28" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="900" letter-spacing="-0.3">Adsrahu</text>
+      <text x="52" y="44" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="800" letter-spacing="2.5">PERFORMANCE AGENCY</text>
     </g>
 
     <!-- Corner Logo Watermark (top-right) -->
@@ -442,18 +379,19 @@ function generateSelfGeneratedPosterCard(
 
     <!-- Read Article CTA (bottom-right) -->
     <g transform="translate(1000, 562)">
-      <rect x="0" y="0" width="150" height="38" rx="19" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-      <text x="22" y="24" fill="#cbd5e1" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="1.5">READ ARTICLE</text>
+      <rect x="0" y="0" width="150" height="38" rx="19" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <text x="22" y="24" fill="#cbd5e1" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" letter-spacing="1.5">READ ARTICLE</text>
       <path d="M 130 19 L 136 19 M 133 15 L 137 19 L 133 23" fill="none" stroke="${t.accent1}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
 
     <!-- Website URL -->
     <g transform="translate(600, 614)">
-      <text x="0" y="0" fill="#475569" font-family="'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" letter-spacing="1.5" text-anchor="middle">ADSRAHU.COM</text>
+      <text x="0" y="0" fill="#64748b" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" letter-spacing="2" text-anchor="middle">ADSRAHU.COM</text>
     </g>
   </svg>`;
 
-  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+  // Use utf-8 encoding which is 100% supported in Safari and all browsers without base64 decoding issues
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
 // ── AI Blog Content & Poster Generation Handler ─────────────────────────
@@ -489,7 +427,8 @@ CRITICAL INSTRUCTIONS:
    - Use 3-5 clearly defined ## headings.
    - Include bullet points, numbered lists, and bold text for readability.
 5. End with a strong Call-To-Action (CTA) encouraging the reader to implement these strategies or consult with Adsrahu.
-6. Design a sleek 16:9 social poster card for this blog. Choose the most relevant theme and icon, and extract exactly 3 distinct key takeaways from the blog post.`;
+6. Design a sleek 16:9 social poster card for this blog. Choose the most relevant theme and icon, and extract exactly 3 distinct key takeaways from the blog post.
+7. Also provide a detailed visual prompt for generating an AI photographic / 3D cover image artwork.`;
 
   const textResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent`,
@@ -523,6 +462,10 @@ CRITICAL INSTRUCTIONS:
               content: {
                 type: "STRING",
                 description: "The full blog body in Markdown format. Use \\n for newlines.",
+              },
+              visualPrompt: {
+                type: "STRING",
+                description: "Detailed 3D / photorealistic image generation prompt for Pollinations AI",
               },
               poster: {
                 type: "OBJECT",
@@ -597,7 +540,7 @@ CRITICAL INSTRUCTIONS:
     }
   }
 
-  // Generate ultra-premium infographic poster card
+  // Generate 100% Safari-compatible ultra-premium infographic poster card
   const posterSvgUrl = generateSelfGeneratedPosterCard(
     parsed.title,
     parsed.excerpt,
