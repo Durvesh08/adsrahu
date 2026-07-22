@@ -5,7 +5,7 @@ export const maxDuration = 60;
 export const config = { api: { bodyParser: { sizeLimit: "10mb" } } };
 
 const GEMINI_MODEL = "gemini-2.5-flash";
-const IMAGEN_MODEL = "imagen-3.0-generate-002";
+const GEMINI_IMAGE_MODEL = "gemini-2.0-flash-preview-image-generation";
 
 // ── Robust JSON parser (handles markdown fences, truncation, control chars) ──
 function safeJsonParse(raw: string): any {
@@ -33,42 +33,48 @@ function safeJsonParse(raw: string): any {
   throw new Error("Cannot parse AI response. Snippet: " + raw.substring(0, 120));
 }
 
-// ── Generate real AI image via Google Imagen API ──────────────────────────
-async function generateImageWithImagen(prompt: string): Promise<string | null> {
+
+// ── Generate real AI image via Gemini 2.0 Flash Image Generation ─────────
+async function generateImageWithGemini(prompt: string): Promise<string | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${IMAGEN_MODEL}:predict?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_IMAGE_MODEL}:generateContent`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
         body: JSON.stringify({
-          instances: [{ prompt }],
-          parameters: {
-            sampleCount: 1,
-            aspectRatio: "16:9",
-            safetyFilterLevel: "BLOCK_ONLY_HIGH",
-            personGeneration: "ALLOW_ADULT",
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseModalities: ["IMAGE", "TEXT"],
           },
         }),
       }
     );
 
     if (!res.ok) {
-      const err = await res.text();
-      console.error("Imagen API error:", res.status, err);
+      const errBody = await res.text();
+      console.error("Gemini Image API error:", res.status, errBody);
       return null;
     }
 
     const data = await res.json();
-    const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
-    if (!b64) return null;
+    const parts = data?.candidates?.[0]?.content?.parts ?? [];
+    const imgPart = parts.find((p: any) => p.inlineData?.mimeType?.startsWith("image/"));
 
-    return `data:image/png;base64,${b64}`;
+    if (!imgPart?.inlineData?.data) {
+      console.error("Gemini Image: no inlineData in response", JSON.stringify(data).substring(0, 300));
+      return null;
+    }
+
+    return `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
   } catch (e) {
-    console.error("Imagen generation error:", e);
+    console.error("Gemini Image generation exception:", e);
     return null;
   }
 }
@@ -150,15 +156,14 @@ Rules:
 
   const parsed = safeJsonParse(rawText);
 
-  // 2️⃣  Generate real AI image via Imagen
+  // 2️⃣  Generate real AI image via Gemini Image Generation
   const rawImagePrompt = parsed.imagePrompt || buildImagePrompt(parsed.title, category, topic);
   const richPrompt = `${rawImagePrompt}. Style: Ultra-premium dark cinematic, electric blue and gold neon glows, volumetric lighting, 3D geometric elements, photorealistic, no text, 16:9 wide format, 4K magazine-quality.`;
 
-  const imageUrl = await generateImageWithImagen(richPrompt);
+  const imageUrl = await generateImageWithGemini(richPrompt);
 
   if (!imageUrl) {
-    // If Imagen fails, return a premium SVG fallback (never a broken image)
-    console.warn("Imagen generation returned null – using SVG fallback.");
+    console.warn("Gemini Image generation returned null – skipping image.");
   }
 
   return {
@@ -167,7 +172,7 @@ Rules:
     category,
     excerpt: parsed.excerpt,
     content: parsed.content,
-    imageUrl: imageUrl || buildSvgFallback(parsed.title, category),
+    imageUrl: imageUrl || "",   // empty = UI shows placeholder, never broken ?
   };
 }
 
