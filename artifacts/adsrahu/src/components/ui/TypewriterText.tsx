@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const WORDS = ['Telegram Communities', 'Real Estate Brands', 'WhatsApp Groups', 'YouTube Channels', 'Digital Businesses'];
+const WORDS = ['SaaS Services', 'Real Estate Brands', 'Business Automations', 'YouTube Channels', 'Digital Businesses'];
 
 export function TypewriterText() {
   const [wordIdx, setWordIdx] = useState(0);
